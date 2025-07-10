@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Signup</title>
+    <link rel="stylesheet" href="../css/output.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+      integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <script
+      src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs"
+      type="module"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+    </style>
+  </head>
+  <body
+    class="bg-surface font-poppins flex h-full items-center justify-center p-6"
+  >
+    <main class="flex h-full w-full flex-col items-center justify-center gap-4">
+      <div
+        class="loading-screen flex max-w-40 flex-col items-center gap-4 transition-all duration-200"
+      >
+        <dotlottie-player
+          src="../assests/lotte-animations/Animation - 1751119543160.lottie"
+          background="transparent"
+          speed="1"
+          direction="1"
+          `
+          playMode="normal"
+          loop
+          autoplay
+          class="h-full w-full"
+        ></dotlottie-player>
+        <p class="text-text-primary text-lg font-semibold">Loading...</p>
+      </div>
+      <section
+        class="intro-section flex hidden h-full items-center justify-center transition-all duration-200"
+      >
+        <div
+          class="intro-1 border-surface-3 flex h-fit w-fit flex-col items-center justify-center gap-6 transition-all duration-200 lg:flex-row lg:gap-8 lg:rounded-3xl lg:border-4 lg:p-8"
+        >
+          <img
+            src="../assests/intro-images/1.png"
+            class="w-full max-w-[400px]"
+            alt=""
+          />
+          <div
+            class="wrapper flex flex-col items-center gap-6 lg:items-start lg:gap-4"
+          >
+            <p
+              class="text-text-primary w-full text-center text-2xl font-semibold md:max-w-80 lg:text-left"
+            >
+              Notes, PYQ's ,Daily updates and many more in One Place
+            </p>
+            <button class="button-hug cursor-pointer" id="intro-1-next-btn">
+              Next <i class="fa-solid fa-arrow-right font-thin"></i>
+            </button>
+          </div>
+        </div>
+        <div
+          class="intro-2 border-surface-3 flex hidden h-fit w-fit flex-col items-center justify-center gap-6 opacity-0 transition-all duration-200 lg:flex-row lg:gap-8 lg:rounded-3xl lg:border-4 lg:p-8"
+        >
+          <div class="wrapper absolute top-0 left-0 lg:hidden">
+            <i
+              class="fa-solid fa-arrow-left text-text-primary cursor-pointer p-6 text-2xl font-thin"
+              id="intro-2-prev-btn"
+            ></i>
+          </div>
+          <img
+            src="../assests/intro-images/2.png"
+            class="w-full max-w-[400px]"
+            alt=""
+          />
+          <div
+            class="wrapper flex flex-col items-center gap-6 lg:items-start lg:gap-4"
+          >
+            <p
+              class="text-text-primary w-full text-center text-2xl font-semibold md:max-w-80 lg:text-left"
+            >
+              Elevate Rank Through Weekly Tests, Mini Hackathons, and More
+            </p>
+            <button class="button-hug cursor-pointer" id="intro-2-next-btn">
+              Next <i class="fa-solid fa-arrow-right font-thin"></i>
+            </button>
+          </div>
+        </div>
+        <div
+          class="intro-3 border-surface-3 flex hidden h-fit w-fit flex-col items-center justify-center gap-6 opacity-0 transition-all duration-200 lg:flex-row lg:gap-8 lg:rounded-3xl lg:border-4 lg:p-8"
+        >
+          <div class="wrapper absolute top-0 left-0 lg:hidden">
+            <i
+              class="fa-solid fa-arrow-left text-text-primary cursor-pointer p-6 text-2xl font-thin"
+              id="intro-3-prev-btn"
+            ></i>
+          </div>
+
+          <img
+            src="../assests/intro-images/3.png"
+            class="w-full max-w-[400px]"
+            alt=""
+          />
+          <div
+            class="wrapper flex flex-col items-center gap-6 lg:items-start lg:gap-4"
+          >
+            <p
+              class="text-text-primary w-full text-center text-2xl font-semibold md:max-w-80 lg:text-left"
+            >
+              Customize Your Profile with over 500+ PFP’s
+            </p>
+            <button class="button-hug" id="intro-3-next-btn">
+              Next
+              <i class="fa-solid fa-arrow-right cursor-pointer font-thin"></i>
+            </button>
+          </div>
+        </div>
+        <div
+          class="intro-4 border-surface-3 flex hidden h-fit w-fit flex-col items-center justify-center gap-6 opacity-0 transition-all duration-200 lg:flex-row lg:gap-8 lg:rounded-3xl lg:border-4 lg:p-8"
+        >
+          <div class="wrapper absolute top-0 left-0 lg:hidden">
+            <i
+              class="fa-solid fa-arrow-left text-text-primary cursor-pointer p-6 text-2xl font-thin"
+              id="intro-4-prev-btn"
+            ></i>
+          </div>
+
+          <img
+            src="../assests/intro-images/4.png"
+            class="w-full max-w-[400px]"
+            alt=""
+          />
+          <div
+            class="wrapper flex flex-col items-center gap-6 lg:items-start lg:gap-4"
+          >
+            <p
+              class="text-text-primary w-full text-center text-3xl font-semibold md:max-w-80 lg:text-left"
+            >
+              Everything You Need,<br />
+              One Tap Away
+            </p>
+            <button class="button-hug" id="intro-4-next-btn">
+              Get Started
+              <i class="fa-solid fa-arrow-right cursor-pointer font-thin"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+      <section
+        id="student-details-section"
+        class="hidden transition-all duration-200"
+      >
+        <form
+          id="student-details-form"
+          class="bg-surface-2 flex w-full max-w-[360px] flex-col items-center gap-4 rounded-3xl p-6 lg:gap-5"
+        >
+          <p class="text-text-primary w-full text-start text-2xl font-semibold">
+            Create account
+          </p>
+          <div class="first-name-input-wrapper flex flex-col gap-1">
+            <label class="text-text-primary px-1 text-sm" for="first-name-input"
+              >First name</label
+            >
+
+            <input
+              type="text"
+              autocomplete="off"
+              id="first-name-input"
+              class="bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+            />
+            <p
+              id="first-name-related-error"
+              class="text-text-error px-1 text-sm"
+            ></p>
+          </div>
+          <div
+            class="last-name-input-wrapper flex flex-col gap-1 max-w-[250px] lg:max-w-[350px]"
+          >
+            <label class="text-text-primary px-1 text-sm" for="last-name-input"
+              >Last name</label
+            >
+            <input
+              type="text"
+              id="last-name-input"
+              autocomplete="off"
+              class="bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+            />
+            <p
+              id="last-name-related-error"
+              class="text-text-error px-1 text-sm"
+            ></p>
+          </div>
+          <div class="roll-no-input-wrapper flex flex-col gap-1">
+            <label class="text-text-primary px-1 text-sm" for="roll-no-input"
+              >Roll no</label
+            >
+            <input
+              type="number"
+              id="roll-no-input"
+              autocomplete="off"
+              class="bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+            />
+            <p
+              id="roll-no-related-error"
+              class="text-text-error px-1 text-sm"
+            ></p>
+          </div>
+
+          <button class="button-fill">Next</button>
+        </form>
+      </section>
+      <section
+        id="student-credential-section"
+        class="hidden transition-all duration-200"
+      >
+        <form
+          id="student-credential-form"
+          class="bg-surface-2 flex w-full max-w-[360px] flex-col items-center gap-4 rounded-3xl p-6 lg:gap-5"
+        >
+          <p class="text-text-primary w-full text-start text-2xl font-semibold">
+            Create account
+          </p>
+          <div class="email-input-wrapper flex flex-col gap-1">
+            <label class="text-text-primary px-1 text-sm" for="email-input"
+              >Email</label
+            >
+
+            <input
+              type="email"
+              autocomplete="off"
+              id="email-input"
+              class="bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+            />
+            <p
+              id="email-related-error"
+              class="text-text-error px-1 text-sm"
+            ></p>
+          </div>
+          <div class="password-input-wrapper flex flex-col gap-1">
+            <label class="text-text-primary px-1 text-sm" for="password-input"
+              >Password</label
+            >
+            <input
+              type="password"
+              autocomplete="off"
+              id="password-input"
+              class="bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+            />
+            <p
+              id="password-related-error"
+              class="text-text-error px-1 text-sm"
+            ></p>
+          </div>
+          <div class="re-enter-password-input-wrapper flex flex-col gap-1">
+            <label class="text-text-primary px-1 text-sm" for="re-enter-input"
+              >Re-enter Password</label
+            >
+            <input
+              type="password"
+              id="re-enter-password-input"
+              autocomplete="off"
+              class="bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+            />
+            <p
+              id="re-enter-password-related-error"
+              class="text-text-error px-1 text-sm"
+            ></p>
+          </div>
+          <div class="flex w-full gap-4">
+            <button
+              class="button-outline gap-2"
+              type="button"
+              id="student-credential-form-prev-button"
+            >
+              Back
+            </button>
+            <button
+              class="button-fill"
+              id="student-credential-form-next-button"
+            >
+              Next
+            </button>
+          </div>
+        </form>
+      </section>
+      <section
+        id="pfp-selection-section"
+        class="flex hidden min-h-0 w-full max-w-[600px] flex-col transition-all duration-200"
+      >
+        <form
+          action=""
+          id="pfp-selection-form"
+          class="bg-surface-2 flex min-h-0 flex-col gap-4 rounded-3xl p-6 lg:gap-5"
+        >
+          <div
+            class="wrapper flex w-full shrink-0 flex-col items-center gap-2 lg:gap-3"
+          >
+            <div class="selected-pfp-wrapper h-[70px] w-[70px]">
+              <div
+                id="selected-pfp"
+                class="image-wrapper h-full w-full transition-all duration-150"
+              >
+                <img
+                  class="h-full w-full"
+                  src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m51.png?updatedAt=1750952706527"
+                />
+              </div>
+            </div>
+            <p class="text-text-primary">Choose a profile photo</p>
+          </div>
+          <div
+            class="wrapper flex h-fit min-h-0 w-full flex-col gap-2 lg:gap-3"
+          >
+            <div class="gender-selection-wrapper flex w-full">
+              <div
+                class="text-text-primary bg-surface-3 w-full rounded-xl px-4 py-2 text-center transition-all duration-200"
+                id="male-toggle-button"
+              >
+                Male
+              </div>
+              <div
+                class="text-text-primary w-full rounded-xl px-4 py-2 text-center transition-all duration-200"
+                id="female-toggle-button"
+              >
+                Female
+              </div>
+            </div>
+            <div
+              class="pfp-container border-surface-3 scrollbar-hide text-text-primary flex h-full flex-col items-center gap-4 overflow-y-scroll rounded-3xl border-2 p-4 lg:gap-5 lg:p-5"
+            >
+              <div
+                class="male-pfp-container-wrapper flex w-full flex-col gap-3"
+              >
+                <div id="male-pfp-container" class="auto-grid w-full"></div>
+              </div>
+              <div
+                class="female-pfp-container-wrapper flex hidden w-full flex-col gap-3"
+              >
+                <div id="female-pfp-container" class="auto-grid w-full"></div>
+              </div>
+              <div
+                class="common-pfp-container-wrapper flex w-full flex-col gap-3"
+              >
+                <div id="common-pfp-container" class="auto-grid w-full"></div>
+              </div>
+            </div>
+          </div>
+          <div class="flex gap-4">
+            <button
+              class="button-outline"
+              id="pfp-selection-form-prev-button"
+              type="button"
+            >
+              Back
+            </button>
+            <button class="button-fill" id="pfp-selection-form-next-button">
+              Next
+            </button>
+          </div>
+        </form>
+      </section>
+      <section
+        id="summary-section"
+        class="flex hidden min-h-0 w-full max-w-[360px] flex-col gap-3 opacity-0 transition-all duration-200"
+      >
+        <form
+          id="summary-form"
+          class="bg-surface-2 text-text-primary flex w-full max-w-[360px] flex-col items-center gap-4 rounded-3xl p-6"
+        >
+          <div class="final-pfp-name-wrapper flex w-full items-center gap-4">
+            <img src="" alt="" id="final-pfp" class="w-[60px]" />
+            <p id="final-name" class="text-xl font-medium"></p>
+          </div>
+          <div class="wrapper flex w-full flex-col gap-3">
+            <div class="wrapper flex gap-2">
+              <p>Roll No :</p>
+              <p id="final-roll-no"></p>
+            </div>
+            <p class="wrapper text-wrap break-all">
+              Email : <span id="final-email" class="break-all"></span>
+            </p>
+
+            <div class="wrapper flex gap-2">
+              <p>Semester :</p>
+              <p id="final-sem"></p>
+            </div>
+            <div class="wrapper flex gap-2">
+              <p>Div :</p>
+              <p id="final-div"></p>
+            </div>
+          </div>
+
+          <div class="flex w-full gap-4">
+            <button
+              class="button-outline"
+              type="button"
+              id="summary-form-prev-button"
+            >
+              Back
+            </button>
+            <button class="button-fill" id="summary-form-next-button">
+              Create
+            </button>
+          </div>
+        </form>
+        <div class="wrapper flex w-full justify-center gap-1 text-sm">
+          <p class="text-text-tertiary">Wrong sem or div ?</p>
+          <a href="" class="text-text-link">Report here</a>
+        </div>
+      </section>
+    </main>
+
+    <!-- <script src="../scripts/createAccount.js" type="module"></script> -->
+    <script src="../scripts/signup.js" type="module"></script>
+  </body>
+</html>

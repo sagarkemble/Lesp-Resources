@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <link rel="stylesheet" href="src/style.css" />
+    <script
+      src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs"
+      type="module"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.css"
+      integrity="sha512-kJlvECunwXftkPwyvHbclArO8wszgBGisiLeuDFwNM8ws+wKIw0sv1os3ClWZOcrEB2eRXULYUsm8OVRGJKwGA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+      integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+    </style>
+  </head>
+  <body class="text-text-primary bg-surface flex h-full w-full">
+    <!-- navigation -->
+    <div
+      class="navigation-wrapper transition-all duration-150 fixed hidden opacity-0 absolute bottom-0 left-0 mb-7 flex w-full justify-center lg:relative lg:mb-0 lg:w-fit"
+    >
+      <div
+        class="wrapper border-surface-3 relative flex flex-col gap-1 rounded-full border-2 bg-[#0B0D0E] px-6 pt-4 pb-3.5 shadow-[0_2px_10px_rgba(14,165,233,0.2)] lg:rounded-none lg:border-0 lg:border-r-2 lg:px-[10px] lg:py-0 lg:py-3 lg:shadow-none"
+      >
+        <div
+          class="navigation flex w-fit translate-x-0 transform items-baseline gap-7 lg:z-30 lg:flex-col lg:items-center"
+        >
+          <img
+            src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m51.png?updatedAt=1750952706527"
+            alt=""
+            class="h=[50px] user-pfp hidden w-[50px] lg:inline-block"
+          />
+          <span class="icon-wrapper home-icon h-[22px] lg:h-[30px]">
+            <svg
+              class="activeIcon h-full w-full"
+              width="19"
+              height="21"
+              viewBox="0 0 19 21"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+            >
+              <mask
+                id="mask0_435_16964"
+                style="mask-type: alpha"
+                maskUnits="userSpaceOnUse"
+                x="0"
+                y="1"
+                width="19"
+                height="21"
+              >
+                <rect
+                  y="0.5"
+                  width="19"
+                  height="20"
+                  fill="url(#pattern0_435_16964)"
+                />
+              </mask>
+              <g mask="url(#mask0_435_16964)">
+                <rect
+                  x="-2.23535"
+                  y="-5.05556"
+                  width="31.2941"
+                  height="30"
+                  fill="#8D9DA6"
+                />
+              </g>
+              <defs>
+                <pattern
+                  id="pattern0_435_16964"
+                  patternContentUnits="objectBoundingBox"
+                  width="1"
+                  height="1"
+                >
+                  <use
+                    xlink:href="#image0_435_16964"
+                    transform="matrix(0.0123529 0 0 0.0116667 -0.117647 -0.0555556)"
+                  />
+                </pattern>
+                <image
+                  id="image0_435_16964"
+                  width="100"
+                  height="100"
+                  preserveAspectRatio="none"
+                  xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAAAsTAAALEwEAmpwYAAAEfUlEQVR4nO2dW6gVVRjHV1neisKMjAgJIgxNCCNQswjfgqIkKimIILv6EL0olMJ5tIeoB0O7kFBR0EPRQxKnixBpN4kijCCSMulywqyw26njLxZnvRzPntnf7L1m1pxZ/x/M296z/uv7z6xvZq1vZpwTQgghhBBCCFEJ4EpgB/AEcEW1f4toALOAbcBxpvIkcKpC3SDA2cCbFPMucK5MacaMFcA39OcwsFKm1GvG7cCf2PkbeECmxDdiDvAUg/McME/GxDHjfOADhucT4AKZMpwZa4ExQ7D3h60ffl9rZUp1I07yYz8wbgjy88D8MKw9bfj9f8CIb0PG2Mw4HXh50IRdIfG/BpwpU8rNuAj43HhJu6pkP5cZL42/BJbKlN5BvBY4agii6aYv3Dy+Zdjf78CNMmVqvtgMTBiCV2laBDglTK/043j43aysjQHOAt4wBOwv4I4h2lkPHDO0swc4x+UIcCnwtSFIXwHLI7R3MfCFob1DwOUuJ4DbgD8MwXkdWBCx3TOAV4xn5J2u6wwwpp/cgpw123UR4DxgryEIvwE3NKDnGuAXg56PgcWuS/iVPOB7Q+c/Ay5sUNfiEPB8plyAu4F/DJ1+ETgtgb65wC6Dvn/9UOdmKqGjz86UjjJ54Iy39cDJcigA1hiH1k+bHFpjJMsjMzVZ0rKLj4Hp0uUkLbg8H4qwHvFq3VMgTeO1Bs398H2f79qAX1MAPjSI9tPhK1x3q1ze9zMBqcXOBt4xiB0FFroZCrAw9KEfbycdioFHc5nWxp4jH0klcHWPMs4TF37WuY4BrAt9K2IiSYEesK9ElL+WX+Y6CrAM+KGk/++luIEq4kdgies4wBLgp5I4rG5SjK8ELCKb9WngppI47GryMYCfC0SMusyguAp/rJEbRuCSkqPiZpcZwC0l8ai/xCgUDPRiPMeCZiZnKcaTHaDAgwWNH3SZQvGdfP2PQgBbCxrf6zKF4tnhrU007guVe7HHZQqT9Vy9GGmicRlyAjKkZciQliFDWoYMaRkypGXIkJYhQ1qGDGkZMqRlZGcIMC/MMj8D7A5rEJZtd/iPnyKfW6O+fAwBrge+Y3i+Ba6rSWMehgD3G0tTrfh93VuDzu4bAlwVXoMRG//4w5rIWrMwZD/18VFkrd02BFhO/URb787BkLtKcsCOUJ5q2XaW5KANEfV23pAtBW3sG2Bfviq9F1si6u28ISOx2mgiWDKkAjIkAugMSRMsGRIBGTId5ZAKKIdEAOWQNMGSIRGQIdNRDqmAckgEUA5JEywZEgEZMh3lkAooh0QA5ZA0wZIhEZAh01EOqYBySARQDokSrLHwZZwY24EGzpADEfWOpVxTf5h0jA6g1/ImuLp4qB4Xpnbw1oQd3DmAXv8G1FSsr8eFqR1cEN5Zm4KrB/z0Xgp+beyjY8A9CTr4whB6X0qgN1ohnrWTG42fERqWiVCBOCfCp1vL3hEZCx+T++JG297RRb68H3g8jNUxt+3Apsg1uEvDPrfXoPexMHIsiqVXCCGEEEIIIYQQLjH/A6e3NgeR1nTHAAAAAElFTkSuQmCC"
+                />
+              </defs>
+            </svg>
+          </span>
+          <span class="icon-wrapper subject-icon h-[22px] lg:h-[30px]">
+            <svg
+              class="h-full w-full"
+              width="17"
+              height="20"
+              viewBox="0 0 17 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+            >
+              <mask
+                id="mask0_635_5826"
+                style="mask-type: alpha"
+                maskUnits="userSpaceOnUse"
+                x="0"
+                y="0"
+                width="17"
+                height="20"
+              >
+                <rect
+                  width="16.5"
+                  height="19.5"
+                  fill="url(#pattern0_635_5826)"
+                />
+              </mask>
+              <g mask="url(#mask0_635_5826)">
+                <rect x="-15" y="-11" width="45" height="44" fill="#8D9DA6" />
+              </g>
+              <defs>
+                <pattern
+                  id="pattern0_635_5826"
+                  patternContentUnits="objectBoundingBox"
+                  width="1"
+                  height="1"
+                >
+                  <use
+                    xlink:href="#image0_635_5826"
+                    transform="scale(0.030303 0.025641)"
+                  />
+                </pattern>
+                <image
+                  id="image0_635_5826"
+                  width="33"
+                  height="39"
+                  preserveAspectRatio="none"
+                  xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACEAAAAnCAYAAACBvSFyAAAACXBIWXMAABYlAAAWJQFJUiTwAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAH/SURBVHgB7Zg/UuMwFId/T/GwlBzBN9jsDXKD3Zo08S6zddil2WqTFgYSWhhIKCBtbsBwAuAE+AgeKsxk9HiSo/wBHCCJHQp/RWxZseaz9STrifCM3aPzMpHaQI6QO9k/uahL4T8DuQoIoZcInDeQCKwEanV6vtZ8NyxHALeJSjeAjpAtbWaUYd7EYABfqeSqXKzvbFXPkAMHpz3zwPZcTVaITIgV4M2qbHU6G1qv/8CCMHO0s7XZx0cljADzl2tpwseCENng7/79VQ1eq1dpNw4G62WJER9Lg2ppNTO7Y3Q7qzqUvsEcmGCXw8wufZeEEfjzc/MKc7B/0qu5UbCYBNCQxkLMARFX+I1ZMFXCYx3p4awujVTeepo0JgTCtP+kBub276rEADewHCJm3UirnNkdMqSacmgiYxQ+AYWEo5BwFBKOQsJRSDgKCceLr+jeca+iFH+X5UjG6eB4AT0tweiKgO8KmSpMNK+mHZa5un4/ry1q+vcqDppBkEku2pKtB12i66TENhd5JsGpCcqy0CWbBFuIqGuOU92hqdRH5tDXsUR8+0KCtM5hg2Q86raHXa4872GUWUlWXkPm8CjWTL5rtczPwenFZZJb2EtdrZHZHkUyB9nU0NBWj3RoAzOmOFizGbjZr+JaPm/EUtdriGxM/AuC8FHF3+S9hFgBT2+nqLYCXuyyAAAAAElFTkSuQmCC"
+                />
+              </defs>
+            </svg>
+          </span>
+          <span class="icon-wrapper timetabel-icon h-5 lg:h-[30px]">
+            <svg
+              class="h-full w-full"
+              width="21"
+              height="21"
+              viewBox="0 0 21 21"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+            >
+              <mask
+                id="mask0_631_1415"
+                style="mask-type: alpha"
+                maskUnits="userSpaceOnUse"
+                x="0"
+                y="0"
+                width="21"
+                height="21"
+              >
+                <rect
+                  x="0.230957"
+                  y="0"
+                  width="20"
+                  height="20"
+                  fill="url(#pattern0_631_1415)"
+                />
+              </mask>
+              <g mask="url(#mask0_631_1415)">
+                <rect
+                  x="-6.43555"
+                  y="-9.5"
+                  width="28.8"
+                  height="30.4"
+                  fill="#8D9DA6"
+                />
+              </g>
+              <defs>
+                <pattern
+                  id="pattern0_631_1415"
+                  patternContentUnits="objectBoundingBox"
+                  width="1"
+                  height="1"
+                >
+                  <use
+                    xlink:href="#image0_631_1415"
+                    transform="scale(0.00195312)"
+                  />
+                </pattern>
+                <image
+                  id="image0_631_1415"
+                  width="512"
+                  height="512"
+                  preserveAspectRatio="none"
+                  xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAYAAAD0eNT6AAAQAElEQVR4AezdCby2az0v8NXRQKOUQrVJGsWRhKOPBqFU0iCVNEk5nAiVEp0GEqmUOGUMGeITJWmgCSFkKBxD2mmiaKKi6dT5/fdu7/3ud7/D/TzPPVz3fX3fz/Vf97PWep77+v+/11r383+f4V7/7ci/LQpcKUXdM/HTiVck3pp4b+LDiXckXpN4buIRiRsnLpwwCBDoR6B+52+Sch+ZqGNBHRPq2FDHiDpW1DHjj/K9n0rcI/EpCWNjAhqA7SxoreXtUs7vJN6QeFri6xNfkLhC4uKJCyUum/iMxK0SD0+8LPHGxA8lrpwwCBDYrsBVUtrjEm9KvDTxvxN1LKhjQh0b6hhRx4o6ZnxhvnfvxM8m6hjx29neNlHXycZYt8DRUd1prL0G+R8d3SwIr078euJLE7uu6yflNg9M/GPiiYnLJAwCBLYj8PEp5cmJ+h1/QLZXTOwy6pjyZbnBsxKvStw0YaxcoBZ15SV0nf4lUv3PJF6U+MzEoeNi2cH9E3+bqEYiG4MAgZUL3Dz51+/0/bK9aOLQ8VnZwYsT9fRAPVqQi8baBCpfDUAprDM+NWn/SeJeibHHJ2eHL0w8JGEQILBege9J6s9L1KN82Yw2LpQ91dMDf5ztGQljhQIagBUuWlK+ZuIPEtdJTDXqZ+Mx2fkTEgYBAusTqKfzvjdp1+9yNpOM62avdSy6RrbGagTOTnTKH4yzZ/BxbIF6oV69GKde6T/2vk+0v2/PF+vFgtkYBAisROBRybOezstm8lHHpHrE0DsFJqcedwINwLieU+/tIpngVxNzP+RWDUC9wyBTGwQINC7w1cnvYYk5x6dlsnqB4BivMciujCkFztm3BuAciXVs6z27/2OBVOv5vjqnQL02YIHpTUmAwECBemSwXpw38OqjXu3zs7e5G49MaewroAHYV27+29Wr/OutevPPfPaM9R7hx5990UcCBBoV+OHkteTbeL8z818rYTQrcF5iGoDzLFq/9OgkWE8BZLPYuEtmvn7CIECgPYHPTUr18H82i416CqBef7BYAiYeLqABGG615DWvnclvk2hhPLiFJORAgMAFBB6ar9TTddksOu6Q2T0KEIQWx7E5aQCO1Wj3cr3ftoVf7BKqU4Fevi4IAgSaEahT97byn4S6X6m/RdIMjkROLFALdeLv+GpLAndqKJl6GuL2DeUjFQIEjo7qf931u9mKxZ1bSUQexwqc/7IG4PweLX5WD6XV+2xbyq3+9kBL+ciFQO8CrZ26u85UWn9gqPd1abp+DUDTy3NWcvXX/M660NCHJd6K2FD5UiHQnIDjRHNL0l5Cx2ekAThepL3P6xGA1rKqRyQu2VpS8iHQqcClUneLZ+GrU5YnNaNVAQ1AqytzXl51Yo/zPmvjUr0g0UmB2lgLWRCoO//6nWxNosVjV2tGM+Zzwak0ABc0ae0rrf5P+9KtQcmHQKcCjhGdLvyhZWsADhWc/vYtvbL32GrrhB/Hfu4yAQLLCLT6u9hqXsus0sKznmh6DcCJVHyNAAECBAhsXEADsPEFVh4BAgQI9C5w4vo1ACd28VUCBAgQILBpAQ3AppdXcQQIECDQu8DJ6tcAnEzG1wkQIECAwIYFNAAbXlylESBAgEDvAievXwNwchvfIUCAAAECmxXQAGx2aRVGgAABAr0LnKp+DcCpdHyPAAECBAhsVEADsNGFVRYBAgQI9C5w6vo1AKf28V0CBAgQILBJAQ3AJpdVUQQIECDQu8Dp6tcAnE7I9wkQIECAwAYFNAAbXFQlESBAgEDvAqevXwNweiPXIECAAAECmxPQAGxuSRVEgAABAr0LDKlfAzBEyXUIECBAgMDGBDQAuy3oRXL1y84cNWembG5cKhnNbWG+oyMGDI7/Gajfxfw6Njfq2HV8rlN/XnM2BzF/QsNm1ACc7fRx2Vw/cdfEdyd+KvGCxF8k3pB4b+IjiQ8k3jFz3DzztThemKTmtjDf0REDBsf/DNTvYn4dmxt17Do+16k/r2N0HavrmF3H7jqG17H8J6NTx/Y6xtex/mPzefejxwbgwln1z018S+KXEn+XeHfilYlfSHxf4t6J+uH9nGyvkrh4wiBAgACBdQjUMbuO3XUMr2P5NyTtOrbXMb6O9e/J53+bqPuA+2V7vcTHJDYxhhbRSwNwRkDum3hWojrQP8v2RxJ3SVwz0d3Cp2aDAAECvQrUMf9aKb7uA56c7Z8n6r7h17O9T6Kah2y2PbbcANQC3j/L9/LEPyV+PHHbRKvPlyU1gwABAgQWErh05r1d4icS9fTB32T7iMTVEisaw1PdWgNwsZReHd1Lsn194omJGyYulDAIECBAgMBQgevkig9PvCbx4sSdE3Ufk802xlYagCtlOX4g8eZEPadz02zd6QfBIECAAIGDBOq+5Euyh19OvCnxmMSnJJocuyS19gagOrSfS8FnJh6cuFzCIECAAAECUwhcPjt9SOJ1iacl6nUE2axzrLUB+LRw13P6r8727omLJgwCBAgQIDCHQN3n3DMT1esEfjXbqycaGLulsLYGoLqvH0uJ9ZxMvaq/XsmZTw0CBAgQIDC7QN2H3jGzViNQ7yb4hFxezajk15BsvXe/XtH/D0n2mxP1eTYGAQIECBBYXKDOQFjnE6j/nNY5Zhb5z+muCmtoAD47Rf1hol7RX6eRzEWDAAECBAg0J1CPANQ5ZupkQ3XGweYSPDahlhuAeo7l0Um2Ttpzg2wNAgQIECCwBoE6A+EfJdFHJerRgWymHrvvv9UGoM7OV//rf2hK8nB/EAwCBAgQWJVA3fE/LBnXfdk1sm1utNgA3CtKdVrG5h8+SZ4GAQIECBA4lcDn5Zv1SPbdsp1s7LPjlhqAOsPSk1LEzyTqDzlkYxAgQIAAgdULXDIV/Hyi3r5eT2/n4vKjlQbgk0LxssS3JgwCBAgQILBFgXr7+ktT2BUSI479dtVCA/CZSb1eLPGF2RoECBAgQGDLAl+U4l6RuHZi0bF0A3CTVF9/ra/O7JeLBgECBAgQ2LzAVVPhHyS+OHHw2HcHSzYAt0jSz0t8fMIgQIAAAQI9CdR5bV6Qgm+eWGQs1QDcNtU+O/FxCYMAAQIECPQoUC94/40UfpvEnmP/my3RAHx50n1Gol71n41BgAABAgS6Faj7wmem+lsnZh1zNwA3S3XV7VTBuWgQIECAAIHuBeqkQfVXBW+6q8Qh15+zAaiTIdSd/8cekrDbEiBAgACBDQrUU+LPSV2fm5hlzNUAXCnV1HP+l8jWIECAAAECBC4oUCcMem6+fEZiwDjsKnM0AJdOii9MVBOQjUGAAAECBAicROCT8/VqAi6V7aRj6gbgQsm+Tu1bJ/vJRYMAAQIECBA4jcBn5ftPT9R9aDYnHod+deoGoP6a3x0OTdLtCRAgQIBAZwJflXoflJhsTNkA3DhZPzJhECBAgAABArsLfH9ucpKzBeY7B46pGoA6u9/PJbePSRgECBAgQIDA7gJ1H/qLuVmdNTCbccdUDcBTk+anJgwCBAgQIEBgf4Gr5KY/mjjfGOOTKRqAr05id0oYBAgQIECAwOECX5td3C4x6hi7AbhMsntiwiBAgAABAgTGE/ix7KqeXj86OsqlEcbYDcDjk5P3+wfBIECAAAECIwrU+QEeM+L+jsZsAOr0hfcaMzn7IkCAAAECBM4VuG8ufV5ilDFWA1AnK6iH/sfa3yjF2QkBAgQIENiQQN3H1n1t3eceXFbt7OCdZAd3TEz2XsXs2yBAgAABAgSOjm4YhNsnDh5jNAD1PsVHHJyJHRAgQIAAAQJDBB6VKx18/33wDpLEXRPXTvQw3pUi35w4c8b4z8zV4vjnJDWng7mOjhgwONHPQP0u5texuVHHrhPlO9XX6thcx+jmIMZM6KP7uk62d0kcNA5tAOp//w87KIM2b/y2pPVriW9P3CLx6Ymqtc7GdOVcvtqM8ZLM1eKo8z3M6WCuoyMGDE70M1C/iy0eI+rYdaJ8p/paHZsvG4g6Vtcxu47d35HPfz3x9sTWRt33HnQfftCNo1l/rOAzst3CeEuKeELi8xJXTNQvVb3Yov6U8evy+YcTBgECBAi0LVDH6jpm17H7h5Nq/UG6K2R7g0Qd09+a7UrH+dK+Zj67TWLvcWgD8IC9Z27nhn+aVOoFFXW6xarnz/J5/QBlYxAgQIDABgTqmP7K1FGP6tYjBfUfvDrW50urHg88JPtDGoAvyMRflFjreHUSr4eIPj/bZyU+lDAIECBAYNsCdayvp3jr0d5bptS/TqxinCDJekdAPbJxgm+d/kuHNAB1QoLTz9DeNd6blB6ZKLR6iCgXDQIECBDoUOD5qfl6iW9LvDuxxnGffZPetwG4VCas9/5ns6pRD/n892Rcb1v8QLYGAQIECPQtUI8IPCkEn5X440Sj46Rp1bsB6j75pFc42Tf2bQD2nvBkiczw9SdnjnrK4rXZGgQIECBA4FiB1+eTGyeemljTuGSS/ZrEzuOQBmDnyRa6wUcy74MT35rwv/4gGAQIECBwQoH356vflKinBOq+IxfbGKfJ4s6n+f4Jv71PA/BJ2dNaTvtbr/y8Z/J9bMIgQIAAAQJDBOopgXvninUfkk3z4ybJsN7qmM3wsU8DUO+prBMtDJ9luWveL1P/fMIgQIAAAQK7CDwtV65HArJZepx2/gvnGvV29myGj30agFsP3/2i16xX+j9l0QxMToAAAQJrFqjXjn3/SgrY+b551wbg4wJxo0Tr43lJsBqAbAwCBAgQILC3QJ1yd9G3jA/MvJ4G+NiB1z3rars2ADXBxc+6Zbsf3pDU7p5Y0ws4kq5BgAABAg0K1OsA7pa86o8NZdPsuEQy2+k/6Ps0AJmj6fENyW6Lf/ghZRkECBAgsIDAv2XOvU+4k9seMHa6af0nffANdm0A6rSDg3e+wBWfkTl/J2EQIECAAIExBeqsgfWXBcfc59j72uk+epcG4GLJ9PqJVsd/JrH6Yz7ZGAQIECBAYHSBelfA+0bf6yl2uOO36hT3Fx16m10agDpN4k4vMBiaxEjX+8ns558TBgECBAgQmELgjdnpTydaHfVC/bqvHpTfLg3A5wza4zJX+mCmfULCIECAAAECUwr8YHY+01llM9Pu47OH3mSXBmBwVzF08hGv9yvZV736PxuDAAECBAhMJlCPArT8WoDB99W7NADXnYzz8B1v+Wx/rT7fVK+5OHzl7IEAgUMF/uvQHUx0+1bzGqPcWe5z9kx08H31Lg3AVfdMZuqb1XszXzL1JAvu/90Lzn2qqf/jVN/0PQIEZhNwjJiN+tyJ6t1mbzn3s7YufPrQdIY2AHWe4asM3enM13tu5vt/ia2Of2qwsA8lpzclDAIElheoh6Trd3L5TM6fwevO/+mmPivvelvghEXtveszcstBf69naANw5eywmoBsmhsvbS6jcRP623F3N8re/jF7qRdeZmMQILCwQL0g7cyFczjR9C0eu06U575fE4jjlwAAEABJREFUe/G+N5z4dhfJ/q+UOO0Y2gDUnwA+7c4WusLLFpp3rmlfnolaO63x7ycngwCBdgTqONFONkdHdcxqLaexfSb9z+eByQ66zx7aAFzuwGSmuvm/ZMdvTWx5VI1/1ViBa/jDGI2RSYfApAK/Pened9/5X+Qm/5rY8qjzzrRa46D77KENwCc2uop/32heY6f1i2Pv8ID9/XtuW39tMRuDAIFGBJ6TPN6VaGX8UiuJTJzHP0yz/4P3evkhexjaAFxmyM4WuE6r+GNT/Fx22Mpbap7WUC5JxSBAIAJ1fHh6ti2Meotwy2+TG9Oo1f+EfvyQIoc2APV3AIbsb+7rvG3uCRear57mqFMdLzT9udPWOQked+5nLhAg0JLADyWZekFgNouOp2b2+ut52Wx+TFLnCGqDTtu/9gag1fe/jrB+F9jFo/KVpRuexyaHOu9CNgYBAo0J1NsBH79wTm/P/I9J9DLe02ihg/4g0NAGoN5W0GKdreJPYVW/WEv+tcN6S88PTFGYfRIgMJrA92VPSz4sff/Mv/R/VJLCbGOCE6KNkvugR+2HNgBDrzdK5jvspE7GsMPVV3/Vel6tYu5C6jm9O2XSep4xG4MAgUYFlvxd/ZmYtPSC5aQz+Wj1PmjQffagK01OaIJdBO6TK9dpKLOZZdRZFu+WmVp7K2JSMggQOIHAq/K1atjnvHOq87F8c+Y1DhSY8+YagDm1x5mrXuTz1dnV7yamHjXX12WSlv/yVdIzCBA4TuA38/k9EnOcsbPu/L8qc70/YaxIQAOwosU6JtV63ukW+XzK99rWq1tvmTmekTAIEFifQB0fbpW06/VD2Uwy6q2HdSyqY9IkE/S103mr1QDM6z3mbPWWvLtmh/WUwNgnAKmzil0v+271XNdJzSBAYIBAPV1Yv8svGnDdXa7yzlz56xN3T/iffxDWODQAa1y18+f8U/n0WomfSNRD9tnsPeqV/nfMrW+e8Ha/IBgENiBQbw/8stRx58Sh7xCoO/unZD91zKmTguWiMZbA3PvRAMwtPs18daKgb8yur5Z4ZOK1iaGjfqGfnSvfNnHdxDMTBgEC2xP4lZR0ncTtE3Xq4F3+w/Ca3OYRiTrG1Iv9Wj0HflI0hgpoAIZKreN6b0qa9Uv6GdlePXHvRJ0YpF7EVw8B1l/xe36+9rOJ70rU//Q/IdvbJX4j8eGEQYDAdgXqd/xZKa9etHfZbOv5+4dmW6cbf0G2dYyoY8Wv5XKd9bMe5q/jyTXyef3nwiODgZhmzL9XDcD85nPN+I+ZqN6X+8Bs75CohwBvlG29sO9e2dZJfeq5/nrfcD41CBDoTKB+9+sve9aZ++6Z2r8iUceIOlbUO40elM/rYf5dHlHMTYy1CGgA1rJS8iRAgACBzQosUZgGYAl1cxIgQIAAgYUFNAALL4DpCRAgQKB3gWXq1wAs425WAgQIECCwqIAGYFF+kxMgQIBA7wJL1a8BWErevAQIECBAYEEBDcCC+KYmQIAAgd4FlqtfA7CcvZkJECBAgMBiAhqAxehNTIAAAQK9CyxZvwZgSX1zEyBAgACBhQQ0AAvBm5YAAQIEehdYtn4NwLL+ZidAgAABAosIaAAWYTcpAQIECPQusHT9GoClV8D8BAgQIEBgAQENwALopiRAgACB3gWWr18DsPwayIAAAQIECMwuoAGYndyEBAgQINC7QAv1awBaWAU5ECBAgACBmQU0ADODm44AAQIEehdoo34NQBvrIAsCBAgQIDCrgAZgVm6TESBAgEDvAq3UrwFoZSXkQYAAAQIEZhTQAMyIbSoCBAgQ6F2gnfo1AO2shUwIECBAgMBsAhqA2ahNRIAAAQK9C7RUvwagpdWQCwECBAgQmElAAzATtGkIECBAoHeBturXALS1HrIhQIAAAQKzCGgAZmE2CQECBAj0LtBa/RqA1lZEPgQIECBAYAYBDcAMyKYgQIAAgd4F2qtfA9DemsiIAAECBAhMLqABmJzYBAQIECDQu0CL9WsAWlwVOREgQIAAgYkFNAATA9s9AQIECPQu0Gb9GoA210VWBAgQIEBgUgENwKS8dk6AAAECvQu0Wr8GoNWVkRcBAgQIEJhQQAMwIa5dEyBAgEDvAu3WrwFod21kRoAAAQIEJhPQAExGa8cECBAg0LtAy/VrAFpeHbkRIECAAIGJBDQAE8HaLQECBAj0LtB2/RqAttdHdgQIECBAYBIBDcAkrHZKgAABAr0LtF6/BqD1FZIfAQIECBCYQGDtDcB3xeSV4ojBEQO/B34G/AzM/jPwkJifZLT/5bU3AGeE+PriiMERA78Hfgb8DMz+M1D3QWFf51h7A7BOdVkTIECAwKYF1lCcBmANqyRHAgQIECAwsoAGYGRQuyNAgACB3gXWUb8GYB3rJEsCBAgQIDCqgAZgVE47I0CAAIHeBdZSvwZgLSslTwIECBAgMKKABmBETLsiQIAAgd4F1lO/BmA9ayVTAgQIECAwmoAGYDRKOyJAgACB3gXWVL8GYE2rJVcCBAgQIDCSgAZgJEi7IUCAAIHeBdZVvwZgXeslWwIECBAgMIqABmAURjshQIAAgd4F1la/BmBtKyZfAgQIECAwgoAGYAREuyBAgACB3gXWV78GYH1rJmMCBAgQIHCwgAbgYEI7IECAAIHeBdZYvwZgjasmZwIECBAgcKCABuBAQDcnQIAAgd4F1lm/BmCd6yZrAgQIECBwkIAG4CA+NyZAgACB3gXWWr8GYK0rJ28CBAgQIHCAgAbgADw3JUCAAIHeBdZbvwZgvWsncwIECBAgsLeABmBvOjckQIAAgd4F1ly/BmDNqyd3AgQIECCwp4AGYE84NyNAgACB3gXWXb8GYN3rJ3sCBAgQILCXgAZgLzY3IkCAAIHeBdZevwZg7SsofwIECBAgsIeABmAPNDchQIAAgd4F1l+/BmD9a6gCAgQIECCws4AGYGcyNyBAgACB3gW2UL8GYAurqAYCBAgQILCjgAZgRzBXJ0CAAIHeBbZRvwZgG+uoCgIECBAgsJPA2huAh6Xaq4kjBkcM/B74GfAzMM/PwDHOdR+UT9c51t4AvC3sZ4ojBkcM/B74GfAzMPvPQN0HhX2dY+0NwDrVZU2AAAECKxXYTtoagO2spUoIECBAgMBgAQ3AYCpXJECAAIHeBbZUvwZgS6upFgIECBAgMFBAAzAQytUIECBAoHeBbdWvAdjWeqqGAAECBAgMEtAADGJyJQIECBDoXWBr9WsAtrai6iFAgAABAgMENAADkFyFAAECBHoX2F79GoDtramKCBAgQIDAaQU0AKclcgUCBAgQ6F1gi/VrALa4qmoiQIAAAQKnEdAAnAbItwkQIECgd4Ft1q8B2Oa6qooAAQIECJxSQANwSh7fJECAAIHeBbZavwZgqyurLgIECBAgcAoBDcApcHyLAAECBHoX2G79GoDtrq3KCBAgQIDASQU0ACel8Q0CBAgQ6F1gy/VrALa8umojQIAAAQInEdAAnATGlwkQIECgd4Ft168B2Pb6qo4AAQIECJxQQANwQhZfJECAAIHeBbZevwZg6yusPgIECBAgcAIBDcAJUHyJAAECBHoX2H79GoDtr7EKCRAgQIDABQQ0ABcg8QUCBAgQ6F2gh/o1AD2sshoJECBAgMBxAhqA40B8SoAAAQK9C/RRvwagj3VWJQECBAgQOJ+ABuB8HD4hQIAAgd4FeqlfA9DLSquTAAECBAgcI6ABOAbDRQIECBDoXaCf+jUA/ay1SgkQIECAwLkCGoBzKVwgQIAAgd4FeqpfA9DTaquVAAECBAh8VEAD8FEIGwIECBDoXaCv+jUAfa23agkQIECAwFkCGoCzGHwgQIAAgd4FeqtfA9DbiquXAAECBAhEQAMQBIMAAQIEehfor34NQH9rrmICBAgQIHCkAfBDQIAAAQLdC/QIoAHocdXVTIAAAQLdC2gAuv8RAECAAIHeBfqsXwPQ57qrmgABAgQ6F9AAdP4DoHwCBAj0LtBr/RqAXlde3QQIECDQtYAGoOvlVzwBAgR6F+i3fg1Av2uvcgIECBDoWEAD0PHiK50AAQK9C/Rcvwag59VXOwECBAh0K6AB6HbpFU6AAIHeBfquXwPQ9/qrngABAgQ6FdAAdLrwyiZAgEDvAr3XrwHo/SdA/QQIECDQpYAGoMtlVzQBAgR6F1C/BsDPAAECBAgQ6FBAA9DhoiuZAAECvQuo/+hIA+CngAABAgQIdCigAehw0ZVMgACBvgVUXwIagFIQBAgQIECgMwENQGcLrlwCBAj0LqD+swU0AGc7+EiAAAECBLoS0AB0tdyKJUCAQO8C6j9HQANwjoQtAQIECBDoSEAD0NFiK5UAAQK9C6j/PAENwHkWLhEgQIAAgW4ENADdLLVCCRAg0LuA+o8V0AAcq+EyAQIECBDoREAD0MlCK5MAAQK9C6j//AIagPN7+IwAAQIECHQhoAHoYpkVSYAAgd4F1H+8gAbgeBGfEyBAgACBDgQ0AB0sshIJECDQu4D6LyigAbigia8QIECAAIHNC2gANr/ECiRAgEDvAuo/kYAG4EQqvkaAAAECBDYuoAHY+AIrjwABAr0LqP/EAhqAE7v4KgECBAgQ2LSABmDTy6s4AgQI9C6g/pMJaABOJuPrBAgQIEBgwwIagA0vrtIIECDQu4D6Ty6gATi5je8QIECAAIHNCmgANru0CiNAgEDvAuo/lYAG4FQ6vkeAAAECBDYqoAHY6MIqiwABAr0LqP/UAhqAU/v4LgECBAgQ2KSABmCTy6ooAgQI9C6g/tMJaABOJ+T7BAgQIEBggwIagA0uqpIIECDQu4D6Ty+gATi9kWsQIECAAIHNCWgANrekCiJAgEDvAuofIqABGKLkOgQIECBAYGMCGoCNLahyCBAg0LuA+ocJaACGObkWAQIECBDYlIAGYFPLqRgCBAj0LqD+oQIagKFSrkeAAAECBDYkoAHY0GIqhQABAr0LqH+4gAZguJVrEiBAgACBzQhoADazlAohQIBA7wLq30VAA7CLlusSIECAAIGNCGgANrKQyiBAgEDvAurfTUADsJuXaxMgQIAAgU0IaAA2sYyKIECAQO8C6t9VQAOwq5jrEyBAgACBDQhoADawiEogQIBA7wLq311AA7C7mVsQIECAAIHVC2gAVr+ECiBAgEDvAurfR0ADsI+a2xAgQIAAgZULaABWvoDSJ0CAQO8C6t9PQAOwn5tbESBAgACBVQtoAFa9fJInQIBA7wLq31dAA7CvnNsRIECAAIEVC2gAVrx4UidAgEDvAurfX0ADsL+dWxIgQIAAgdUKaABWu3QSJ0CAQO8C6j9EQANwiJ7bEiBAgACBlQpoAFa6cNImQIBA7wLqP0xAA3CYn1sTIECAAIFVCmgAVrlskiZAgEDvAuo/VEADcKig2xMgQIAAgRUKaABWuGhSJkCAQO8C6j9cQANwuKE9ECBAgACB1QloAFa3ZM6eWnUAABAASURBVBImQIBA7wLqH0NAAzCGon0QIECAAIGVCWgAVrZg0iVAgEDvAuofR0ADMI6jvRAgQIAAgVUJaABWtVySJUCAQO8C6h9LQAMwlqT9ECBAgACBFQloAFa0WFIlQIBA7wLqH09AAzCepT0RIECAAIHVCGgAVrNUEiVAgEDvAuofU0ADMKamfREgQIAAgZUIaABWslDSJECAQO8C6h9XQAMwrqe9ESBAgACBVQhoAFaxTJIkQIBA7wLqH1tAAzC2qP0RIECAAIEVCGgAVrBIUiRAgEDvAuofX0ADML6pPRIgQIAAgeYFNADNL5EECRAg0LuA+qcQ0ABMoWqfBAgQIECgcQENQOMLJD0CBAj0LqD+aQQ0ANO42isBAgQIEGhaQAPQ9PJIjgABAr0LqH8qAQ3AVLL2S4AAAQIEGhbQADS8OFIjQIBA7wLqn05AAzCdrT0TIECAAIFmBTQAzS6NxAgQINC7gPqnFNAATKlr3wQIECBAoFEBDUCjCyMtAgQI9C6g/mkFNADT+to7AQIECBBoUkAD0OSySIoAAQK9C6h/agENwNTC9k+AAAECBBoU0AA0uChSIkCAQO8C6p9eQAMwvbEZCBAgQIBAcwIagOaWREIECBDoXUD9cwhoAOZQNgcBAgQIEGhMQAPQ2IJIhwABAr0LqH8eAQ3APM5mIUCAAAECTQloAJpaDskQIECgdwH1zyWgAZhL2jwECBAgQKAhAQ1AQ4shFQIECPQuoP75BDQA81mbiQABAgQINCOgAWhmKSRCgACB3gXUP6eABmBObXMRIECAAIFGBDQAjSyENAgQINC7gPrnFdAAzOttNgIECBAg0ISABqCJZZAEAQIEehdQ/9wCGoC5xc1HgAABAgQaENAANLAIUiBAgEDvAuqfX0ADML+5GQkQIECAwOICGoDFl0ACBAgQ6F1A/UsIaACWUDcnAQIECBBYWEADsPACmJ4AAQK9C6h/GQENwDLuZiVAgAABAosKaAAW5Tc5AQIEehdQ/1ICGoCl5M1LgAABAgQWFNAALIhvagIECPQuoP7lBDQAy9mbmQABAgQILCagAViM3sQECBDoXUD9SwpoAJbUNzcBAgQIEFhIQAOwELxpCRAg0LuA+pcV0AAs6292AgQIECCwiIAGYBF2kxIgQKB3AfUvLaABWHoFzE+AAAECBBYQ0AAsgG5KAgQI9C6g/uUFNADLr4EMCBAgQIDA7AIagNnJTUiAAIHeBdTfgoAGoIVVkAMBAgQIEJhZQAMwM7jpCBAg0LuA+tsQ0AC0sQ6yIECAAAECswpoAGblNhkBAgR6F1B/KwIagFZWQh4ECBAgQGBGAQ3AjNimIkCAQO8C6m9HQAPQzlrIhAABAgQIzCagAZiN2kQECBDoXUD9LQloAFpaDbkQIECAAIGZBDQAM0GbhgABAr0LqL8tAQ1AW+shGwIECBAgMIuABmAWZpMQIECgdwH1tyagAWhtReRDgAABAgRmENAAzIBsCgIECPQuoP72BDQA7a2JjAgQIECAwOQCGoDJiU1AgACB3gXU36KABqDFVZETAQIECBCYWEADMDGw3RMgQKB3AfW3KaABaHNdZEWAAAECBCYV0ABMymvnBAgQ6F1A/a0KaABaXRl5ESBAgACBCQU0ABPi2jUBAgR6F1B/uwIagHbXRmYECBAgQGAyAQ3AZLR2TIAAgd4F1N+ygAag5dWRGwECBAgQmEhAAzARrN0SIECgdwH1ty2gAWh7fWRHgAABAgQmEdAATMJqpwQIEOhdQP2tC2gAWl8h+REgQIAAgQkENAAToNolAQIEehdQf/sCGoD210iGBAgQIEBgdAENwOikdkiAAIHeBdS/BgENwBpWSY4ECBAgQGBkAQ3AyKB2R4AAgd4F1L8OAQ3AOtZJlgQIECBAYFQBDcConHZGgACB3gXUvxYBDcBaVkqeBAgQIEBgRAENwIiYdkWAAIHeBdS/HgENwHrWSqYECBAgQGA0AQ3AaJR2RIAAgd4F1L8mAQ3AmlZLrgQIECBAYCQBDcBIkHZDgACB3gXUvy4BDcC61ku2BAgQIEBgFAENwCiMdkKAAIHeBdS/NgENwNpWTL4ECBAgQGAEAQ3ACIh2QYAAgd4F1L8+AQ3A+tZMxgQIECBA4GABDcDBhHZAgACB3gXUv0YBDcAaV03OBAgQIEDgQAENwIGAbk6AAIHeBdS/TgENwDrXTdYECBAgQOAgAQ3AQXxuTIAAgd4F1L9WAQ3AWldO3gQIECBA4AABDcABeG5KgACB3gXUv16BoQ3Ahxst8SKN5iUtAgQIENi+QKv3QYPus4c2AB9sdB0v2Whe0iJAgEAHAt2XeOlGBd4/JK+hDcCgnQ2ZcOTraABGBrU7AgQIEBgscKnB15z3ioPus4c2AO+bN/fBs11x8DVdkQABAgRGFbCzoys0ajDoPntoA/DORou8RqN5SYsAAQIEti9wzUZLfMeQvIY2AG8fsrMFrtMq/gIUpiRAgMCcAuaKQKv3QYPus4c2AG9LoS2Oevjlyi0mJicCBAgQ2LTAGanucokWx6gNwL+0WOFHc7rpR7c2BAgQIDCTgGmOvqRhg0H32UMfAXhzCv1AosWhAWhxVeREgACBbQvcrNHy6gWAozYAdVKBNzZa7K2TV6snY0hqBgECBLYm0H09F43ALRItjtcnqbrPzubUY+gjALWX19aHBuMTk1OrC5HUDAIECBDYmMAtU8/lEy2OM4cmtUsD8FdDd7rA9e6xwJymJECAQJcCij66e8MGfz00t600ALdNwVdPGAQIECBAYEqBq2XnX5lodbx6aGK7NACvGrrTBa73MZnzOxMGAQIECEwq0P3OvzsCF060OgY/Wr9LA1APK7y31YqTVz0kU51ZLhoECBAgQGB0gTr77NeNvtfxdvie7OpvEoPGLg3Ah7LHP0m0OupVmf+n1eTkRYAAgS0IdF7DE1N/y+86e0Xyq/vqbE4/dmkAam9/UB8aji9PbndIGAQIECBAYEyBO2VnX5Foeex0H71rA/DSliv/aG5PyfZKCYMAAQIERhXodmdXSeU/lmh97HQfvWsD8PJU/+5Ey6POC/DLSbDlF2kkPYMAAQIEViBQ9yV1n9Lqef/PIfyPXPjDxOCxawNQpwN+yeC9L3fFL87U9VxNNgYBAgQIjCHQ6T5+NHXfMNH6eFES/GBi8Ni1AagdP7c+rCD+V3J8WMIgQIAAAQL7CDwiN/rGxBrGzvfN+zQAz4rETl1Grr/UeFQmfkDCIECAAIGDBLq78YNS8cMTaxj16Pyzd010nwbg7ZmkHmrIZhXjccnySYl9as3NDAIECBDoSOBCqfUHEo9NrGW8MIm+M7HT2PdOsV4QsdNEC1/5WzN/5XzpbA0CBAgQ2FGgk6tfJnU+M/HgxJrGM/ZJdt8G4Ncy2bsSaxpfk2RfmbhewiBAgAABAscKXD+f/Fni9ok1jfqffz01v3PO+zYA/5mZfimxtlF/MOiPk3Q9JXCpbA0CBAgQOK3Apq9w8VRXL/art9Ct8XTyv5D8/yux89i3AaiJfrw+rDDqNI71lED9bYO7Jf96j2c2BgECBAh0JFDH/nuk3r9L1Iv96nTyubi68ZP7ZnxIA1B/cnBNLwY83uiMfOHnE3+fuG/ikgmDAAECBI4T2Nin9ehvvbXvH1LXzybqLH/ZrHL8TrIe/Nf/ct3zjUMagNrR4+vDyuPTk389mvGWbJ+euGWiHhLKxiBAgACBDQhcIjXcKlEPl9ex/qm5fNXE2ke9y23vGg5tAOqtB/VIwN4JNHTD+gGpP/P4W8mpXlTxu9k+OlFfu0G2dYrhevogFw0CBAj0IrCqOusYXcfqz0/W9RTv92f7e4l3JOpEOXfNdiv/wfvL1FKPAGSz3zi0AfhIpn1kYmujngu6UYp6aKIeFfiTbP81USdbeF+29cMkjo4YMPAz4GeglZ+BOjbXMbqO1fVi73qK97tyvK5Tw9cxPRc3NeqFi3UfvHdRhzYANXG9/eBP60IncbHUeVlxxOCIgd+D7f8MrGiN69icdLsY9XbF5xxa6RgNQHUg9QrKQ3NxewIECBAgQOD0AvXodN33nv6ap7jGGA1A7f75+VCRjUGAAAEC2xBQRYMCv5mcfjtx8BirAahEviMf1vJHgpKqQYAAAQIEViVQr3F44FgZj9kA1MkUnjxWYvZDgAABAssKmL05gR9ORnX+gmwOH2M2AJXNw/LhtQmDAAECBAgQGE/gddnV9yZGG2M3APU3Au6T7A5+cUL2YRAgQIDAYgImbkig7lPrjLXvHTOnsRuAyu2l+VBn1svGIECAAAECBA4UeEpuP/qp96doAJLn0QPyoV4TkI1BgAABAmsTkG8zAv83mTwoMfqYqgGopwLqlIvvHz1jOyRAgAABAn0I1NkNvzal1n1qNuOOqRqAyvLP86H+7G42BgECBAisR0CmjQjcL3m8KjHJmLIBqIR/Ih9+OmEQIECAAAECwwXqtXST3n9O3QBUqdXB/FFdEAQIECDQvoAMFxd4eTK4f2LSMUcDUM9h3CZVvCZhECBAgAABAicXODPfukNi8tfQzdEApI6jt+XDVybenjAIECBAoFkBiS0o8G+Z+xaJf01MPuZqAKqQv8+HL028M2EQIECAAAEC5wn8Ry7eMjHbo+VzNgCp6+gvj46ObpV4T8IgQIAAgcYEpLOIQL3Nrx4lf+Wcs8/dAFRt9YLAKvTd9YkgQIAAAQIdC9R9Yf3P//fmNliiAagaX5YPX5LwmoAgGAQIEGhDQBYzC7wr83154ncTs4+lGoAqtB7quFku/HPCIECAAAECPQm8KcXeKPGKxCJjyQagCq4zHN0gF/4iYRAgQIDAggKmnk3grzLTFyVqm80yY+kGoKquRwBukgu/lTAIECBAgMCWBX4zxd0w8cbEoqOFBqAA6u0P9cLAh+STDycMAgQIEJhVwGQTC3wk+//BxG0T9cK/bJYdrTQApXAOTp01sE4cVF8TBAgQIEBg7QJ1Yp96pX9T/8ltqQE4Z4HrqYDr5pPnJQwCBAgQmEHAFJMJvCh7vl7iBYmmRosNQAG9NR9unfi2xHsTBgECBAgQWJNAnfDuW5Jwvc2vXuuWi22NVhuAUqqnBJ6UC/VowAuzNQgQIEBgEgE7HVng+dlf3Xf9aLZ1X5ZNe6PlBuAcrX/KhfrjCHfO9g0JgwABAgQItChQ91d3TGL1fP/rs216rKEBOAfwV3LhWomHJ+qhlWwMAgQIEDhUwO0PFqj7pO/JXq6deGZiFWNNDUCB/lc+PCpx1US9naL+gEIuGgQIECBAYHaBug/6kcx69cSjE+9LrGasrQE4B7beJlhvpyj0x+WL/54wCBAgQGBnATfYQ6Ducx6b210tcf/EWxKrG2ttAM6BrldWPiifnJF4YOK1CYMAAQIECEwhUPcxD8iOr5J4cGKVd/zJ+6yx9gbgrCLyoc4k+Phs6xGBL832GYlVPRRCdxcUAAABPElEQVSTfA0CBAjMLmDC0wrUfckv51r1x+vqPuYJudzEmfySx0FjKw3AOQj1dosX55O7JK6YuHuiTiz0gWwNAgQIECAwROD9uVKds/9u2V4h8bWJlyTqPiabbYytNQDHrko9KvD0fKFOKHS5bG+X+PFEvU0jG4MAAQK9C6j/GIEzc/mpia9KXD5Rp6X/hWw38b/91HGBseUG4Nhi6y0az84X/mei3kFw5WzrvAL16s3fz+V3JQwCBAgQ6EOgjvm/l1LrPuBO2dZ9Qr2g75ty+TmJus/IZtujlwbg+FV8c75Q5xWoV2/eKJcvm/jURJ2y8RuzfUziFxN1BsI/z7ZOQPTObCv8tcJAGAQIrF9gYxXUsbmO0RV1Ep46dtcxvI7ldUy/b+qtY3y9aLyO+TfO53Uf8KvZ1n1CNn2N/w8AAP//5Yf6cgAAAAZJREFUAwB16+uDhg/8PAAAAABJRU5ErkJggg=="
+                />
+              </defs>
+            </svg>
+          </span>
+          <span class="icon-wrapper h-6 leaderboard-icon lg:h-[30px]">
+            <svg
+              class="h-full w-full"
+              width="21"
+              height="21"
+              viewBox="0 0 21 21"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+            >
+              <mask
+                id="mask0_631_1411"
+                style="mask-type: alpha"
+                maskUnits="userSpaceOnUse"
+                x="0"
+                y="0"
+                width="21"
+                height="21"
+              >
+                <rect
+                  x="0.230957"
+                  y="0.5"
+                  width="20"
+                  height="20"
+                  fill="url(#pattern0_631_1411)"
+                />
+              </mask>
+              <g mask="url(#mask0_631_1411)">
+                <rect
+                  x="-0.0673828"
+                  y="-7.73529"
+                  width="21.1765"
+                  height="29.4118"
+                  fill="#8D9DA6"
+                />
+              </g>
+              <defs>
+                <pattern
+                  id="pattern0_631_1411"
+                  patternContentUnits="objectBoundingBox"
+                  width="1"
+                  height="1"
+                >
+                  <use xlink:href="#image0_631_1411" transform="scale(0.01)" />
+                </pattern>
+                <image
+                  id="image0_631_1411"
+                  width="100"
+                  height="100"
+                  preserveAspectRatio="none"
+                  xlink:href="data:image/png;base64,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"
+                />
+              </defs>
+            </svg>
+          </span>
+          <span class="icon-wrapper h-5 lg:h-[30px] tests-icon">
+            <svg
+              class="h-full w-full"
+              width="21"
+              height="21"
+              viewBox="0 0 21 21"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+            >
+              <mask
+                id="mask0_631_1419"
+                style="mask-type: alpha"
+                maskUnits="userSpaceOnUse"
+                x="0"
+                y="0"
+                width="21"
+                height="21"
+              >
+                <rect
+                  x="0.230957"
+                  y="0"
+                  width="20"
+                  height="20"
+                  fill="url(#pattern0_631_1419)"
+                />
+              </mask>
+              <g mask="url(#mask0_631_1419)">
+                <rect
+                  x="-0.365723"
+                  y="-2.18628"
+                  width="23.2836"
+                  height="22.9851"
+                  fill="#8D9DA6"
+                />
+              </g>
+              <defs>
+                <pattern
+                  id="pattern0_631_1419"
+                  patternContentUnits="objectBoundingBox"
+                  width="1"
+                  height="1"
+                >
+                  <use
+                    xlink:href="#image0_631_1419"
+                    transform="scale(0.00195312)"
+                  />
+                </pattern>
+                <image
+                  id="image0_631_1419"
+                  width="512"
+                  height="512"
+                  preserveAspectRatio="none"
+                  xlink:href="data:image/png;base64,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"
+                />
+              </defs>
+            </svg>
+          </span>
+          <span class="icon-wrapper h-[19px] lg:h-[25px] sessions-icon">
+            <svg
+              class="h-full w-full"
+              width="28"
+              height="19"
+              viewBox="0 0 28 19"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+            >
+              <mask
+                id="mask0_631_1423"
+                style="mask-type: alpha"
+                maskUnits="userSpaceOnUse"
+                x="0"
+                y="0"
+                width="28"
+                height="19"
+              >
+                <rect
+                  x="0.230957"
+                  width="27"
+                  height="19"
+                  fill="url(#pattern0_631_1423)"
+                />
+              </mask>
+              <g mask="url(#mask0_631_1423)">
+                <rect
+                  x="0.230957"
+                  y="0.209778"
+                  width="26.0606"
+                  height="18.6147"
+                  fill="#8D9DA6"
+                />
+              </g>
+              <defs>
+                <pattern
+                  id="pattern0_631_1423"
+                  patternContentUnits="objectBoundingBox"
+                  width="1"
+                  height="1"
+                >
+                  <use
+                    xlink:href="#image0_631_1423"
+                    transform="matrix(0.0109989 0 0 0.01563 -0.0499428 -0.290658)"
+                  />
+                </pattern>
+                <image
+                  id="image0_631_1423"
+                  width="100"
+                  height="100"
+                  preserveAspectRatio="none"
+                  xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAAAXNSR0IArs4c6QAABXdJREFUeAHtnUmIJFUQhtNdwdNI1/sjMtFWW4UW0ZMKnhTRgyt6E0XBBUXBi4wgo+N4EhFBcLkLrjf17uAGoogyNnrxIipeVBDcZUYn2qye7Jr3Xr3cujKLv6GozJcZkRHf//Jl5RadZfwjARIgARIgARIgARIgARIgARIgARIgARIgARIgARIgARIgARIgARIgga4InJDneeGcu0RVrxzQ5zIAq6urqyd3lehg/ViiqrpbRD4UkYMi8u/APwdU9Qnn3AWDhdoksDzPTwPwJIA/By5AsIOo6ttFUZzTJP9B2ajqVQB+HqsQ1bitQ6nqnYMCXCcYAPeLyD/VpJZk+pksy46pw2Lh64rIzSJyaEkE8A1lexYOOTWAPM8vAvDbEothAh1U1RtSmSx0PefcB3PE2ABwX57n5xZFccpCg53Z+Pr6+okicoaI3CYi78byAPBtF/EDuEZEPi478ScALp8Jq/msqt4YScJ61cNZlh3XfAs7a6mqt8T29jKfRkE5584E8OYsLwB/ADi/kdNZIxHZP7uByvxds+uPYd56rKr+Xclj65gC4Pssy46tk4eddAJ4DMDvPp/WpqpP1fHpXdfON0K/qgC86jUaSaOqPh6CZ1cbUtNwzl2rql+HfE3bVfWNVJ/B9Wz3njqc/bbjRdBwBAtWVlZOFZFfZvOyeTubn5dCOTy95bP3tXUiCIBHfc5F5MC8gMew3CAF8ns5FH85PO2NDU8+n50IIiIv+pyLyCuhgMfUDmBvIL/9vjzsgimArwI2W8ch3/JOBFHV1wPOn/cFPLY2VX3Al9/hk+AvqrlMJpOzACQPTz6fXQni3aVV9blqwGOdLi8F+Xr2huXUYHiyK94/UJCGPSImSN3hCcCnzrlLrbNSkO4FSb63A+BHEblneu5CQRqKYWaRPcQ3jM222YXWlwCsVEOgIFUaNaebCjIdnnyboyA+KoltdQUpb8w9GLt2R0ES4ftWqyGId3jy+aQgPiqJbSmCxIYn32YoiI9KYltMkJThybcZCuKjktgWEqS8UbUr0c221SjINhz1ZkKCiMjmmXo9b/+vTUGaUCttKEgLeH2YUpA+qLbwSUFawOvDlIL0QbWFTwrSAl4fphSkD6otfFKQFvD6MKUgfVBt4ZOCtIDXhykF6YNqC58UpAW8PkwpSB9UW/ikIC3g9WEaEoSX3/ugneAzJIg9V8UbVAkAu14lJsj0YTfewu2aesRfiiClMHzIIcKxs0U1BNl8SC5lGOMdwxby1BUkZRijIAsQJDaMUZB+BOHD1i24NjaNDFkbfB2hMdbmhjFBzOsQX9jhK21Zlg3plbYXpr8sqt8AXmveL4djGXpXXVXf8UVZdxirMuvkHUMR2VN1Wpnma9GRqg0VTlsv+XQiSKxwgKqe5+tFY2mbUzhg37w8FlI4IFZaw16Znhf0kJer6j5fT7Y2ABenxr6jpTUsKBtPQ4GLyN2pgQ9pPefcFaHiM8657+pWl0spPiMiz3bCQFWvjwhiJ1CPxF7x6iSIDp2IyK1zyjPtbrq5SHmmv/I8v7Cp36PsALwXEcUOXF9aVQQ7rnRRAOyoAFo0WAEzK2cL4HYA78fyAPCN9fYWm9s0LQuYfVTWQ/lcRK5u63ObvakrIr/GklmCZVaM7bptiQ955nAFoJuWvAimDb3j+hORe0MFzca8h6jq03UP5INRrjxb/WnMAkxjt0LKAO4YDNymgRRFsWvkpcYP2ZnzZDI5uymDQdqp6ukAHip/vSTfQ5j20J3+ds59ZtevOqsQOkhVjgR1fFEU+RD/XYXV7V1bWzvpSKicIgESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIIGhEfgPLHJnd4rEVIIAAAAASUVORK5CYII="
+                />
+              </defs>
+            </svg>
+          </span>
+        </div>
+        <div
+          class="slider bg-primary-500 lg:bg-surface-2 lg:border-primary-400 left-0 z-10 h-1 w-6 translate-x-0 transform rounded-lg transition-all duration-100 lg:absolute lg:h-[50px] lg:w-full lg:rounded-none lg:border-r-4"
+        ></div>
+        <div
+          class="theme-icon from-primary-400 via-primary-300 via-primary-200 via-primary-100 to-primary-50 mt-auto hidden h-[50px] w-[50px] rounded-full bg-gradient-to-r lg:inline-block"
+        ></div>
+      </div>
+    </div>
+
+    <main class="flex h-full w-full flex-col gap-4 px-4 py-3">
+      <!-- loading screen -->
+      <div
+        class="loading-screen bg-surface absolute top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center py-4 transition-all"
+      >
+        <div class="loading-wrapper flex max-w-40 flex-col items-center gap-4">
+          <dotlottie-player
+            id="lotte-loader"
+            src="lotte-files/Animation - 1751119543160.lottie"
+            background="transparent"
+            speed="1"
+            direction="1"
+            playMode="normal"
+            loop
+            autoplay
+            class="h-full w-full"
+          ></dotlottie-player>
+          <p class="loading-text text-text-primary text-lg font-semibold">
+            Loading...
+          </p>
+        </div>
+      </div>
+      <!-- navbar -->
+      <nav class="flex w-full opacity-0 hidden items-center gap-2 lg:gap-3">
+        <img
+          src="https://ik.imagekit.io/yn9gz2n2g/image123.png?updatedAt=1751459031970"
+          alt=""
+          class="nav-icon h-[45px] w-[45px] lg:h-[50px] lg:w-[50px]"
+        />
+        <p
+          class="nav-title text-2xl font-semibold h-[50px] text-center flex items-center"
+        ></p>
+      </nav>
+      <!-- login-section -->
+      <section
+        class="login-form-section flex hidden h-full flex-col items-center justify-center gap-2 transition-all duration-200"
+      >
+        <form
+          id="login-form"
+          class="bg-surface-2 flex w-full max-w-[360px] flex-col items-center gap-4 rounded-3xl p-6"
+        >
+          <div class="swiper-text-wrapper flex flex-col items-center gap-2">
+            <div class="swiper h-[64px] w-[64px]" id="login-section-swiper">
+              <!-- Additional required wrapper -->
+              <div class="swiper-wrapper">
+                <!-- Slides -->
+                <div class="swiper-slide">
+                  <img
+                    src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m14.png?updatedAt=1750951353530"
+                    alt=""
+                  />
+                </div>
+                <div class="swiper-slide">
+                  <img
+                    src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Female/female114.png?updatedAt=1750987518953"
+                    alt=""
+                  />
+                </div>
+                <div class="swiper-slide">
+                  <img
+                    src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m51.png?updatedAt=1750952706527"
+                    alt=""
+                  />
+                </div>
+                <div class="swiper-slide">
+                  <img
+                    src="https://ik.imagekit.io/yn9gz2n2g/Avatars/image(1).png?updatedAt=1751521326535"
+                    alt=""
+                  />
+                </div>
+                <!-- <div class="swiper-slide">
+                  <img
+                    src="https://ik.imagekit.io/yn9gz2n2g/Avatars/image.png?updatedAt=1750763928136"
+                    alt=""
+                  />
+                </div>
+                <div class="swiper-slide">
+                  <img
+                    src="https://ik.imagekit.io/yn9gz2n2g/Avatars/f1?updatedAt=1750750439823"
+                    alt=""
+                  />
+                </div> -->
+              </div>
+            </div>
+            <p class="text-text-primary text-2xl font-medium">Login</p>
+            <p id="form-related-error" class="text-text-error text-sm"></p>
+          </div>
+          <div class="email-input-wrapper flex flex-col gap-1">
+            <label class="text-text-primary px-1 text-sm" for="email-input"
+              >Email</label
+            >
+
+            <input
+              type="email"
+              autocomplete="off"
+              id="email-input"
+              class="bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+            />
+            <p
+              id="email-related-error"
+              class="text-text-error px-1 text-sm"
+            ></p>
+          </div>
+          <div class="password-input-wrapper flex flex-col gap-1">
+            <label class="text-text-primary px-1 text-sm" for="email-input"
+              >Password</label
+            >
+            <input
+              type="password"
+              id="password-input"
+              class="bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+            />
+            <p
+              id="password-related-error"
+              class="text-text-error px-1 text-sm"
+            ></p>
+            <div class="wrapper flex w-full justify-between">
+              <div class="checkbox-wrapper flex items-center gap-2">
+                <div class="flex items-center">
+                  <div class="relative flex cursor-pointer items-center">
+                    <input
+                      type="checkbox"
+                      class="peer bg-surface-3 checked:bg-primary-400 !h-4 !w-4 cursor-pointer appearance-none rounded transition-all"
+                      id="keep-login-check"
+                    />
+                    <span
+                      class="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform text-white opacity-0 peer-checked:opacity-100"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-3 w-3"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        stroke="currentColor"
+                        stroke-width="1"
+                      >
+                        <path
+                          fill-rule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clip-rule="evenodd"
+                        ></path>
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+                <label
+                  for="remember-me-checkbox "
+                  class="text-text-tertiary text-sm"
+                  >Remember me</label
+                >
+              </div>
+              <a
+                href=""
+                class="text-text-link text-sm"
+                id="forgot-password-link"
+                >Forgot password?</a
+              >
+            </div>
+          </div>
+          <button class="button-fill mt-3">Login</button>
+        </form>
+        <div class="no-account-wrppaer flex justify-center gap-1 text-sm">
+          <p class="text-text-primary">New here?</p>
+          <a href="" class="text-text-link"> Create account</a>
+        </div>
+      </section>
+      <!-- reset password section -->
+      <section
+        class="reset-password-section flex hidden h-full flex-col items-center justify-center transition-all duration-200"
+      >
+        <form
+          id="reset-password-form"
+          class="bg-surface-2 flex w-full max-w-[360px] flex-col items-center gap-4 rounded-3xl p-6"
+        >
+          <p class="text-text-primary w-full text-start text-2xl font-semibold">
+            Reset Password
+          </p>
+          <div class="registered-email-input-wrapper flex flex-col gap-1">
+            <label
+              class="text-text-primary px-1 text-sm"
+              for="registered-email-input"
+              >Registered Email</label
+            >
+
+            <input
+              type="email"
+              autocomplete="off"
+              id="registered-email-input"
+              class="bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+            />
+            <p
+              id="registered-email-related-error"
+              class="text-text-error px-1 text-sm"
+            ></p>
+          </div>
+
+          <button class="button-fill">Reset Password</button>
+          <button class="button-outline back-to-login-btn" type="button">
+            Back to login
+          </button>
+        </form>
+      </section>
+
+      <!-- readmore-popup -->
+      <div
+        id="readmore-popup"
+        class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden z-50 flex items-center justify-center"
+      >
+        <div
+          class="bg-surface-2 max-w-[600px] w-full max-h-[90vh] p-5 rounded-2xl text-white relative overflow-hidden flex flex-col gap-4"
+        >
+          <!-- Top section: Icon + Title + New badge -->
+          <div class="wrapper flex items-center justify-between">
+            <div class="slide-icon-title-wrapper flex items-center gap-3">
+              <div
+                class="icon bg-surface flex h-10 w-10 items-center justify-center rounded-full"
+              >
+                <i class="ri-file-text-line text-xl"></i>
+              </div>
+              <p
+                id="readmore-popup-title"
+                class="slider-title text-xl font-semibold"
+              >
+                update-1
+              </p>
+            </div>
+            <p class="bg-primary-400 px-2 py-1 w-fit rounded-xl text-xs">New</p>
+          </div>
+
+          <!-- Scrollable Description -->
+          <div
+            id="readmore-popup-content"
+            class="description text-text-secondary text-sm overflow-auto max-h-[50vh] leading-relaxed pr-2"
+          >
+            Full notice content will appear here and scroll if too long...
+          </div>
+
+          <!-- Action links -->
+          <p id="popup-attachment-link" class="cursor-pointer">
+            See attachment
+          </p>
+
+          <!-- Close button -->
+          <button
+            id="close-readmore-popup"
+            class="absolute top-3 right-4 text-white text-xl"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <!-- subjectselector-popup -->
+      <div
+        class="bg-surface subject-selector-popup absolute z-30 flex bottom-24 lg:bottom-auto lg:left-20 lg:top-36 hidden flex-col rounded-2xl p-3 border-2 border-surface-2 transition-opacity duration-100 transform -translate-x-16 lg:translate-x-0"
+      >
+        <!-- <p class="text-lg font-semibold">Select Subject</p> -->
+        <div class="card-wrapper flex flex-col gap-3"></div>
+      </div>
+      <!-- dashboard home page section  -->
+      <section class="dashboard-section"></section>
+      <!-- subject page section  -->
+      <section
+        class="subject-page-section hidden transition-all duration-200 flex flex-col gap-4 lg:gap-5 w-full h-full"
+      >
+        <!-- editor tools -->
+        <div
+          class="add-notice-popup-wrapper hidden transition-all duration-200 w-full h-full absolute z-40 flex justify-center items-center top-0 left-0 bg-[#00000060]"
+        >
+          <div
+            class="add-notice-popup p-6 flex flex-col bg-surface-2 rounded-3xl gap-4 w-full max-w-[300px]"
+          >
+            <div class="w-full flex justify-between items-center">
+              <p class="title text-2xl font-semibold">Add Notice</p>
+              <i class="fa-solid fa-xmark text-xl close-form-btn"></i>
+            </div>
+            <div class="title-input-wrapper flex flex-col gap-1">
+              <label class="text-text-primary px-1" for="first-name-input"
+                >Title</label
+              >
+              <input
+                type="text"
+                autocomplete="off"
+                id="title-name-input"
+                class="title bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+              />
+              <p
+                id="title-related-error"
+                class="text-text-error px-1 text-sm"
+              ></p>
+            </div>
+            <div class="description-input-wrapper flex flex-col gap-1">
+              <label class="text-text-primary px-1" for="description-name-input"
+                >Description</label
+              >
+              <textarea
+                class="description bg-surface-3 border-surface-4 resize-none focus:border-surface-3 min-h-[6rem] focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+              ></textarea>
+
+              <p
+                id="description-related-error"
+                class="text-text-error px-1 text-sm"
+              ></p>
+            </div>
+            <div
+              class="upload-attachment bg-surface-3 border-2 border-surface-4 py-6 flex justify-center rounded-3xl gap-2 justify-center"
+              onclick="document.getElementById('notice-file-input').click()"
+            >
+              <i
+                class="fa-solid fa-arrow-up-from-bracket text-xl font-thin"
+              ></i>
+              Upload (Optional)
+              <input type="file" class="hidden" id="notice-file-input" />
+            </div>
+            <div class="button-wrapper flex gap-4 w-full">
+              <!-- <div class="button-outline">Cancle</div> -->
+              <button class="button-fill create-notice-btn" type="button">
+                Create
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slider main container -->
+        <div class="w-full swiper h-60" id="subject-page-swiper">
+          <div class="swiper-wrapper"></div>
+          <div class="swiper-pagination translate-y-1"></div>
+        </div>
+
+        <button class="button-hug add-notice-btn" type="button">
+          Add notice
+        </button>
+        <!-- upcoming submissions -->
+        <div class="upcoming-submissions gap-2 lg:gap-3 flex flex-col">
+          <p class="text-2xl font-semibold">Upcoming submissions</p>
+          <div class="card-wrapper grid-auto-fit">
+            <div class="card p-4 bg-surface-2 rounded-[20px]">
+              <p class="description">Manual 4-5</p>
+              <p class="submission-date">04-March</p>
+            </div>
+          </div>
+        </div>
+        <div class="container gap-2 lg:gap-3 flex flex-col">
+          <p class="text-2xl font-semibold">Textbooks</p>
+          <div class="card-wrapper grid-auto-fit">
+            <div class="card p-4 w-full t bg-surface-2 rounded-[20px]">
+              <a href="hi how are you " class="text-center">Manual4-5</a>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- test section -->
+      <section
+        class="tests-section hidden transition-all duration-200 flex flex-col gap-4 lg:gap-5 w-full h-full"
+      >
+        <!-- about tests lg breakpoint-->
+        <div
+          class="about-tests lg:flex flex-col hidden gap-4 lg:gap-5 p-6 rounded-3xl border-2 border-surface-2"
+        >
+          <div class="wrapper flex-col flex gap-2 lg:gap-3">
+            <p class="title text-2xl font-semibold">About Test</p>
+            <p class="description text-text-secondary">
+              The tests we conduct include questions from all subjects based on
+              the topics taught during the week. Test are designed in such a way
+              to prevent copying ,cause each test will have a time limit and
+              timer will start as soon as you start test ,You can't copy if you
+              try, you'll have less time to attempt the remaining questions due
+              to very strict time limit.Test scores are used for ranking and
+              points are awarded accordingly.
+            </p>
+          </div>
+          <div class="wrapper flex-col flex gap-2 lg:gap-3">
+            <p class="title font-semibold">How ranks are assigned?</p>
+            <p class="description text-text-secondary">
+              The top 3 scorer of test are assigned medal accordingly,each medal
+              have points such as
+            </p>
+            <div class="wrapper gap-3 flex items-center">
+              <div class="wrapper flex items-center gap-1 text-sm">
+                <img
+                  class="h-[20px]"
+                  src="https://ik.imagekit.io/yn9gz2n2g/others/gold.png?updatedAt=1751607550552"
+                  alt=""
+                />
+                <p class="">= 30 pts</p>
+              </div>
+              <div class="wrapper flex items-center gap-1">
+                <img
+                  class="h-[20px]"
+                  src="https://ik.imagekit.io/yn9gz2n2g/others/silver.png?updatedAt=1751607529476"
+                  alt=""
+                />
+                <p class="">= 20 pts</p>
+              </div>
+              <div class="wrapper flex items-center gap-1">
+                <img
+                  class="h-[20px]"
+                  src="https://ik.imagekit.io/yn9gz2n2g/others/bronze.png?updatedAt=1751607503968"
+                  alt=""
+                />
+                <p class="">= 30 pts</p>
+              </div>
+            </div>
+            <p class="text-text-secondary">
+              In case if two students score 29, the one who finishes faster will
+              be ranked higher.
+            </p>
+          </div>
+        </div>
+        <!-- upcoming test -->
+        <div class="upcoming-tests gap-2 lg:gap-3 flex flex-col w-full">
+          <p class="text-2xl font-semibold">Upcoming Test</p>
+          <div
+            class="card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full rounded-3xl lg:max-w-[500px] p-6"
+          >
+            <div class="wrapper w-full flex items-center justify-between">
+              <div class="flex items-center gap-2 lg:gap-3 icon-name-wrapper">
+                <img
+                  src="https://ik.imagekit.io/yn9gz2n2g/others/test.png?updatedAt=1751607386764"
+                  class="h-[45px]"
+                  alt=""
+                />
+                <p class="text-xl font-semibold">Test-01</p>
+              </div>
+              <p class="status text-xs text-text-link">Coming soom</p>
+            </div>
+            <div class="description">
+              This test includes questions only from the topics taught during
+              this week. A quick way to revise what you just learned.
+            </div>
+            <div
+              class="duration-date-wrapper text-xs font-light flex flex-col gap-1"
+            >
+              <p class="day">Day : Friday</p>
+              <p class="duration">Duration : 30mins</p>
+            </div>
+          </div>
+        </div>
+        <!-- about tests -->
+        <div
+          class="about-tests lg:hidden flex flex-col gap-4 lg:gap-5 p-6 rounded-3xl border-2 border-surface-2"
+        >
+          <div class="wrapper flex-col flex gap-2 lg:gap-3">
+            <p class="title text-2xl font-semibold">About Test</p>
+            <p class="description text-text-secondary">
+              The tests we conduct include questions from all subjects based on
+              the topics taught during the week. Test are designed in such a way
+              to prevent copying ,cause each test will have a time limit and
+              timer will start as soon as you start test ,You can't copy if you
+              try, you'll have less time to attempt the remaining questions due
+              to very strict time limit.Test scores are used for ranking and
+              points are awarded accordingly.
+            </p>
+          </div>
+          <div class="wrapper flex-col flex gap-2 lg:gap-3">
+            <p class="title font-semibold">How ranks are assigned?</p>
+            <p class="description text-text-secondary">
+              The top 3 scorer of test are assigned medal accordingly,each medal
+              have points such as
+            </p>
+            <div class="wrapper gap-3 flex items-center">
+              <div class="wrapper flex items-center gap-1 text-sm">
+                <img
+                  class="h-[20px]"
+                  src="https://ik.imagekit.io/yn9gz2n2g/others/gold.png?updatedAt=1751607550552"
+                  alt=""
+                />
+                <p class="">= 30 pts</p>
+              </div>
+              <div class="wrapper flex items-center gap-1">
+                <img
+                  class="h-[20px]"
+                  src="https://ik.imagekit.io/yn9gz2n2g/others/silver.png?updatedAt=1751607529476"
+                  alt=""
+                />
+                <p class="">= 20 pts</p>
+              </div>
+              <div class="wrapper flex items-center gap-1">
+                <img
+                  class="h-[20px]"
+                  src="https://ik.imagekit.io/yn9gz2n2g/others/bronze.png?updatedAt=1751607503968"
+                  alt=""
+                />
+                <p class="">= 30 pts</p>
+              </div>
+            </div>
+            <p class="text-text-secondary">
+              In case if two students score 29, the one who finishes faster will
+              be ranked higher.
+            </p>
+          </div>
+        </div>
+        <!-- previous tests -->
+        <div class="previous-tests gap-2 lg:gap-3 flex flex-col w-full">
+          <p class="text-2xl font-semibold">Upcoming Test</p>
+          <div class="card-wrapper flex flex-wrap gap-4 lg:gap-5">
+            <div
+              class="card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full rounded-3xl lg:max-w-[500px] p-6"
+            >
+              <div class="wrapper w-full flex items-center justify-between">
+                <div class="flex items-center gap-2 lg:gap-3 icon-name-wrapper">
+                  <img
+                    src="https://ik.imagekit.io/yn9gz2n2g/others/test.png?updatedAt=1751607386764"
+                    class="h-[45px]"
+                    alt=""
+                  />
+                  <p class="text-xl font-semibold">Test-01</p>
+                </div>
+                <div class="button-hug">View</div>
+              </div>
+
+              <div
+                class="duration-date-wrapper text-xs font-light flex flex-col gap-1"
+              >
+                <p class="day">Day : Friday</p>
+                <p class="duration">Duration : 30mins</p>
+              </div>
+            </div>
+            <div
+              class="card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full rounded-3xl lg:max-w-[500px] p-6"
+            >
+              <div class="wrapper w-full flex items-center justify-between">
+                <div class="flex items-center gap-2 lg:gap-3 icon-name-wrapper">
+                  <img
+                    src="https://ik.imagekit.io/yn9gz2n2g/others/test.png?updatedAt=1751607386764"
+                    class="h-[45px]"
+                    alt=""
+                  />
+                  <p class="text-xl font-semibold">Test-01</p>
+                </div>
+                <div class="button-hug">View</div>
+              </div>
+
+              <div
+                class="duration-date-wrapper text-xs font-light flex flex-col gap-1"
+              >
+                <p class="day">Day : Friday</p>
+                <p class="duration">Duration : 30mins</p>
+              </div>
+            </div>
+
+            <div
+              class="card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full rounded-3xl lg:max-w-[500px] p-6"
+            >
+              <div class="wrapper w-full flex items-center justify-between">
+                <div class="flex items-center gap-2 lg:gap-3 icon-name-wrapper">
+                  <img
+                    src="https://ik.imagekit.io/yn9gz2n2g/others/test.png?updatedAt=1751607386764"
+                    class="h-[45px]"
+                    alt=""
+                  />
+                  <p class="text-xl font-semibold">Test-01</p>
+                </div>
+                <div class="button-hug">View</div>
+              </div>
+
+              <div
+                class="duration-date-wrapper text-xs font-light flex flex-col gap-1"
+              >
+                <p class="day">Day : Friday</p>
+                <p class="duration">Duration : 30mins</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- sessions section -->
+      <section
+        class="sessions-section hidden transition-all duration-200 flex flex-col gap-4 lg:gap-5 w-full h-full"
+      >
+        <!-- about sessions lg breakpoint-->
+        <div
+          class="about-sessions lg:flex flex-col hidden gap-4 lg:gap-5 p-6 rounded-3xl border-2 border-surface-2"
+        >
+          <div class="wrapper flex-col flex gap-2 lg:gap-3">
+            <p class="title text-2xl font-semibold">About Sessions</p>
+            <p class="description text-text-secondary">
+              Our sessions are open to students from all years and are designed
+              to be beginner-friendly. We cover essential topics in computer
+              science and also share some interesting knowledge like how
+              databases are managed, live API demos, and more. Whether you're
+              starting out or just curious to learn something new. If interested
+              about a topic and willing to teach or share your thoughts, you can
+              even take a session yourself and share your knowledge,you're
+              welcome to join us.
+            </p>
+          </div>
+          <div class="button-hug">Take a session</div>
+        </div>
+        <!-- upcoming test -->
+        <div class="upcoming-sessions gap-2 lg:gap-3 flex flex-col w-full">
+          <p class="text-2xl font-semibold">Upcoming Sessions</p>
+          <div
+            class="card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full rounded-3xl lg:max-w-[500px] p-6"
+          >
+            <div class="wrapper w-full flex items-center justify-between">
+              <div class="flex items-center gap-2 lg:gap-3 icon-name-wrapper">
+                <img
+                  src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m30.png?updatedAt=1751608418404"
+                  class="h-[45px]"
+                  alt=""
+                />
+                <div class="wrapper">
+                  <p class="text-xl">Sagar Kemble</p>
+                  <p class="text-xs text-text-tertiary">TYCO A</p>
+                </div>
+              </div>
+              <p class="status text-xs text-text-link">Coming soom</p>
+            </div>
+            <div class="wrapper flex flex-col gap-2">
+              <p class="title text-xl font-semibold">
+                Take your first step into OS!
+              </p>
+              <div class="description text-text-secondary">
+                Learn how to contribute to real projects, use version control,
+                and join a global developer community. Perfect for students,
+                hobbyists, and beginners looking to grow their skills and give
+                back.
+              </div>
+            </div>
+            <div
+              class="duration-date-wrapper text-xs font-light flex flex-col gap-1"
+            >
+              <p class="day">17-03-2025 at 8:30pm</p>
+              <p class="duration">Duration : 45mins</p>
+            </div>
+          </div>
+        </div>
+        <!-- about sessions -->
+        <div
+          class="about-sessions flex flex-col lg:hidden gap-4 lg:gap-5 p-6 rounded-3xl border-2 border-surface-2"
+        >
+          <div class="wrapper flex-col flex gap-2 lg:gap-3">
+            <p class="title text-2xl font-semibold">About Sessions</p>
+            <p class="description text-text-secondary">
+              Our sessions are open to students from all years and are designed
+              to be beginner-friendly. We cover essential topics in computer
+              science and also share some interesting knowledge like how
+              databases are managed, live API demos, and more. Whether you're
+              starting out or just curious to learn something new. If interested
+              about a topic and willing to teach or share your thoughts, you can
+              even take a session yourself and share your knowledge,you're
+              welcome to join us.
+            </p>
+          </div>
+          <div class="button-hug">Take a session</div>
+        </div>
+        <!-- previous sessions -->
+        <div class="previous-sessions gap-2 lg:gap-3 flex flex-col w-full">
+          <p class="text-2xl font-semibold">Previous Sessions</p>
+          <div class="card-wrapper flex flex-wrap gap-4 lg:gap-5">
+            <div
+              class="card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full rounded-3xl lg:max-w-[500px] p-6"
+            >
+              <div class="flex items-center gap-2 lg:gap-3 icon-name-wrapper">
+                <img
+                  src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m30.png?updatedAt=1751608418404"
+                  class="h-[45px]"
+                  alt=""
+                />
+                <div class="wrapper">
+                  <p class="text-xl">Sagar Kemble</p>
+                  <p class="text-xs text-text-tertiary">TYCO A</p>
+                </div>
+              </div>
+              <div class="wrapper flex flex-col gap-2">
+                <p class="title text-xl font-semibold">
+                  Take your first step into OS!
+                </p>
+                <div class="description text-text-secondary">
+                  Learn how to contribute to real projects, use version control,
+                  and join a global developer community. Perfect for students,
+                  hobbyists, and beginners looking to grow their skills and give
+                  back.
+                </div>
+              </div>
+              <div
+                class="duration-date-wrapper text-xs font-light flex flex-col gap-1"
+              >
+                <p class="day">17-03-2025 at 8:30pm</p>
+                <p class="duration">Duration : 45mins</p>
+              </div>
+              <div class="button-hug">View Session</div>
+            </div>
+            <div
+              class="card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full rounded-3xl lg:max-w-[500px] p-6"
+            >
+              <div class="flex items-center gap-2 lg:gap-3 icon-name-wrapper">
+                <img
+                  src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m30.png?updatedAt=1751608418404"
+                  class="h-[45px]"
+                  alt=""
+                />
+                <div class="wrapper">
+                  <p class="text-xl">Sagar Kemble</p>
+                  <p class="text-xs text-text-tertiary">TYCO A</p>
+                </div>
+              </div>
+              <div class="wrapper flex flex-col gap-2">
+                <p class="title text-xl font-semibold">
+                  Take your first step into OS!
+                </p>
+                <div class="description text-text-secondary">
+                  Learn how to contribute to real projects, use version control,
+                  and join a global developer community. Perfect for students,
+                  hobbyists, and beginners looking to grow their skills and give
+                  back.
+                </div>
+              </div>
+              <div
+                class="duration-date-wrapper text-xs font-light flex flex-col gap-1"
+              >
+                <p class="day">17-03-2025 at 8:30pm</p>
+                <p class="duration">Duration : 45mins</p>
+              </div>
+              <div class="button-hug">View Session</div>
+            </div>
+            <div
+              class="card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full rounded-3xl lg:max-w-[500px] p-6"
+            >
+              <div class="flex items-center gap-2 lg:gap-3 icon-name-wrapper">
+                <img
+                  src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m30.png?updatedAt=1751608418404"
+                  class="h-[45px]"
+                  alt=""
+                />
+                <div class="wrapper">
+                  <p class="text-xl">Sagar Kemble</p>
+                  <p class="text-xs text-text-tertiary">TYCO A</p>
+                </div>
+              </div>
+              <div class="wrapper flex flex-col gap-2">
+                <p class="title text-xl font-semibold">
+                  Take your first step into OS!
+                </p>
+                <div class="description text-text-secondary">
+                  Learn how to contribute to real projects, use version control,
+                  and join a global developer community. Perfect for students,
+                  hobbyists, and beginners looking to grow their skills and give
+                  back.
+                </div>
+              </div>
+              <div
+                class="duration-date-wrapper text-xs font-light flex flex-col gap-1"
+              >
+                <p class="day">17-03-2025 at 8:30pm</p>
+                <p class="duration">Duration : 45mins</p>
+              </div>
+              <div class="button-hug">View Session</div>
+            </div>
+            <div
+              class="card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full rounded-3xl lg:max-w-[500px] p-6"
+            >
+              <div class="flex items-center gap-2 lg:gap-3 icon-name-wrapper">
+                <img
+                  src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m30.png?updatedAt=1751608418404"
+                  class="h-[45px]"
+                  alt=""
+                />
+                <div class="wrapper">
+                  <p class="text-xl">Sagar Kemble</p>
+                  <p class="text-xs text-text-tertiary">TYCO A</p>
+                </div>
+              </div>
+              <div class="wrapper flex flex-col gap-2">
+                <p class="title text-xl font-semibold">
+                  Take your first step into OS!
+                </p>
+                <div class="description text-text-secondary">
+                  Learn how to contribute to real projects, use version control,
+                  and join a global developer community. Perfect for students,
+                  hobbyists, and beginners looking to grow their skills and give
+                  back.
+                </div>
+              </div>
+              <div
+                class="duration-date-wrapper text-xs font-light flex flex-col gap-1"
+              >
+                <p class="day">17-03-2025 at 8:30pm</p>
+                <p class="duration">Duration : 45mins</p>
+              </div>
+              <div class="button-hug">View Session</div>
+            </div>
+            <div
+              class="card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full rounded-3xl lg:max-w-[500px] p-6"
+            >
+              <div class="flex items-center gap-2 lg:gap-3 icon-name-wrapper">
+                <img
+                  src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m30.png?updatedAt=1751608418404"
+                  class="h-[45px]"
+                  alt=""
+                />
+                <div class="wrapper">
+                  <p class="text-xl">Sagar Kemble</p>
+                  <p class="text-xs text-text-tertiary">TYCO A</p>
+                </div>
+              </div>
+              <div class="wrapper flex flex-col gap-2">
+                <p class="title text-xl font-semibold">
+                  Take your first step into OS!
+                </p>
+                <div class="description text-text-secondary">
+                  Learn how to contribute to real projects, use version control,
+                  and join a global developer community. Perfect for students,
+                  hobbyists, and beginners looking to grow their skills and give
+                  back.
+                </div>
+              </div>
+              <div
+                class="duration-date-wrapper text-xs font-light flex flex-col gap-1"
+              >
+                <p class="day">17-03-2025 at 8:30pm</p>
+                <p class="duration">Duration : 45mins</p>
+              </div>
+              <div class="button-hug">View Session</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- leaderboard section -->
+      <section
+        class="leaderboard-section hidden transition-all duration-200 flex flex-col gap-4 lg:gap-5 w-full h-full max-w-[1500px] mr-auto ml-auto"
+      >
+        <div
+          class="stats-card p-6 bg-surface-2 flex flex-col rounded-3xl gap-4 md:gap-0 md:justify-between lg:px-8 items-center h-fit md:flex-row max-w-[1000px] lg:justify-center lg:gap-12 mr-auto ml-auto w-full"
+        >
+          <div class="rank-wrapper hidden md:flex flex-col items-center">
+            <p class="rank text-2xl font-semibold">01</p>
+            <p
+              class="total-student text-xs font-light leading-tight text-center text-text-link"
+            >
+              Rank <br />
+              out of 70
+            </p>
+          </div>
+          <div class="image-name-wrapper flex items-center gap-3">
+            <img
+              src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m53.png?updatedAt=1750952781028"
+              alt=""
+              class="h-[50px] w-[50px]"
+            />
+            <p class="name text-2xl font-semibold">Sagar Kemble</p>
+          </div>
+          <div
+            class="wrapper flex w-full justify-between max-w-[300px] md:w-full"
+          >
+            <div class="rank-wrapper md:hidden flex flex-col items-center">
+              <p class="rank text-2xl font-semibold">01</p>
+              <p
+                class="total-student text-xs font-light leading-tight text-center text-text-link"
+              >
+                Rank <br />
+                out of 70
+              </p>
+            </div>
+            <div class="points-wrapper flex gap-1 items-center">
+              <img
+                src="https://ik.imagekit.io/yn9gz2n2g/others/coin.png?updatedAt=1751607575051"
+                class="h-5 w-5"
+                alt=""
+              />
+
+              <p class="points text-2xl">136</p>
+            </div>
+            <div class="medal-wrapper gap-2 md:gap-8 flex items-center">
+              <div class="gold-medal-wrapper flex items-center gap-1 text-sm">
+                <img
+                  class="h-[20px]"
+                  src="https://ik.imagekit.io/yn9gz2n2g/others/gold.png?updatedAt=1751607550552"
+                  alt=""
+                />
+                <p class="">x 3</p>
+              </div>
+              <div class="silver-medal-wrapper flex items-center gap-1">
+                <img
+                  class="h-[20px]"
+                  src="https://ik.imagekit.io/yn9gz2n2g/others/silver.png?updatedAt=1751607529476"
+                  alt=""
+                />
+                <p class="">x 3</p>
+              </div>
+              <div class="bronz-medal-wrapper flex items-center gap-1">
+                <img
+                  class="h-[20px]"
+                  src="https://ik.imagekit.io/yn9gz2n2g/others/bronze.png?updatedAt=1751607503968"
+                  alt=""
+                />
+                <p class="">x 3</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="wrapper flex flex-col w-full md:flex-row md:justify-between gap-4 md:gap-0"
+        >
+          <!-- previous test winners  -->
+          <div class="wrapper gap-4 lg:gap-5 w-full flex flex-col items-center">
+            <p class="text-2xl font-semibold">Previous test winners</p>
+            <div
+              class="rank-container flex justify-between md:justify-center md:gap-5 xl:gap-9 w-full items-end"
+            >
+              <!-- Second Place -->
+              <div
+                class="winner-column flex flex-col items-center gap-2 lg:gap-3"
+              >
+                <div class="winner-profile flex flex-col items-center gap-2">
+                  <img
+                    src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m54.png?updatedAt=1751608964260"
+                    alt=""
+                    class="w-[50px] h-[50px]"
+                  />
+                  <p
+                    class="winner-name font-semibold truncate w-[100px] lg:w-32 xl:w-40 text-center"
+                  >
+                    Rohan <br />Korake
+                  </p>
+                </div>
+                <div
+                  class="winner-podium w-[100px] h-[130px] border-2 rounded-tr-lg rounded-tl-lg border-surface-3 border-b-0 bg-surface-2 flex items-center justify-center xl:w-40 lg:w-32"
+                >
+                  <div class="podium-details gap-1 flex flex-col items-center">
+                    <div class="medal-display flex items-center flex-col">
+                      <img
+                        src="https://ik.imagekit.io/yn9gz2n2g/others/silver.png?updatedAt=1751607529476"
+                        alt=""
+                        class="h-9"
+                      />
+                      <p class="font-semibold">2nd</p>
+                    </div>
+                    <div class="points-display flex items-center gap-2">
+                      <p class="text-xl">+20</p>
+                      <img
+                        src="https://ik.imagekit.io/yn9gz2n2g/others/coin.png?updatedAt=1751607575051"
+                        alt=""
+                        class="w-5 h-5"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- First Place -->
+              <div
+                class="winner-column flex flex-col items-center gap-2 lg:gap-3"
+              >
+                <div class="winner-profile flex flex-col items-center gap-2">
+                  <img
+                    src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Common/common83.png?updatedAt=1750991402045"
+                    alt=""
+                    class="w-[50px] h-[50px]"
+                  />
+                  <p
+                    class="winner-name font-semibold truncate w-[100px] lg:w-32 xl:w-40 text-center"
+                  >
+                    Rohan <br />Korake
+                  </p>
+                </div>
+                <div
+                  class="winner-podium w-[100px] h-[160px] border-2 rounded-tr-lg rounded-tl-lg border-surface-3 border-b-0 bg-surface-2 flex items-center justify-center lg:w-32 xl:w-40"
+                >
+                  <div class="podium-details gap-1 flex flex-col items-center">
+                    <div class="medal-display flex items-center flex-col">
+                      <img
+                        src="https://ik.imagekit.io/yn9gz2n2g/others/gold.png?updatedAt=1751607550552"
+                        alt=""
+                        class="h-9"
+                      />
+                      <p class="font-semibold">1st</p>
+                    </div>
+                    <div class="points-display flex items-center gap-2">
+                      <p class="text-xl">+30</p>
+                      <img
+                        src="https://ik.imagekit.io/yn9gz2n2g/others/coin.png?updatedAt=1751607575051"
+                        alt=""
+                        class="w-5 h-5"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Third Place -->
+              <div
+                class="winner-column flex flex-col items-center gap-2 lg:gap-3"
+              >
+                <div class="winner-profile flex flex-col items-center gap-2">
+                  <img
+                    src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Memes/me2.png?updatedAt=1750954163478"
+                    alt=""
+                    class="w-[50px] h-[50px]"
+                  />
+                  <p
+                    class="winner-name font-semibold truncate w-[100px] lg:w-32 xl:w-40 text-center"
+                  >
+                    Harshwardhan <br />Korake
+                  </p>
+                </div>
+                <div
+                  class="winner-podium w-[100px] h-[130px] border-2 rounded-tr-lg rounded-tl-lg border-surface-3 border-b-0 bg-surface-2 flex items-center justify-center lg:w-32 xl:w-40 h"
+                >
+                  <div class="podium-details gap-1 flex flex-col items-center">
+                    <div class="medal-display flex items-center flex-col">
+                      <img
+                        src="https://ik.imagekit.io/yn9gz2n2g/others/bronze.png?updatedAt=1751607503968"
+                        alt=""
+                        class="h-9"
+                      />
+                      <p class="font-semibold">3rd</p>
+                    </div>
+                    <div class="points-display flex items-center gap-2">
+                      <p class="text-xl">+10</p>
+                      <img
+                        src="https://ik.imagekit.io/yn9gz2n2g/others/coin.png?updatedAt=1751607575051"
+                        alt=""
+                        class="w-5 h-5"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- divider -->
+          <div
+            class="divider h-0.5 w-full bg-surface-3 mt-2 md:w-0.5 md:h-full md:mt-0"
+          ></div>
+          <!-- leaderboard top rankers winners  -->
+          <div class="wrapper gap-4 lg:gap-5 w-full flex flex-col items-center">
+            <p class="text-2xl font-semibold">Leaderboard top rankers</p>
+            <div
+              class="rank-container flex justify-between md:justify-center md:gap-5 xl:gap-9 w-full items-end"
+            >
+              <!-- Second Place -->
+              <div
+                class="winner-column flex flex-col items-center gap-2 lg:gap-3"
+              >
+                <div class="winner-profile flex flex-col items-center gap-2">
+                  <img
+                    src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m54.png?updatedAt=1751608964260"
+                    alt=""
+                    class="w-[50px] h-[50px]"
+                  />
+                  <p
+                    class="winner-name font-semibold truncate w-[100px] lg:w-32 xl:w-40 text-center"
+                  >
+                    Rohan <br />Korake
+                  </p>
+                </div>
+                <div
+                  class="winner-podium w-[100px] h-[130px] border-2 rounded-tr-lg rounded-tl-lg border-surface-3 border-b-0 bg-surface-2 flex items-center justify-center xl:w-40 lg:w-32"
+                >
+                  <div class="podium-details gap-1 flex flex-col items-center">
+                    <div class="medal-display flex items-center flex-col">
+                      <img
+                        src="https://ik.imagekit.io/yn9gz2n2g/others/silver.png?updatedAt=1751607529476"
+                        alt=""
+                        class="h-9"
+                      />
+                      <p class="font-semibold">2nd</p>
+                    </div>
+                    <div class="points-display flex items-center gap-2">
+                      <p class="text-xl">120</p>
+                      <img
+                        src="https://ik.imagekit.io/yn9gz2n2g/others/coin.png?updatedAt=1751607575051"
+                        alt=""
+                        class="w-5 h-5"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- First Place -->
+              <div
+                class="winner-column flex flex-col items-center gap-2 lg:gap-3"
+              >
+                <div class="winner-profile flex flex-col items-center gap-2">
+                  <img
+                    src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Common/common83.png?updatedAt=1750991402045"
+                    alt=""
+                    class="w-[50px] h-[50px]"
+                  />
+                  <p
+                    class="winner-name font-semibold truncate w-[100px] lg:w-32 xl:w-40 text-center"
+                  >
+                    Rohan <br />Korake
+                  </p>
+                </div>
+                <div
+                  class="winner-podium w-[100px] h-[160px] border-2 rounded-tr-lg rounded-tl-lg border-surface-3 border-b-0 bg-surface-2 flex items-center justify-center lg:w-32 xl:w-40"
+                >
+                  <div class="podium-details gap-1 flex flex-col items-center">
+                    <div class="medal-display flex items-center flex-col">
+                      <img
+                        src="https://ik.imagekit.io/yn9gz2n2g/others/gold.png?updatedAt=1751607550552"
+                        alt=""
+                        class="h-9"
+                      />
+                      <p class="font-semibold">1st</p>
+                    </div>
+                    <div class="points-display flex items-center gap-2">
+                      <p class="text-xl">130</p>
+                      <img
+                        src="https://ik.imagekit.io/yn9gz2n2g/others/coin.png?updatedAt=1751607575051"
+                        alt=""
+                        class="w-5 h-5"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Third Place -->
+              <div
+                class="winner-column flex flex-col items-center gap-2 lg:gap-3"
+              >
+                <div class="winner-profile flex flex-col items-center gap-2">
+                  <img
+                    src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Memes/me2.png?updatedAt=1750954163478"
+                    alt=""
+                    class="w-[50px] h-[50px]"
+                  />
+                  <p
+                    class="winner-name font-semibold truncate w-[100px] lg:w-32 xl:w-40 text-center"
+                  >
+                    Harshwardhan <br />Korake
+                  </p>
+                </div>
+                <div
+                  class="winner-podium w-[100px] h-[130px] border-2 rounded-tr-lg rounded-tl-lg border-surface-3 border-b-0 bg-surface-2 flex items-center justify-center lg:w-32 xl:w-40"
+                >
+                  <div class="podium-details gap-1 flex flex-col items-center">
+                    <div class="medal-display flex items-center flex-col">
+                      <img
+                        src="https://ik.imagekit.io/yn9gz2n2g/others/bronze.png?updatedAt=1751607503968"
+                        alt=""
+                        class="h-9"
+                      />
+                      <p class="font-semibold">3rd</p>
+                    </div>
+                    <div class="points-display flex items-center gap-2">
+                      <div class="points-display flex items-center gap-2">
+                        <p class="text-xl">110</p>
+                        <img
+                          src="https://ik.imagekit.io/yn9gz2n2g/others/coin.png?updatedAt=1751607575051"
+                          alt=""
+                          class="w-5 h-5"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="leaderboard-card-container w-full">
+          <div
+            class="card bg-surface-2 px-3 py-4 md:px-4 flex justify-between rounded-lg"
+          >
+            <div
+              class="name-pfp-rank-wrapper w-[180px] md:w-[340px] gap-1.5 md:gap-4 flex items-center"
+            >
+              <p class="rank md:text-xl">01.</p>
+              <div class="name-pfp-wrapper flex items-center gap-1 md:gap-2">
+                <img
+                  src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m3.png?updatedAt=1750951038899"
+                  alt=""
+                  class="pfp h-10 w-10"
+                />
+                <div
+                  class="flex flex-col leading-tight md:gap-1.5 text-sm md:text-base md:flex-row"
+                >
+                  <p class="truncate w-full">Harshwardhan</p>
+                  <p class="truncate w-full">Harshwardhan</p>
+                </div>
+              </div>
+            </div>
+            <div class="medals-wrapper flex gap-3 md:gap-8">
+              <div
+                class="medal flex flex-col md:flex-row md:gap-2 items-center"
+              >
+                <img
+                  src="https://ik.imagekit.io/yn9gz2n2g/others/gold.png?updatedAt=1751607550552"
+                  alt=""
+                  class="h-6 w-fit"
+                />
+                <div class="wrapper flex items-center">
+                  <p class="text-xs">x</p>
+                  <p class="text-xs md:text-base">3</p>
+                </div>
+              </div>
+              <div
+                class="medal flex flex-col md:flex-row md:gap-2 items-center"
+              >
+                <img
+                  src="https://ik.imagekit.io/yn9gz2n2g/others/silver.png?updatedAt=1751607529476"
+                  alt=""
+                  class="h-6 w-fit"
+                />
+                <div class="wrapper flex items-center">
+                  <p class="text-xs">x</p>
+                  <p class="text-xs md:text-base">3</p>
+                </div>
+              </div>
+              <div
+                class="medal flex flex-col md:flex-row md:gap-2 items-center"
+              >
+                <img
+                  src="https://ik.imagekit.io/yn9gz2n2g/others/bronze.png?updatedAt=1751607503968"
+                  alt=""
+                  class="h-6 w-fit"
+                />
+                <div class="wrapper flex items-center">
+                  <p class="text-xs">x</p>
+                  <p class="text-xs md:text-base">3</p>
+                </div>
+              </div>
+            </div>
+            <div class="points w-14 md:w-20 flex items-center gap-1 md:gap-3">
+              <img
+                src="https://ik.imagekit.io/yn9gz2n2g/others/coin.png?updatedAt=1751607575051"
+                alt=""
+                class="h-5 w-5 md:h-[30px] md:w-[30px]"
+              />
+              <p class="font-semibold">120</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <script src="src/scripts/index.js" type="module"></script>
+    <script src="src/scripts/dashboard.js" type="module"></script>
+    <script src="src/scripts/subject.js" type="module"></script>
+    <script src="src/scripts/login.js" type="module"></script>
+    <script src="src/scripts/navigation.js" type="module"></script>
+    <script src="src/scripts/tests.js" type="module"></script>
+    <script src="src/scripts/sessions.js" type="module"></script>
+    <script src="src/scripts/leaderboard.js" type="module"></script>
+  </body>
+</html>
