@@ -1,23 +1,11 @@
-import {
-  app,
-  signInWithEmailAndPassword,
-  auth,
-  get,
-  equalTo,
-  ref,
-  db,
-  child,
-  onAuthStateChanged,
-  orderByChild,
-  signOut,
-  query,
-  getDatabase,
-} from "./firebase.js";
+import { app, auth, onAuthStateChanged, signOut } from "./firebase.js";
 import { fadeInEffect, fadeOutEffect } from "./animation.js";
 import { showDashboard, loadDashboard } from "./dashboard.js";
 import { loadTestSection, showTestsSection } from "./tests.js";
 import {
-  navIcon,
+  headerIcon,
+  headerTitle,
+  header,
   setActiveNavIcon,
   dashboardIcon,
   subjectIcon,
@@ -26,121 +14,69 @@ import {
   sessionsIcon,
   timeTabelIcon,
   testsIcon,
+  sideBar,
+  subjectSelectorPopup,
 } from "./navigation.js";
 import { loadSubjectSection } from "./subject.js";
 import { showLoginSection, showResetPasswordSection } from "./login.js";
-import { showSessionsSection } from "./sessions.js";
+import { showSessionsSection, loadSessionsSection } from "./sessions.js";
 import {
   loadLeaderboardSection,
   showLeaderboardSection,
 } from "./leaderboard.js";
+import { appState, initAppState } from "./appstate.js";
+import { showErrorSection } from "./error.js";
 const loadingScreen = document.querySelector(".loading-screen");
 const lotteLoader = document.querySelector("#lotte-loader");
-const navigationWrapper = document.querySelector(".navigation-wrapper");
-const header = document.querySelector("nav");
-
-export let userData;
-export let semesterGlobalData;
-export let globalData;
-export let subjectData;
-export let divisionData;
-let activeSem;
-let activeDiv;
-async function getUserData(inputUid) {
-  return get(child(ref(db), `users/${inputUid}`))
-    .then((snapshot) => {
-      if (snapshot.exists()) {
-        console.log(snapshot.val());
-
-        return snapshot.val();
-      } else {
-        console.log("No data available");
-        return null;
-      }
-    })
-    .catch((error) => {
-      console.error(error.message);
-      return null;
-    });
+const sectionLoader = document.querySelector(".section-loader-wrapper");
+const sectionLoaderMessage = sectionLoader.querySelector(".loader-status");
+const editModeToggleButton = document.querySelector(".edit-mode-toggle-btn");
+const confirmationPopup = document.querySelector(".confirmation-popup-wrapper");
+const confirmationDescription = confirmationPopup.querySelector(".description");
+const confirmationTitle = confirmationPopup.querySelector(".title");
+const confirmButton = confirmationPopup.querySelector(".confirm-btn");
+const cancelButton = confirmationPopup.querySelector(".cancel-btn");
+export async function showSectionLoader(message = "Loading...") {
+  sectionLoaderMessage.textContent = message;
+  await fadeInEffect(sectionLoader);
 }
-async function getSemesterGlobalData() {
-  return get(child(ref(db), `semesters/${userData.sem}/semesterGlobal`))
-    .then((snapshot) => {
-      if (snapshot.exists()) {
-        return snapshot.val();
-      } else {
-        console.log("No data available");
-        return null;
-      }
-    })
-    .catch((error) => {
-      console.error(error.message);
-      return null;
-    });
-}
-async function getGlobalData() {
-  return get(child(ref(db), `globalData`))
-    .then((snapshot) => {
-      if (snapshot.exists()) {
-        return snapshot.val();
-      } else {
-        console.log("No data available");
-        return null;
-      }
-    })
-    .catch((error) => {
-      console.error(error.message);
-      return null;
-    });
-}
-
-async function getDivivsionData() {
-  return get(
-    child(ref(db), `semesters/${userData.sem}/divisions/${userData.div}`)
-  )
-    .then((snapshot) => {
-      if (snapshot.exists()) {
-        console.log("division dat recived ");
-        console.log(snapshot.val());
-        return snapshot.val();
-      } else {
-        console.log("No data available");
-        return null;
-      }
-    })
-    .catch((error) => {
-      console.error(error.message);
-      return null;
-    });
+export async function hideSectionLoader() {
+  await fadeOutEffect(sectionLoader);
 }
 async function loadContent() {
-  loadSubjectSelectionList(divisionData.subjects.individualSubjects);
-  loadTestSection(divisionData.test);
+  await loadDashboard();
+  await loadTestSection();
+  await loadSubjectSelectionList();
+  await loadLeaderboardSection();
+  await loadSessionsSection();
 }
-function singout() {
-  signOut(auth)
-    .then(() => {
-      console.log("Signed out successfully.");
-    })
-    .catch((error) => {
-      console.error("Sign-out error:", error);
+export async function showConfirmationPopup(
+  description = "This action cannot be undone.",
+  title = "Are you sure?"
+) {
+  return new Promise((resolve) => {
+    confirmationTitle.textContent = title;
+    confirmationDescription.textContent = description;
+    fadeInEffect(confirmationPopup);
+    confirmButton.addEventListener("click", async () => {
+      await fadeOutEffect(confirmationPopup);
+      resolve(true);
     });
+    cancelButton.addEventListener("click", async () => {
+      await fadeOutEffect(confirmationPopup);
+      resolve(false);
+    });
+  });
 }
 document.addEventListener("DOMContentLoaded", async () => {
-  // singout();
   await fadeInEffect(loadingScreen);
   onAuthStateChanged(auth, async (userCredential) => {
     if (userCredential) {
+      await initAppState();
       await fadeInEffect(loadingScreen);
       await hideSections();
-      userData = await getUserData(userCredential.uid);
-      semesterGlobalData = await getSemesterGlobalData();
-      globalData = await getGlobalData();
-      divisionData = await getDivivsionData();
-      activeSem = userData.sem;
-      activeDiv = userData.div;
-      console.log(divisionData);
       await loadContent();
+      await applyEditModeUI();
       initRouting();
     } else {
       await fadeOutEffect(loadingScreen);
@@ -149,7 +85,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 });
 export async function initRouting() {
-  if (userData.role === "admin") window.location.href = "./html/admin.html";
   const params = new URLSearchParams(window.location.search);
   const dashboard = params.get("dashboard");
   const activeSubject = params.get("subject");
@@ -157,63 +92,105 @@ export async function initRouting() {
   const tests = params.get("tests");
   const pyq = params.get("pyq");
   const sessions = params.get("sessions");
-
   if (dashboard) {
     setActiveNavIcon(dashboardIcon);
-
     await fadeOutEffect(loadingScreen);
-    // await showDashboard();
+    showDashboard();
   } else if (activeSubject) {
-    await fadeOutEffect(loadingScreen);
-    loadSubjectSection(
-      divisionData.subjects,
-      activeSubject,
-      activeDiv,
-      activeSem
-    );
+    appState.activeSubject = activeSubject;
     setActiveNavIcon(subjectIcon);
-  } else if (leaderboard) {
     await fadeOutEffect(loadingScreen);
-    console.log("this is leaderboard route");
+    loadSubjectSection();
+  } else if (leaderboard) {
     setActiveNavIcon(leaderboardIcon);
+    await fadeOutEffect(loadingScreen);
     showLeaderboardSection();
   } else if (tests) {
-    await fadeOutEffect(loadingScreen);
-    await showTestsSection();
     setActiveNavIcon(testsIcon);
-  } else if (sessions) {
     await fadeOutEffect(loadingScreen);
-    await showSessionsSection();
+    showTestsSection();
+  } else if (sessions) {
     setActiveNavIcon(sessionsIcon);
+    await fadeOutEffect(loadingScreen);
+    showSessionsSection();
   } else if (pyq) {
     await fadeOutEffect(loadingScreen);
     showPyq();
   } else {
+    setActiveNavIcon(dashboardIcon);
     await fadeOutEffect(loadingScreen);
-    console.log("hi this is init routing");
-    hideSections();
-    // showDashboard();
+    showDashboard();
   }
 }
-export async function hideSections(showNavigationAndHeader = true) {
-  if (showNavigationAndHeader) {
-    if (
-      getComputedStyle(navigationWrapper).display === "none" ||
-      getComputedStyle(header).display === "none" ||
-      getComputedStyle(navIcon).display === "none"
-    ) {
-      fadeInEffect(navigationWrapper);
-      fadeInEffect(header);
-      fadeInEffect(navIcon);
-    }
-  }
-
+export async function hideSections(
+  showHeaderIcon = true,
+  showHeaderTitle = true,
+  showSidebar = true,
+  showHeader = true
+) {
+  await (showHeaderIcon ? fadeInEffect(headerIcon) : fadeOutEffect(headerIcon));
+  await (showHeaderTitle
+    ? fadeInEffect(headerTitle)
+    : fadeOutEffect(headerTitle));
+  await (showSidebar ? fadeInEffect(sideBar) : fadeOutEffect(sideBar));
+  await (showHeader ? fadeInEffect(header) : fadeOutEffect(header));
   const allSections = document.querySelectorAll("section");
+  fadeOutEffect(subjectSelectorPopup);
   for (const section of allSections) {
     await fadeOutEffect(section);
   }
 }
-
+editModeToggleButton.addEventListener("click", () => {
+  appState.isEditing = !appState.isEditing;
+  console.log("this is from the index page");
+  console.log(appState.isEditing);
+  if (appState.isEditing) {
+    editModeToggleButton.textContent = "Exit mode";
+    applyEditModeUI();
+  } else {
+    editModeToggleButton.textContent = "Edit";
+    applyEditModeUI();
+  }
+});
+export async function applyEditModeUI() {
+  const editorTool = document.querySelectorAll(".editor-tool");
+  const editorOnlyContent = document.querySelectorAll(".editor-only-content");
+  const editorOnlyContentCard = document.querySelectorAll(
+    ".editor-only-content-card"
+  );
+  const upcomingSubmissions = document.querySelector(".upcoming-submissions");
+  if (appState.isEditing) {
+    editorOnlyContent.forEach((content) => fadeInEffect(content));
+    editorOnlyContentCard.forEach((card) => {
+      const wrapper = card.closest("a");
+      if (wrapper?.classList.contains("hidden")) {
+        fadeInEffect(wrapper);
+      }
+      fadeInEffect(card);
+      if (card.classList.contains("visiblity-hidden")) {
+        card.style.opacity = "0.5";
+      }
+    });
+    editorTool.forEach((tool) => fadeInEffect(tool));
+    editModeToggleButton.textContent = "Exit editing";
+    fadeInEffect(upcomingSubmissions);
+  } else {
+    if (
+      !appState.subjectData.upcomingSubmissions ||
+      !appState.subjectData.upcomingSubmissions[appState.activeSubject]
+    ) {
+      fadeOutEffect(upcomingSubmissions);
+    }
+    editorOnlyContent.forEach((content) => fadeOutEffect(content));
+    editorOnlyContentCard.forEach((card) => {
+      fadeOutEffect(card);
+      const wrapper = card.closest("a");
+      if (wrapper) fadeOutEffect(wrapper);
+    });
+    editorTool.forEach((tool) => fadeOutEffect(tool));
+    editModeToggleButton.textContent = "Edit";
+  }
+}
 window.addEventListener("popstate", () => {
   initRouting();
 });

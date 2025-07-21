@@ -21,8 +21,8 @@ import {
 import { fadeInEffect, fadeOutEffect } from "./animation.js";
 const addStudentBtn = document.querySelector("#add-student-btn");
 let dbSemesterData;
-const navTitle = document.querySelector(".nav-title");
-const navIcon = document.querySelector(".nav-icon ");
+const headerTitle = document.querySelector(".nav-title");
+const headerIcon = document.querySelector(".nav-icon ");
 const dbpath = ref(db, "semesters");
 const loadingScreen = document.querySelector(".loading-screen-container");
 get(dbpath)
@@ -71,7 +71,7 @@ async function loadSemestersPage() {
       "rounded-3xl",
       "p-6",
       "text-center",
-      "font-semibold",
+      "font-semibold"
     );
     card.textContent = element;
     card.addEventListener("click", async (e) => {
@@ -79,24 +79,24 @@ async function loadSemestersPage() {
       history.pushState(
         { sem: activeSem },
         "",
-        `admin.html?sem=${encodeURIComponent(activeSem)}`,
+        `admin.html?sem=${encodeURIComponent(activeSem)}`
       );
       await unloadSemstersPage();
       loadDivisionsOfSemesterPage();
     });
     semCardContainer.appendChild(card);
   }
-  navIcon.src =
+  headerIcon.src =
     "https://ik.imagekit.io/yn9gz2n2g/image.png?updatedAt=1751378410144";
-  navTitle.textContent = "Semesters";
+  headerTitle.textContent = "Semesters";
   addSemBtn.classList.remove("hidden");
   fadeInEffect(semestersSection);
 }
 async function unloadSemstersPage() {
   semCardContainer.innerHTML = "";
-  navTitle.textContent = "";
+  headerTitle.textContent = "";
   addSemBtn.classList.add("hidden");
-  navIcon.src = "";
+  headerIcon.src = "";
   await fadeOutEffect(semestersSection);
 }
 addSemBtn.addEventListener("click", () => {
@@ -139,7 +139,7 @@ function writeNewSemToDb(inputSemName) {
 
 // divisions page variables and listners
 const divisionsOfSemesterSection = document.querySelector(
-  "#divisions-of-semester-section",
+  "#divisions-of-semester-section"
 );
 const addDivBtn = document.querySelector("#add-div-btn");
 const divCardContainer = document.querySelector(".div-card-container");
@@ -166,7 +166,7 @@ async function loadDivisionsOfSemesterPage() {
       "rounded-3xl",
       "p-6",
       "text-center",
-      "font-semibold",
+      "font-semibold"
     );
     card.textContent = element;
     card.addEventListener("click", (e) => {
@@ -175,23 +175,25 @@ async function loadDivisionsOfSemesterPage() {
       history.pushState(
         { div: activeDiv },
         "",
-        `admin.html?sem=${encodeURIComponent(activeSem)}&div=${encodeURIComponent(activeDiv)}`,
+        `admin.html?sem=${encodeURIComponent(
+          activeSem
+        )}&div=${encodeURIComponent(activeDiv)}`
       );
       loadIndividualDivPage();
     });
     divCardContainer.appendChild(card);
   }
-  navTitle.textContent = activeSem;
+  headerTitle.textContent = activeSem;
   addDivBtn.classList.remove("hidden");
-  navIcon.src =
+  headerIcon.src =
     "https://ik.imagekit.io/yn9gz2n2g/image.png?updatedAt=1751378410144";
   await fadeInEffect(divisionsOfSemesterSection);
 }
 async function unloadDivisionsOfSemesterPage() {
   divCardContainer.innerHTML = "";
-  navTitle.textContent = "";
+  headerTitle.textContent = "";
   addDivBtn.classList.add("hidden");
-  navIcon.src = "";
+  headerIcon.src = "";
   await fadeOutEffect(divisionsOfSemesterSection);
 }
 addDivBtn.addEventListener("click", () => {
@@ -223,7 +225,7 @@ function divExists(inputName) {
 function writeNewDivToDb(inputDivName) {
   set(
     ref(db, `semesters/${activeSem}/divisions/${inputDivName}`),
-    divParameters,
+    divParameters
   )
     .then(() => {
       location.reload();
@@ -239,16 +241,16 @@ function writeNewDivToDb(inputDivName) {
 // student related
 let studentsArr = [];
 const individualDivisionSection = document.querySelector(
-  "#individual-division-section",
+  "#individual-division-section"
 );
 const individualSubjectCardContainer = document.querySelector(
-  ".individual-subject-card-container",
+  ".individual-subject-card-container"
 );
 const linkPopupContainer = document.querySelector(".link-popup-container");
 const addStudentLink = document.querySelector("#add-student-link");
 const linkPopupOkBtn = document.querySelector(".link-popup-container button");
 const studentsCardContainer = document.querySelector(
-  ".students-card-container",
+  ".students-card-container"
 );
 linkPopupOkBtn.addEventListener("click", async (e) => {
   e.preventDefault();
@@ -262,8 +264,8 @@ async function loadIndividualDivPage() {
   if (studentsArr.length === 0) await getStudentData();
   renderIndividualStudentCard();
   renderIndividualSubjectCard();
-  navTitle.textContent = activeDiv;
-  navIcon.src =
+  headerTitle.textContent = activeDiv;
+  headerIcon.src =
     "https://ik.imagekit.io/yn9gz2n2g/image.png?updatedAt=1751378410144";
   addStudentBtn.classList.remove("hidden");
   fadeInEffect(individualDivisionSection);
@@ -271,9 +273,9 @@ async function loadIndividualDivPage() {
 async function unloadIndividualDivisionPage() {
   studentsCardContainer.innerHTML = "";
   individualSubjectCardContainer.innerHTML = "";
-  navTitle.textContent = "";
+  headerTitle.textContent = "";
   addDivBtn.classList.add("hidden");
-  navIcon.src = "";
+  headerIcon.src = "";
   console.log("unload individual div page called");
 
   await fadeOutEffect(individualDivisionSection);
@@ -311,7 +313,9 @@ function renderIndividualStudentCard() {
       history.pushState(
         { student: activeStudent },
         "",
-        `admin.html?sem=${encodeURIComponent(activeSem)}&div=${activeDiv}&student=${activeStudent}`,
+        `admin.html?sem=${encodeURIComponent(
+          activeSem
+        )}&div=${activeDiv}&student=${activeStudent}`
       );
       loadIndividualStudentPage();
     });
@@ -343,7 +347,7 @@ function getStudentData() {
 addStudentLink.addEventListener("click", () => {
   const text = addStudentLink.textContent;
   const popupTitle = document.querySelector(
-    ".link-popup-container .popup-title",
+    ".link-popup-container .popup-title"
   );
   navigator.clipboard
     .writeText(text)
@@ -371,7 +375,7 @@ addStudentBtn.addEventListener("click", (e) => {
 // subject related
 const addSubjectBtn = document.querySelector("#add-subject-btn");
 const selectSubjectIconPopupContainer = document.querySelector(
-  "#subject-icon-selection-popup-container",
+  "#subject-icon-selection-popup-container"
 );
 const subjectParameters = {
   subjectName: "",
@@ -414,10 +418,10 @@ function subjectExists(inputSubject) {
   return false;
 }
 const selectedSubjectPopupNextBtn = document.querySelector(
-  "#subject-icon-selection-popup-container .next-btn",
+  "#subject-icon-selection-popup-container .next-btn"
 );
 const selectedSubjectPopupPrevBtn = document.querySelector(
-  "#subject-icon-selection-popup-container .back-btn",
+  "#subject-icon-selection-popup-container .back-btn"
 );
 const subjectIconContainer = document.querySelector(".subject-icon-container");
 const selectedIcon = document.querySelector("#selected-icon");
@@ -472,9 +476,9 @@ function writeNewSubjectToDb(inputSubject) {
   set(
     ref(
       db,
-      `semesters/${activeSem}/divisions/${activeDiv}/subjects/${inputSubject}`,
+      `semesters/${activeSem}/divisions/${activeDiv}/subjects/${inputSubject}`
     ),
-    subjectParameters,
+    subjectParameters
   )
     .then(() => {
       location.reload();
@@ -516,7 +520,7 @@ function renderIndividualSubjectCard() {
 // student page related var and listner
 const studentDisplayName = document.querySelector(".student-display-name");
 const individualstudentSection = document.querySelector(
-  ".individual-student-section",
+  ".individual-student-section"
 );
 const studentDisplayPfp = document.querySelector(".student-display-pfp");
 const studentInfoWrapper = document.querySelector(".studenet-info-wrapper");
@@ -577,7 +581,7 @@ function createPopup({
     "justify-center",
     "bg-[#00000020]",
     "transition-all",
-    "duration-200",
+    "duration-200"
   );
 
   const popup = document.createElement("div");
@@ -589,7 +593,7 @@ function createPopup({
     "gap-4",
     "rounded-3xl",
     "p-6",
-    "lg:gap-5",
+    "lg:gap-5"
   );
   popupContainer.appendChild(popup);
   const inputRefs = [];
@@ -599,7 +603,7 @@ function createPopup({
     "form-related-error",
     "text-text-error",
     "text-sm",
-    "hidden",
+    "hidden"
   );
   const popupTitle = document.createElement("p");
   popupTitle.classList.add("text-2xl", "font-semibold", "text-text-primary");
@@ -630,7 +634,7 @@ function createPopup({
       "px-3",
       "py-1.5",
       "focus:!ring-1",
-      "focus:outline-none",
+      "focus:outline-none"
     );
     const errorMsg = document.createElement("p");
     errorMsg.classList.add("text-text-error", "text-sm", "hidden");

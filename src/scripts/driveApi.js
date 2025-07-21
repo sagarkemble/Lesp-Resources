@@ -1,79 +1,74 @@
-import { google } from "googleapis";
-import path from "path";
-import fs from "fs";
-import { fileURLToPath } from "url";
-import { log } from "console";
+import { showSectionLoader, hideSectionLoader } from "./index.js";
+import { showErrorSection } from "./error.js";
+export async function deleteDriveFile(attachmentId) {
+  if (!attachmentId) return false;
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+  //   showSectionLoader("Deleting attachment...");
 
-const CLIENT_ID =
-  "172156645696-ukp2qshuv5rl0klbi6v7ed6bk3o9827g.apps.googleusercontent.com";
-const CLIENT_SECRET = "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";
-const REDIRECT_URI = "https://developers.google.com/oauthplayground";
-const REFRESH_TOKEN =
-  "1//04jME_1LJQS2rCgYIARAAGAQSNwF-L9IrJgRHYbK82_ymqShF5kF4dPT71vBTY_RcnvmJU_yn0IXiuC-utAA0axcEWDdTRGchdX8";
-
-const oauth2Client = new google.auth.OAuth2(
-  CLIENT_ID,
-  CLIENT_SECRET,
-  REDIRECT_URI
-);
-oauth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
-
-const drive = google.drive({
-  version: "v3",
-  auth: oauth2Client,
-});
-
-const filePath = path.join(__dirname, "Unit 3.pdf");
-
-async function uploadFile() {
   try {
-    const response = await drive.files.create({
-      requestBody: {
-        name: "sample.pdf",
-        mimeType: "application/pdf",
-      },
-      media: {
-        mimeType: "application/pdf",
-        body: fs.createReadStream(filePath),
-      },
-    });
-    console.log("File uploaded:", response.data);
-  } catch (e) {
-    console.error("Upload failed:", e.message);
+    const res = await fetch(
+      "https://lesp-resources-gdrive-api.onrender.com/delete",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: attachmentId }),
+      }
+    );
+
+    const data = await res.json();
+    console.log("Drive delete response:", data);
+
+    if (!res.ok || data.success === false) {
+      console.error(
+        "Attachment deletion failed:",
+        data.error || "Unknown error"
+      );
+      showErrorSection();
+      return false;
+    }
+
+    return true;
+  } catch (err) {
+    console.error("Error deleting attachment from Drive:", err.message);
+    showErrorSection();
+    return false;
   }
 }
+export async function uploadDriveFile(file, path) {
+  if (!file || !path) return null;
 
-createPublicUrl();
-// uploadFile();
-// deleteFile();
-async function deleteFile() {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("path", path);
+
+  //   showSectionLoader("Uploading file...");
+
   try {
-    const response = await drive.files.delete({
-      fileId: "1ETuMMmqF_zyUV0myxe8zoSIMiPbBu2hs",
-    });
-    console.log(response.data, response.status);
-  } catch (error) {
-    console.log(error.message);
-  }
-}
-async function createPublicUrl() {
-  try {
-    await drive.permissions.create({
-      fileId: "1YT598I9_Q_42Q4RS66In4DMIInlmQk-w",
-      requestBody: {
-        role: "reader",
-        type: "anyone",
-      },
-    });
-    const response = await drive.files.get({
-      fileId: "1YT598I9_Q_42Q4RS66In4DMIInlmQk-w",
-      fields: "webViewLink,webContentLink",
-    });
-    console.log(response.data);
-  } catch (error) {
-    console.log(error.message);
+    const response = await fetch(
+      "https://lesp-resources-gdrive-api.onrender.com/upload",
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    const result = await response.json();
+    console.log("Drive upload response:", result);
+
+    if (!result.success) {
+      showErrorSection();
+
+      console.error("File upload failed:", result.error);
+      return null;
+    }
+
+    return {
+      webViewLink: result.webViewLink,
+      fileId: result.fileId,
+    };
+  } catch (err) {
+    showErrorSection();
+    console.error("Upload error:", err.message);
+    return null;
   }
 }

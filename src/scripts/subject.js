@@ -1,90 +1,133 @@
-const subjectPageSection = document.querySelector(".subject-page-section");
+import { deleteData, pushData, updateData } from "./firebase.js";
+import { deleteDriveFile, uploadDriveFile } from "./driveApi.js";
+import { appState, syncDbData } from "./appstate.js";
 import { fadeInEffect, fadeOutEffect } from "./animation.js";
-import { hideSections } from "./index.js";
-import { navIcon, navTitle } from "./navigation.js";
-let swiperInstance = null;
-import { db, push, ref } from "./firebase.js";
-const Swiperwrapper = document.querySelector(
-  "#subject-page-swiper .swiper-wrapper"
-);
-const addNoticeBtn = document.querySelector(".add-notice-btn");
-const addNoticePopup = document.querySelector(".add-notice-popup-wrapper");
-const closeFormBtn = document.querySelector(".close-form-btn");
-const createNoticeBtn = document.querySelector(".create-notice-btn");
-const createNoticeTitleInput = document.querySelector(
-  ".add-notice-popup-wrapper #title-name-input"
-);
-const fileInput = document.getElementById("notice-file-input");
-const createNoticeDescription = document.querySelector(
-  ".add-notice-popup-wrapper .description"
-);
-const titleRelatedError = document.querySelector("#title-related-error");
-const descriptionRelatedError = document.querySelector(
-  "#description-related-error"
-);
-let activeSubject;
-let activeSubjectObj;
-let activeDiv;
-let activeSem;
-
-const upcomingSubmissionCardWrapper = document.querySelector(
-  ".upcoming-submissions .card-wrapper"
-);
-const subjectSelectorPopup = document.querySelector(".subject-selector-popup");
-const subjectSelectorPopupCardWrapper = document.querySelector(
-  ".subject-selector-popup .card-wrapper"
-);
-let subjectData;
-export async function loadSubjectSection(
-  inputSubjectData,
-  inputActiveSubject,
-  inputActiveDiv,
-  inputActiveSem
-) {
-  activeDiv = inputActiveDiv;
-  activeSem = inputActiveSem;
-  activeSubject = inputActiveSubject;
-  subjectData = inputSubjectData;
-  activeSubjectObj = subjectData.individualSubjects[activeSubject];
-  console.log(activeSubjectObj);
+import {
+  hideSections,
+  showSectionLoader,
+  hideSectionLoader,
+  applyEditModeUI,
+  showConfirmationPopup,
+} from "./index.js";
+import { headerIcon, headerTitle } from "./navigation.js";
+import { showErrorSection } from "./error.js";
+const subjectPageSection = document.querySelector(".subject-page-section");
+export async function loadSubjectSection() {
   await unloadSubjectSection();
   await renderSwiper();
   await renderUpcomingSubmissions();
   await renderResources();
-  navIcon.src = activeSubjectObj.icon;
-  navTitle.textContent = activeSubjectObj.name;
+  headerIcon.src =
+    appState.subjectData.individualSubjects[appState.activeSubject].icon;
+  headerTitle.textContent =
+    appState.subjectData.individualSubjects[appState.activeSubject].name;
   await hideSections();
+  swiper.update();
+  swiper.slideTo(0);
+  swiper.updateSlides();
+  swiper.updateProgress();
+  updateNavVisibility();
+  await applyEditModeUI();
+
   await fadeInEffect(subjectPageSection);
 }
-export async function unloadSubjectSection() {
-  Swiperwrapper.innerHTML = "";
-  // Destroy Swiper instance if exists
-  if (swiperInstance) {
-    swiperInstance.destroy(true, true);
-    swiperInstance = null;
-  }
-  upcomingSubmissionCardWrapper.innerHTML = "";
+async function unloadSubjectSection() {
+  await fadeOutEffect(subjectPageSection);
+  document.querySelectorAll(".dynamic-container").forEach((container) => {
+    container.remove();
+  });
+  swiper.removeAllSlides();
+  swiper.update();
+  upcomingSubmissionCardContainer.innerHTML = "";
 }
 
-function addNotice() {}
+// notice related functions and var
 
-function renderSwiper() {
-  // Clear previous slides
-  Swiperwrapper.innerHTML = "";
-  for (let key in subjectData.notice[activeSubject]) {
-    const noticeData = subjectData.notice[activeSubject][key];
+const swiper = new Swiper("#subject-page-swiper", {
+  direction: "horizontal",
+  slidesPerView: "auto",
+  spaceBetween: 30,
+  loop: false,
+  centeredSlides: true,
+  watchOverflow: true,
+  breakpoints: {
+    768: {
+      centeredSlides: false,
+    },
+  },
+  pagination: {
+    el: ".swiper-pagination",
+    clickable: true,
+  },
+  navigation: {
+    size: "10px",
+    nextEl: ".custom-swiper-button-next",
+    prevEl: ".custom-swiper-button-prev",
+  },
 
+  observer: true,
+  observeParents: true,
+});
+const Swiperwrapper = document.querySelector(
+  "#subject-page-swiper .swiper-wrapper"
+);
+const addNoticeBtn = subjectPageSection.querySelector(".add-notice-btn");
+// main add notice popup
+const addNoticePopup = subjectPageSection.querySelector(
+  ".add-notice-popup-wrapper"
+);
+//button inside popup
+const addNoticePopupcloseBtn = addNoticePopup.querySelector(".close-popup-btn");
+const addNoticePopupcreateBtn = addNoticePopup.querySelector(".create-btn");
+// inputs
+const addNoticeTitleInput = addNoticePopup.querySelector(".title-input");
+const addNoticefileInput = addNoticePopup.querySelector("#notice-file-input");
+const addNoticeDescriptionInput =
+  addNoticePopup.querySelector(".description-input");
+const addNoticeLinkInput = addNoticePopup.querySelector(".link-input");
+// error msgs
+const addNoticePopupLinkError = addNoticePopup.querySelector(
+  ".link-related-error"
+);
+const addNoticePopuptitleError = addNoticePopup.querySelector(
+  ".title-related-error"
+);
+const addNoticePopupdescriptionError = addNoticePopup.querySelector(
+  ".description-related-error"
+);
+// file attachment ui
+const addNoticeFileAttachment =
+  addNoticePopup.querySelector(".file-attachment");
+const addNotivePopupFileAttachmentText =
+  addNoticePopup.querySelector(".upload-text");
+const addNoticePopupFileAttachmentIcon = addNoticePopup.querySelector(
+  ".file-attachment-icon"
+);
+// error popup
+const addNoticePopupErrorPopup = addNoticePopup.querySelector(
+  ".error-popup-wrapper"
+);
+const addNoticePopupErrorPopupOkayBtn =
+  addNoticePopupErrorPopup.querySelector(".okay-btn");
+let selectedNotice;
+// functions
+async function renderSwiper() {
+  // return;
+  if (!appState.subjectData.notice) return;
+  if (!appState.subjectData.notice[appState.activeSubject]) return;
+  const noticeEntries = Object.entries(
+    appState.subjectData.notice[appState.activeSubject]
+  ).reverse();
+  for (const [key, noticeData] of noticeEntries) {
     const swiperSlide = document.createElement("div");
     swiperSlide.className =
-      "swiper-slide max-w-[600px] bg-surface-2 !flex flex-col gap-4 lg:gap-5 rounded-2xl p-4 lg:p-5";
-
-    // Top wrapper
+      "swiper-slide w-full max-w-[600px] bg-surface-2 flex flex-col gap-4 lg:gap-5 rounded-2xl p-4 lg:p-5";
     const topWrapper = document.createElement("div");
-    topWrapper.className = "wrapper flex items-center justify-between";
+    topWrapper.className = "wrapper flex items-center gap-4  justify-between";
 
     const iconTitleWrapper = document.createElement("div");
     iconTitleWrapper.className =
-      "slide-icon-title-wrapper flex items-center gap-2 lg:gap-3";
+      "slide-icon-title-wrapper w-full flex items-center gap-2 lg:gap-3";
 
     const icon = document.createElement("div");
     icon.className =
@@ -101,23 +144,35 @@ function renderSwiper() {
     iconTitleWrapper.appendChild(icon);
     iconTitleWrapper.appendChild(title);
 
-    const tag = document.createElement("p");
-    tag.className = "bg-primary-400 px-2 py-1 w-fit rounded-xl text-xs";
-    tag.textContent = "New";
-
     topWrapper.appendChild(iconTitleWrapper);
-    topWrapper.appendChild(tag);
 
+    const createdAt = noticeData.createdAt;
+    const now = Date.now();
+    const diffInMinutes = (now - createdAt) / (1000 * 60);
+    if (diffInMinutes <= 1440) {
+      const tag = document.createElement("p");
+      tag.className = "bg-primary-400 px-2 py-1 w-fit rounded-xl text-xs";
+      tag.textContent = "New";
+      topWrapper.appendChild(tag);
+    }
+    const deleteIcon = document.createElement("div");
+    deleteIcon.className =
+      "delete-icon hidden editor-tool ml-auto flex items-center";
+    const deleteIconInner = document.createElement("i");
+    deleteIconInner.className =
+      "fa-solid fa-trash text-xl cursor-pointer text-text-error";
+    deleteIcon.appendChild(deleteIconInner);
+    topWrapper.appendChild(deleteIcon);
     const wrapper2 = document.createElement("div");
     wrapper2.className = "wrapper";
 
     const description = document.createElement("div");
     description.className = "description text-text-secondary line-clamp-5";
-    description.textContent = noticeData.description;
+    description.innerHTML = noticeData.description.replace(/\n/g, "<br>");
 
     const linkWrapper = document.createElement("div");
     linkWrapper.className =
-      "wrapper text-text-link underline text-sm flex gap-4";
+      "wrapper text-text-link underline text-sm flex gap-4 pb-4 md:pb-0";
 
     const readmore = document.createElement("p");
     readmore.className = "cursor-pointer";
@@ -128,8 +183,10 @@ function renderSwiper() {
     attachment.textContent = "See attachment";
     attachment.className = "cursor-pointer hidden";
     attachment.target = "_blank";
+    deleteIcon.addEventListener("click", async () => {
+      deleteNotice(key, noticeData.attachmentId);
+    });
 
-    // Assign attachment link if available
     if (noticeData.attachmentURL) {
       let rawURL = noticeData.attachmentURL;
       if (!rawURL.startsWith("http")) {
@@ -138,37 +195,30 @@ function renderSwiper() {
       attachment.href = rawURL;
       attachment.classList.remove("hidden");
     }
-
     linkWrapper.appendChild(readmore);
     linkWrapper.appendChild(attachment);
-
     wrapper2.appendChild(description);
     wrapper2.appendChild(linkWrapper);
-
     swiperSlide.appendChild(topWrapper);
     swiperSlide.appendChild(wrapper2);
-
-    Swiperwrapper.appendChild(swiperSlide);
-
+    swiper.appendSlide(swiperSlide);
     requestAnimationFrame(() => {
       if (description.scrollHeight > description.clientHeight) {
         readmore.style.display = "inline";
       }
     });
 
-    // Readmore click handler → populate popup
     readmore.addEventListener("click", () => {
       const popup = document.getElementById("readmore-popup");
       const popupTitle = document.getElementById("readmore-popup-title");
       const popupContent = document.getElementById("readmore-popup-content");
       const popupAttachment = document.getElementById("popup-attachment-link");
-
-      popupTitle.textContent = key;
-      popupContent.textContent = noticeData.description || noticeData;
-
-      // Add attachment to popup if available
+      popupAttachment;
+      popupTitle.textContent = noticeData.title;
+      popupContent.textContent = noticeData.description;
       if (noticeData.attachmentURL) {
         popupAttachment.href = noticeData.attachmentURL;
+        popupAttachment.target = "_blank";
         popupAttachment.classList.remove("hidden");
       } else {
         popupAttachment.classList.add("hidden");
@@ -176,207 +226,959 @@ function renderSwiper() {
       popup.classList.remove("hidden");
     });
   }
-  swiperInstance = new Swiper("#subject-page-swiper", {
-    direction: "horizontal",
-    loop: true,
-    slidesPerView: "auto",
-    spaceBetween: 30,
-    centeredSlides: true,
-    pagination: {
-      el: ".swiper-pagination",
-    },
-  });
 }
 document
   .getElementById("close-readmore-popup")
-  .addEventListener("click", () => {
-    document.getElementById("readmore-popup").classList.add("hidden");
+  ?.addEventListener("click", () => {
+    document.getElementById("readmore-popup")?.classList.add("hidden");
   });
-function renderUpcomingSubmissions() {
-  const submissions = subjectData.upcomingSubmissions[activeSubject];
-  if (!submissions || Object.keys(submissions).length === 0) {
-    fadeOutEffect(upcomingSubmissionCardWrapper);
-    return;
-  }
-
-  console.log(subjectData.upcomingSubmissions[activeSubject]);
-
-  for (const key in subjectData.upcomingSubmissions[activeSubject]) {
-    let submissions = subjectData.upcomingSubmissions[activeSubject][key];
-    // Create the card container
-    const card = document.createElement("div");
-    card.className = "card p-4 bg-surface-2 rounded-[20px]";
-
-    // Create the description paragraph
-    const description = document.createElement("p");
-    description.className = "description";
-    description.textContent = submissions.description;
-
-    // Create the submission-date paragraph
-    const submissionDate = document.createElement("p");
-    submissionDate.className = "submission-date";
-    submissionDate.textContent = submissions.date;
-
-    // Append the paragraphs to the card
-    card.appendChild(description);
-    card.appendChild(submissionDate);
-
-    // Append the card to the body or any specific container
-    upcomingSubmissionCardWrapper.appendChild(card);
-  }
-}
-function renderResources() {
-  console.log("this is category", activeSubjectObj.content);
-  for (const category in activeSubjectObj.content) {
-    const items = activeSubjectObj.content[category];
-
-    // Create main container for this category (e.g., textbooks, notes, etc.)
-    const container = document.createElement("div");
-    container.className = "container gap-2 lg:gap-3 flex flex-col";
-
-    // Add heading (like "Textbooks")
-    const heading = document.createElement("p");
-    heading.className = "text-2xl font-semibold";
-    heading.textContent = category.charAt(0).toUpperCase() + category.slice(1);
-    container.appendChild(heading);
-
-    // Card wrapper
-    const cardWrapper = document.createElement("div");
-    cardWrapper.className = "card-wrapper grid-auto-fit";
-
-    for (const key in items) {
-      const item = items[key];
-      // if (!item.visibility) continue; // Skip if not visible
-
-      // Create individual card
-      const card = document.createElement("div");
-      card.className =
-        "card p-4 w-full text-center t bg-surface-2 rounded-[20px]";
-
-      const link = document.createElement("a");
-      link.href = item.link;
-      link.className = "text-center";
-      link.textContent = item.title;
-
-      card.appendChild(link);
-      cardWrapper.appendChild(card);
+async function deleteNotice(key, attachmentId) {
+  const confirmed = await showConfirmationPopup(
+    "The notice will be deleted permenantly"
+  );
+  if (!confirmed) return;
+  showSectionLoader("Deleting notice...");
+  if (attachmentId) {
+    showSectionLoader("Deleting attachment...");
+    const deleted = await deleteDriveFile(attachmentId);
+    if (!deleted) {
+      showErrorSection();
+      return;
     }
-
-    container.appendChild(cardWrapper);
-    subjectPageSection.appendChild(container);
+    showSectionLoader("Deleting notice...");
   }
+  await deleteData(
+    `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/notice/${appState.activeSubject}/${key}`
+  );
+  await showSectionLoader("Syncing data...");
+  await syncDbData();
+  await hideSectionLoader();
+  loadSubjectSection();
 }
+function resetAddNoticePopup() {
+  addNoticeTitleInput.value = "";
+  addNoticeDescriptionInput.value = "";
+  addNoticefileInput.value = "";
+  addNoticeLinkInput.value = "";
+  addNotivePopupFileAttachmentText.textContent = "Upload (Optional)";
+  fadeInEffect(addNoticePopupFileAttachmentIcon);
+  fadeOutEffect(addNoticePopupLinkError);
+  fadeOutEffect(addNoticePopupdescriptionError);
+  fadeOutEffect(addNoticePopuptitleError);
+}
+// listeners
+addNoticeFileAttachment.addEventListener("click", () => {
+  addNoticefileInput.click();
+});
 addNoticeBtn.addEventListener("click", () => {
   fadeInEffect(addNoticePopup);
 });
-closeFormBtn.addEventListener("click", (e) => {
-  fadeOutEffect(addNoticePopup);
+addNoticePopupcloseBtn.addEventListener("click", async (e) => {
+  await fadeOutEffect(addNoticePopup);
+  resetAddNoticePopup();
 });
-
-// createNoticeBtn.addEventListener("click", () => {
-//   const path = ref(
-//     db,
-//     `semesters/${activeSem}/divisions/${activeDiv}/subjects/notice/${activeSubject}`
-//   );
-//   console.log(activeDiv, activeSem, activeSubject);
-//   console.log(path);
-//   console.log(createNoticeDescription.value + createNoticeTitleInput.value);
-
-//   push(path, {
-//     attachmentURL: "",
-//     description: createNoticeDescription.value,
-//     title: createNoticeTitleInput.value,
-//   })
-//     .then(() => {
-//       console.log("Notice added successfully");
-//       createNoticeTitleInput.value = "";
-//       createNoticeDescription.value = "";
-//       titleRelatedError.classList.add("hidden");
-//       descriptionRelatedError.classList.add("hidden");
-//       fadeOutEffect(addNoticePopup);
-//     })
-//     .catch((error) => {
-//       console.log(error);
-//     });
-// });
-
-createNoticeBtn.addEventListener("click", async () => {
-  const title = createNoticeTitleInput.value.trim();
-  const description = createNoticeDescription.value.trim();
-  const file = fileInput.files[0];
-
-  // Reset errors
-  titleRelatedError.classList.add("hidden");
-  descriptionRelatedError.classList.add("hidden");
-
+addNoticePopupcreateBtn.addEventListener("click", async () => {
+  const title = addNoticeTitleInput.value.trim();
+  const description = addNoticeDescriptionInput.value.trim();
+  const file = addNoticefileInput.files[0];
+  fadeOutEffect(addNoticePopuptitleError);
+  fadeOutEffect(addNoticePopupdescriptionError);
+  fadeOutEffect(addNoticePopupLinkError);
+  const link = addNoticeLinkInput.value.trim();
+  fadeOutEffect(addNoticePopupLinkError);
   let hasError = false;
   if (!title) {
-    titleRelatedError.textContent = "Title is required";
-    titleRelatedError.classList.remove("hidden");
+    addNoticePopuptitleError.textContent = "Title is required";
+    fadeInEffect(addNoticePopuptitleError);
     hasError = true;
   }
   if (!description) {
-    descriptionRelatedError.textContent = "Description is required";
-    descriptionRelatedError.classList.remove("hidden");
+    addNoticePopupdescriptionError.textContent = "Description is required";
+    fadeInEffect(addNoticePopupdescriptionError);
     hasError = true;
   }
+  if (!file && link && !/^https?:\/\//.test(link)) {
+    addNoticePopupLinkError.textContent =
+      "Enter a valid link starting with http:// or https://";
+    fadeInEffect(addNoticePopupLinkError);
+    hasError = true;
+  }
+  if (file && link) {
+    fadeInEffect(addNoticePopupErrorPopup);
+    return;
+  }
   if (hasError) return;
-
   let attachmentURL = "";
   let attachmentId = "";
-
+  showSectionLoader("Uploading attachment...");
   if (file) {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append(
-      "path",
-      `resources/${activeSem}/${activeDiv}/${activeSubject}`
+    let uploaded = await uploadDriveFile(
+      file,
+      `resources/${appState.activeSem}/${appState.activeDiv}/${appState.activeSubject}/notices`
     );
-
-    try {
-      const response = await fetch(
-        "https://lesp-resources-gdrive-api.onrender.com/upload",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-
-      const result = await response.json();
-      if (result.success) {
-        attachmentURL = result.webViewLink;
-        attachmentId = result.fileId; // ✅ Capture the fileId
-      } else {
-        alert("File upload failed: " + result.error);
-        return;
-      }
-    } catch (err) {
-      console.error("Upload error:", err);
-      alert("Something went wrong while uploading file.");
+    if (!uploaded) return;
+    attachmentURL = uploaded.webViewLink;
+    attachmentId = uploaded.fileId;
+  } else if (link) {
+    attachmentURL = link;
+    attachmentId = "custom-link";
+  }
+  showSectionLoader("Adding notice...");
+  await pushData(
+    `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/notice/${appState.activeSubject}`,
+    {
+      attachmentURL,
+      attachmentId,
+      title,
+      description,
+      createdAt: Date.now(),
+    }
+  );
+  fadeOutEffect(addNoticePopup);
+  resetAddNoticePopup();
+  await showSectionLoader("Syncing data...");
+  await syncDbData();
+  await hideSectionLoader();
+  loadSubjectSection();
+});
+addNoticefileInput.addEventListener("change", () => {
+  const file = addNoticefileInput.files[0];
+  if (file) {
+    if (file.size > 20 * 1024 * 1024) {
+      addNoticefileInput.value = "";
+      addNoticePopupLinkError.textContent = "File too large (max 20MB)";
+      fadeInEffect(addNoticePopupLinkError);
+      fadeInEffect(addNoticePopupFileAttachmentIcon);
       return;
     }
+    fadeOutEffect(addNoticePopupFileAttachmentIcon);
+    addNotivePopupFileAttachmentText.textContent = "1 file attached";
+  } else {
+    fadeInEffect(addNoticePopupFileAttachmentIcon);
+    addNotivePopupFileAttachmentText.textContent = "Upload (Optional)";
+  }
+});
+addNoticePopupErrorPopupOkayBtn.addEventListener("click", async () => {
+  await fadeOutEffect(addNoticePopup);
+  fadeOutEffect(addNoticePopupErrorPopup);
+  resetAddNoticePopup();
+});
+
+//
+// add category related var and fucntion
+let isCategoryEditing = false;
+let selectedCategoryId = null;
+const addCategoryBtn = document.querySelector(".add-category-container-btn");
+const addCategoryPopup = document.querySelector(".add-category-popup-wrapper");
+const addCategoryPopupTitle = addCategoryPopup.querySelector(".popup-title");
+//popup buttons
+const addCategoryPopupCloseBtn =
+  addCategoryPopup.querySelector(".close-popup-btn");
+const addCategoryPopupCreateBtn = addCategoryPopup.querySelector(".create-btn");
+// inputs
+const addCategoryTitleInput = addCategoryPopup.querySelector(".title-input");
+const addCategoryTitleError = addCategoryPopup.querySelector(
+  ".title-related-error"
+);
+// listners
+addCategoryBtn.addEventListener("click", () => {
+  fadeInEffect(addCategoryPopup);
+});
+addCategoryPopupCloseBtn.addEventListener("click", async () => {
+  await fadeOutEffect(addCategoryPopup);
+  resetAddCategoryPopup();
+});
+addCategoryPopupCreateBtn.addEventListener("click", async () => {
+  const title = addCategoryTitleInput.value.trim();
+  addCategoryTitleError.classList.add("hidden");
+  if (!title) {
+    addCategoryTitleError.textContent = "Title is required";
+    fadeInEffect(addCategoryTitleError);
+    return;
+  }
+  if (isCategoryEditing) {
+    await showSectionLoader("Updating category...");
+    updateData(
+      `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/individualSubjects/${appState.activeSubject}/content/${selectedCategoryId}`,
+      { name: title }
+    );
+  } else {
+    showSectionLoader("Adding category...");
+    await pushData(
+      `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/individualSubjects/${appState.activeSubject}/content`,
+      { name: title, visible: true }
+    );
+  }
+  await fadeOutEffect(addCategoryPopup);
+  resetAddCategoryPopup();
+  showSectionLoader("Syncing data...");
+  await syncDbData();
+  hideSectionLoader();
+  loadSubjectSection();
+});
+async function deleteCategory() {
+  const confirm = await showConfirmationPopup(
+    "All the content in this category will be deleted forever"
+  );
+  if (!confirm) return;
+  showSectionLoader("Deleting category...");
+  const data =
+    appState.subjectData.individualSubjects[appState.activeSubject].content[
+      selectedCategoryId
+    ];
+  showSectionLoader("Deleting individual content...");
+  for (const key in data.items) {
+    const element = data.items[key];
+    if (element.attachmentId === "custom-link") continue;
+    await deleteDriveFile(element.attachmentId);
+  }
+  await deleteData(
+    `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/individualSubjects/${appState.activeSubject}/content/${selectedCategoryId}`
+  );
+  await showSectionLoader("Syncing data...");
+  await syncDbData();
+  loadSubjectSection();
+  hideSectionLoader();
+}
+async function resetAddCategoryPopup() {
+  fadeInEffect(addItemPopupCreateBtn);
+  addCategoryTitleInput.value = "";
+  fadeOutEffect(addCategoryTitleError);
+  isCategoryEditing = false;
+  selectedCategoryId = null;
+  addCategoryPopupCreateBtn.textContent = "Create";
+  addCategoryPopupTitle.textContent = "Add Category";
+}
+function editCategory() {
+  addCategoryTitleInput.value =
+    appState.subjectData.individualSubjects[appState.activeSubject].content[
+      selectedCategoryId
+    ].name;
+  isCategoryEditing = true;
+  addCategoryPopupCreateBtn.textContent = "Edit";
+  addCategoryPopupTitle.textContent = "Edit Category";
+  fadeInEffect(addCategoryPopup);
+}
+async function toggleCategoryVisibility() {
+  const confirm = await showConfirmationPopup(
+    "All the content in this category will not be visible to students until you unhide it"
+  );
+  if (!confirm) return;
+  await showSectionLoader("Changing visibility...");
+  await updateData(
+    `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/individualSubjects/${appState.activeSubject}/content/${selectedCategoryId}`,
+    {
+      visible:
+        !appState.subjectData.individualSubjects[appState.activeSubject]
+          .content[selectedCategoryId].visible,
+    }
+  );
+  await showSectionLoader("Syncing data...");
+  await syncDbData();
+  hideSectionLoader();
+  loadSubjectSection();
+}
+//
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+///
+
+// individual resource item related var and functions
+
+// individual item var and function
+let isItemEditing = false;
+let selectedItemId = null;
+let originalLink = "";
+let originalAttachmentId = "";
+const addItemPopup = document.querySelector(".add-item-popup-wrapper");
+const addItemPopupTitle = addItemPopup.querySelector(".popup-title");
+//popup buttons
+const addItemPopupCloseBtn = addItemPopup.querySelector(".close-popup-btn");
+const addItemPopupCreateBtn = addItemPopup.querySelector(".create-btn");
+const addItemPopupChangeAttachmentBtn = addItemPopup.querySelector(
+  ".change-attachment-btn"
+);
+// inputs
+const addItemPopupTitleInput = addItemPopup.querySelector(".title-input");
+const addItemPopupLinkInput = addItemPopup.querySelector(".link-input");
+const addItemPopupFileInput = addItemPopup.querySelector("#item-file-input");
+// error msgs
+const addItemPopupTitleError = addItemPopup.querySelector(".title-error");
+const addItemPopupLinkError = addItemPopup.querySelector(".link-error");
+// error popup
+const addItemPopupErrorPopup = addItemPopup.querySelector(
+  ".error-popup-wrapper "
+);
+const addItemPopupErrorPopupOkBtn = addItemPopup.querySelector(
+  ".error-popup-wrapper .okay-btn"
+);
+// editor icons
+const addItemPopupEditTools = addItemPopup.querySelector(".edit-tools");
+const addItemPopupHideIcon = addItemPopup.querySelector(".hide-icon");
+const addItemPopupUnhideIcon = addItemPopup.querySelector(".unhide-icon");
+const addItemPopupDeleteIcon = addItemPopup.querySelector(".delete-icon");
+// file attachment ui
+const addItemPopupFileAttachment =
+  addItemPopup.querySelector(".upload-attachment");
+const addItemPopupFileAttachmentText = addItemPopup.querySelector(
+  ".upload-attachment .upload-text"
+);
+const addItemPopupFileAttachmentIcon = addItemPopup.querySelector(
+  ".upload-attachment .upload-attachment-icon "
+);
+const addItemPopupOrLine = addItemPopup.querySelector(".or-line");
+const addItemPopupLinkInputLabel =
+  addItemPopup.querySelector(".link-input-label");
+function resetAddItemPopup() {
+  addItemPopupTitleInput.value = "";
+  addItemPopupLinkInput.value = "";
+  addItemPopupFileInput.value = "";
+  addItemPopupCreateBtn.textContent = "Create";
+  addItemPopupFileAttachmentText.textContent = "Upload (Optional)";
+  addItemPopupTitle.textContent = "Add Item";
+  fadeInEffect(addItemPopupLinkInputLabel);
+  fadeInEffect(addItemPopupLinkInput);
+  fadeInEffect(addItemPopupFileAttachmentIcon);
+  fadeInEffect(addItemPopupFileAttachment);
+  fadeInEffect(addItemPopupOrLine);
+  fadeOutEffect(addItemPopupTitleError);
+  fadeOutEffect(addItemPopupLinkError);
+  fadeOutEffect(addItemPopupChangeAttachmentBtn);
+  fadeOutEffect(addItemPopupEditTools);
+  originalAttachmentId = "";
+  originalLink = "";
+  isItemEditing = false;
+  selectedItemId = null;
+}
+function editItem(itemId, categoryId, link, attachmentId, title, visible) {
+  selectedItemId = itemId;
+  selectedCategoryId = categoryId;
+  originalLink = link;
+  originalAttachmentId = attachmentId || "custom-link";
+  isItemEditing = true;
+  addItemPopupTitleInput.value = title;
+  addItemPopupLinkInput.value = link;
+  addItemPopupFileInput.value = "";
+  addItemPopupTitle.textContent = "Edit Item";
+  addItemPopupCreateBtn.textContent = "Update";
+  fadeOutEffect(addItemPopupLinkInputLabel);
+  fadeOutEffect(addItemPopupLinkInput);
+  fadeInEffect(addItemPopupEditTools);
+  fadeInEffect(addItemPopupDeleteIcon);
+  if (visible === false) {
+    fadeInEffect(addItemPopupUnhideIcon);
+    fadeOutEffect(addItemPopupHideIcon);
+  } else {
+    fadeOutEffect(addItemPopupUnhideIcon);
+    fadeInEffect(addItemPopupHideIcon);
+  }
+  fadeInEffect(addItemPopupChangeAttachmentBtn);
+  fadeOutEffect(addItemPopupFileAttachment);
+  fadeOutEffect(addItemPopupOrLine);
+  addItemPopupCreateBtn.textContent = "Edit";
+  fadeInEffect(addItemPopup);
+}
+addItemPopupChangeAttachmentBtn.addEventListener("click", () => {
+  fadeInEffect(addItemPopupCreateBtn);
+  fadeInEffect(addItemPopupFileAttachment);
+  fadeInEffect(addItemPopupLinkInput);
+  fadeInEffect(addItemPopupLinkInputLabel);
+  addItemPopupLinkInput.value = "";
+  fadeOutEffect(addItemPopupChangeAttachmentBtn);
+});
+addItemPopupFileAttachment.addEventListener("click", () => {
+  addItemPopupFileInput.click();
+});
+addItemPopupCloseBtn.addEventListener("click", async () => {
+  await fadeOutEffect(addItemPopup);
+  resetAddItemPopup();
+});
+addItemPopupErrorPopupOkBtn.addEventListener("click", async () => {
+  fadeOutEffect(addItemPopup);
+  await fadeOutEffect(addItemPopupErrorPopup);
+  resetAddItemPopup();
+});
+addItemPopupFileInput.addEventListener("change", () => {
+  const file = addItemPopupFileInput.files[0];
+  if (file) {
+    if (file.size > 20 * 1024 * 1024) {
+      addNoticefileInput.value = "";
+      addItemPopupLinkError.textContent = "File too large (max 20MB)";
+      fadeInEffect(addItemPopupLinkError);
+      return;
+    }
+    fadeOutEffect(addItemPopupFileAttachmentIcon);
+    addItemPopupFileAttachmentText.textContent = "1 file attached";
+  } else {
+    resetAddItemPopup();
+  }
+});
+addItemPopupCreateBtn.addEventListener("click", async () => {
+  const title = addItemPopupTitleInput.value.trim();
+  const link = addItemPopupLinkInput.value.trim();
+  const file = addItemPopupFileInput.files[0];
+  fadeOutEffect(addItemPopupTitleError);
+  fadeOutEffect(addItemPopupLinkError);
+  let iserror = false;
+  if (!title) {
+    addItemPopupTitleError.textContent = "Title is required";
+    fadeInEffect(addItemPopupTitleError);
+    iserror = true;
+  }
+  if (!link && !file) {
+    addItemPopupLinkError.textContent = "Link or file is required";
+    fadeInEffect(addItemPopupLinkError);
+    iserror = true;
+  }
+  if (file && link) {
+    fadeInEffect(addItemPopupErrorPopup);
+    return;
+  }
+  if (link && !/^https?:\/\//.test(link)) {
+    addItemPopupLinkError.textContent =
+      "Enter a valid link starting with http:// or https://";
+    fadeInEffect(addItemPopupLinkError);
+    iserror = true;
+  }
+  if (iserror) return;
+  let attachmentURL = "";
+  let attachmentId = "";
+  if (file) {
+    showSectionLoader("Uploading file...");
+    let uploaded = await uploadDriveFile(
+      file,
+      `resources/${appState.activeSem}/${appState.activeDiv}/${appState.activeSubject}/resources`
+    );
+    if (!uploaded) return;
+    attachmentURL = uploaded.webViewLink;
+    attachmentId = uploaded.fileId;
+  } else {
+    attachmentURL = link;
+    if (link !== originalLink) {
+      attachmentId = "custom-link";
+    } else {
+      attachmentId = originalAttachmentId;
+    }
+  }
+  if (isItemEditing) {
+    if (originalAttachmentId !== attachmentId) {
+      showSectionLoader("Deleting old file...");
+      await deleteDriveFile(originalAttachmentId);
+    }
+    showSectionLoader("Updating item...");
+    await updateData(
+      `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/individualSubjects/${appState.activeSubject}/content/${selectedCategoryId}/items/${selectedItemId}`,
+      {
+        title,
+        link: attachmentURL,
+        attachmentId,
+        createdAt: Date.now(),
+      }
+    );
+  } else {
+    showSectionLoader("Adding item...");
+    pushData(
+      `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/individualSubjects/${appState.activeSubject}/content/${selectedCategoryId}/items`,
+      {
+        title,
+        link: attachmentURL,
+        attachmentId,
+        createdAt: Date.now(),
+        visible: true,
+      }
+    );
+  }
+  fadeOutEffect(addItemPopup);
+  showSectionLoader("Syncing data...");
+  await syncDbData();
+  hideSectionLoader();
+  resetAddItemPopup();
+  loadSubjectSection();
+});
+addItemPopupUnhideIcon.addEventListener("click", async () => {
+  let confirm = await showConfirmationPopup(
+    "Are you sure you want to unhide this item?"
+  );
+  if (!confirm) return;
+  showSectionLoader("Unhiding item...");
+  updateData(
+    `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/individualSubjects/${appState.activeSubject}/content/${selectedCategoryId}/items/${selectedItemId}`,
+    { visible: true }
+  );
+  fadeOutEffect(addItemPopup);
+  showSectionLoader("Syncing data...");
+  await syncDbData();
+  hideSectionLoader();
+  resetAddItemPopup();
+  loadSubjectSection();
+});
+addItemPopupHideIcon.addEventListener("click", async () => {
+  let confirm = await showConfirmationPopup(
+    "Are you sure you want to hide this item?"
+  );
+  if (!confirm) return;
+  showSectionLoader("Hiding item...");
+  updateData(
+    `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/individualSubjects/${appState.activeSubject}/content/${selectedCategoryId}/items/${selectedItemId}`,
+    { visible: false }
+  );
+  fadeOutEffect(addItemPopup);
+  showSectionLoader("Syncing data...");
+  await syncDbData();
+  hideSectionLoader();
+  resetAddItemPopup();
+  loadSubjectSection();
+});
+addItemPopupDeleteIcon.addEventListener("click", async () => {
+  let confirm = await showConfirmationPopup(
+    "Are you sure you want to delete this item?"
+  );
+  if (!confirm) return;
+  if (
+    appState.subjectData.individualSubjects[appState.activeSubject].content[
+      selectedCategoryId
+    ].items[selectedItemId].attachmentId !== "custom-link"
+  ) {
+    showSectionLoader("Deleting uploaded attachment...");
+    await deleteDriveFile(originalAttachmentId);
+    showSectionLoader("Deleting item...");
+  }
+  deleteData(
+    `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/individualSubjects/${appState.activeSubject}/content/${selectedCategoryId}/items/${selectedItemId}`
+  );
+  fadeOutEffect(addItemPopup);
+  showSectionLoader("Syncing data...");
+  await syncDbData();
+  hideSectionLoader();
+  resetAddItemPopup();
+  loadSubjectSection();
+});
+function renderResources() {
+  if (!appState.subjectData.individualSubjects[appState.activeSubject].content)
+    return;
+  const categoryData =
+    appState.subjectData.individualSubjects[appState.activeSubject].content;
+  for (const categoryId in categoryData) {
+    const category = categoryData[categoryId];
+    const container = document.createElement("div");
+    container.className =
+      "category-item-container dynamic-container gap-2 lg:gap-3 flex flex-col w-full";
+    if (!category.visible) {
+      container.classList.add("hidden");
+      container.classList.add("editor-only-content");
+    }
+    const headingWrapper = document.createElement("div");
+    headingWrapper.className = "gap-2 lg:gap-3 flex items-center w-full";
+    const heading = document.createElement("p");
+    if (!category.visible)
+      heading.className = "text-2xl font-semibold opacity-50";
+    else heading.className = "text-2xl font-semibold";
+    heading.textContent = category.name;
+
+    const plusIcon = document.createElement("div");
+    plusIcon.className = "plus-icon hidden editor-tool";
+    const plusIconInner = document.createElement("i");
+    plusIconInner.className = "fa-solid fa-plus text-2xl cursor-pointer";
+    plusIcon.appendChild(plusIconInner);
+
+    const editIcon = document.createElement("div");
+    editIcon.className = "edit-icon hidden editor-tool ml-auto";
+    const editIconInner = document.createElement("i");
+    editIconInner.className = "fa-solid fa-pen text-xl cursor-pointer ml-auto";
+    editIcon.appendChild(editIconInner);
+
+    const deleteIcon = document.createElement("div");
+    deleteIcon.className = "delete-icon hidden editor-tool";
+    const deleteIconInner = document.createElement("i");
+    deleteIconInner.className =
+      "fa-solid fa-trash text-xl cursor-pointer text-text-error";
+    deleteIcon.appendChild(deleteIconInner);
+    const visibilityIcon = document.createElement("div");
+    visibilityIcon.className = "visibility-icon hidden editor-tool";
+    const visibilityIconInner = document.createElement("i");
+    visibilityIconInner.className = category.visible
+      ? "fa-solid fa-eye-slash text-xl cursor-pointer"
+      : "fa-solid fa-eye text-xl cursor-pointer";
+    visibilityIcon.appendChild(visibilityIconInner);
+    headingWrapper.appendChild(heading);
+    headingWrapper.appendChild(plusIcon);
+    headingWrapper.appendChild(editIcon);
+    headingWrapper.appendChild(visibilityIcon);
+    headingWrapper.appendChild(deleteIcon);
+    container.appendChild(headingWrapper);
+
+    plusIcon.addEventListener("click", () => {
+      selectedCategoryId = categoryId;
+      fadeInEffect(addItemPopup);
+    });
+    deleteIcon.addEventListener("click", () => {
+      selectedCategoryId = categoryId;
+      deleteCategory();
+    });
+    editIcon.addEventListener("click", () => {
+      selectedCategoryId = categoryId;
+      editCategory();
+    });
+    visibilityIcon.addEventListener("click", () => {
+      selectedCategoryId = categoryId;
+      toggleCategoryVisibility();
+    });
+
+    const cardContainer = document.createElement("div");
+    if (!category.visible) {
+      cardContainer.className = "card-wrapper grid-auto-fit opacity-50";
+    } else cardContainer.className = "card-wrapper grid-auto-fit";
+
+    const items = category.items;
+    for (const itemId in items) {
+      const item = items[itemId];
+      const link = document.createElement("a");
+      link.href = item.link;
+      link.target = "_blank";
+      link.className = "w-full";
+      const card = document.createElement("div");
+
+      if (!item.visible) {
+        card.className =
+          "card p-4 w-full text-center t bg-surface-2 rounded-[20px] hidden editor-only-content-card visiblity-hidden";
+        link.classList.add("hidden");
+      } else
+        card.className =
+          "card p-4 w-full text-center t bg-surface-2 rounded-[20px]";
+
+      card.textContent = item.title;
+      link.appendChild(card);
+      cardContainer.appendChild(link);
+
+      // listner
+      card.addEventListener("click", (e) => {
+        if (appState.isEditing) {
+          e.preventDefault(); // Prevent navigation
+          editItem(
+            itemId,
+            categoryId,
+            item.link,
+            item.attachmentId,
+            item.title,
+            item.visible
+          );
+        }
+      });
+    }
+
+    container.appendChild(cardContainer);
+    subjectPageSection.appendChild(container);
+  }
+}
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+// upcoming submission var and function
+const upcomingSubmissionCardContainer = document.querySelector(
+  ".upcoming-submissions .card-container"
+);
+const upcomingSubmission = document.querySelector(".upcoming-submissions");
+let isSubmissionEditing = false;
+let selectedSubmissionId = null;
+const addSubbmissionButton = document.querySelector(".add-submission-btn");
+const addSubmissionPopup = document.querySelector(
+  ".add-submission-popup-wrapper"
+);
+const addSubmissionPopupTitle =
+  addSubmissionPopup.querySelector(".popup-title");
+// popup buttons
+const addSubmissionPopupCreateBtn =
+  addSubmissionPopup.querySelector(".create-btn");
+const addSubmissionPopupDeleteIcon =
+  addSubmissionPopup.querySelector(".delete-icon");
+const addSubmissionPopupCloseIcon =
+  addSubmissionPopup.querySelector(".close-popup-btn");
+const addSubmissionPopupChangeDateBtn =
+  addSubmissionPopup.querySelector(".change-date-btn");
+// error messages
+const addSubmissionPopupTitleError = addSubmissionPopup.querySelector(
+  ".title-related-error"
+);
+const addSubmissionPopupDescriptionError = addSubmissionPopup.querySelector(
+  ".submission-description-related-error"
+);
+// inputs
+const addSubmissionPopupTitleInput = addSubmissionPopup.querySelector(
+  "#submission-title-input"
+);
+const addSubmissionPopupDescriptionInput = addSubmissionPopup.querySelector(
+  "#submission-description-input"
+);
+const addSubmissionPopupDateInput = document.querySelector(
+  "#submission-date-input"
+);
+// error popup
+const addSubmissionPopupErrorPopup = addSubmissionPopup.querySelector(
+  ".error-popup-wrapper "
+);
+const addSubmissionPopupErrorPopupOkBtn = addSubmissionPopup.querySelector(
+  ".error-popup-wrapper .okay-btn"
+);
+const fakePlaceHolder = document.querySelector(".fake-placeholder");
+const addSubmissionPopupDateInputWrapper = addSubmissionPopup.querySelector(
+  ".date-input-wrapper"
+);
+const addSubmissionPopupDescriptionInputWrapper =
+  addSubmissionPopup.querySelector(".description-input-wrapper");
+const addSubmissionPopupDateOrLine =
+  addSubmissionPopup.querySelector(".or-line");
+addSubbmissionButton.addEventListener("click", () => {
+  fadeInEffect(addSubmissionPopup);
+});
+addSubmissionPopupCloseIcon.addEventListener("click", async () => {
+  await fadeOutEffect(addSubmissionPopup);
+  resetAddUpcomingSubmissionPopup();
+});
+addSubmissionPopupDateInput.addEventListener("click", () => {
+  openDatePicker();
+});
+addSubmissionPopupErrorPopupOkBtn.addEventListener("click", () => {
+  fadeOutEffect(addSubmissionPopupErrorPopup);
+  fadeOutEffect(addSubmissionPopup);
+  resetAddUpcomingSubmissionPopup();
+});
+addSubmissionPopupDateInput.addEventListener("input", () => {
+  fadeOutEffect(fakePlaceHolder);
+});
+addSubmissionPopupCreateBtn.addEventListener("click", async () => {
+  let title = addSubmissionPopupTitleInput.value;
+  let description = addSubmissionPopupDescriptionInput.value;
+  let date = addSubmissionPopupDateInput.value;
+  fadeOutEffect(addSubmissionPopupTitleError);
+  fadeOutEffect(addSubmissionPopupDescriptionError);
+  let isError = false;
+  if (!title) {
+    isError = true;
+    addSubmissionPopupTitleError.textContent = "Required";
+    fadeInEffect(addSubmissionPopupTitleError);
+  }
+  if (!description && !date) {
+    isError = true;
+    addSubmissionPopupDescriptionError.textContent = "Required";
+    fadeInEffect(addSubmissionPopupDescriptionError);
+  }
+  if (description && date) {
+    isError = true;
+    fadeInEffect(addSubmissionPopupErrorPopup);
+  }
+  if (isError) return;
+  if (description) {
+    date = description;
+  }
+  if (isSubmissionEditing) {
+    showSectionLoader("Updating submission...");
+    updateData(
+      `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/upcomingSubmissions/${appState.activeSubject}/${selectedSubmissionId}`,
+      {
+        title: title,
+        date: date,
+      }
+    );
+  } else {
+    showSectionLoader("Creating submission...");
+    await pushData(
+      `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/upcomingSubmissions/${appState.activeSubject}`,
+      {
+        title: title,
+        date: date,
+      }
+    );
+  }
+  await fadeOutEffect(addSubmissionPopup);
+  resetAddUpcomingSubmissionPopup();
+  showSectionLoader("Syncing data...");
+  await syncDbData();
+  hideSectionLoader();
+  loadSubjectSection();
+});
+addSubmissionPopupDeleteIcon.addEventListener("click", async () => {
+  const confirm = await showConfirmationPopup(
+    "All the content in this category will be deleted forever"
+  );
+  if (!confirm) return;
+  showSectionLoader("Deleting submission...");
+  await deleteData(
+    `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/upcomingSubmissions/${appState.activeSubject}/${selectedSubmissionId}`
+  );
+  await fadeOutEffect(addSubmissionPopup);
+  resetAddUpcomingSubmissionPopup();
+  showSectionLoader("Syncing data...");
+  await syncDbData();
+  hideSectionLoader();
+  loadSubjectSection();
+});
+function resetAddUpcomingSubmissionPopup() {
+  fadeInEffect(addSubmissionPopupDateInputWrapper);
+  fadeInEffect(addSubmissionPopupDescriptionInputWrapper);
+  fadeOutEffect(addSubmissionPopupChangeDateBtn);
+  addSubmissionPopupTitleInput.value = "";
+  addSubmissionPopupDescriptionInput.value = "";
+  addSubmissionPopupDateInput.value = "";
+  isSubmissionEditing = false;
+  selectedSubmissionId = null;
+  addSubmissionPopupTitle.textContent = "Add Submission";
+  addSubmissionPopupCreateBtn.textContent = "Create";
+  fadeInEffect(fakePlaceHolder);
+  fadeOutEffect(addSubmissionPopupDeleteIcon);
+}
+addSubmissionPopupChangeDateBtn.addEventListener("click", () => {
+  fadeInEffect(addSubmissionPopupDateInputWrapper);
+  fadeInEffect(addSubmissionPopupDescriptionInputWrapper);
+  addSubmissionPopupDescriptionInput.value = "";
+  fadeOutEffect(addSubmissionPopupChangeDateBtn);
+});
+function openDatePicker() {
+  if (addSubmissionPopupDateInput.showPicker) {
+    addSubmissionPopupDateInput.showPicker();
+  } else {
+    addSubmissionPopupDateInput.focus();
+  }
+}
+function editUpcomingSubmission(submissionId) {
+  fadeInEffect(addSubmissionPopupChangeDateBtn);
+  fadeOutEffect(addSubmissionPopupDateInputWrapper);
+  fadeOutEffect(addSubmissionPopupDescriptionInputWrapper);
+  fadeOutEffect(addSubmissionPopupDateOrLine);
+  addSubmissionPopupCreateBtn.textContent = "Edit";
+  addSubmissionPopupTitleInput.value =
+    appState.subjectData.upcomingSubmissions[appState.activeSubject][
+      submissionId
+    ].title;
+  addSubmissionPopupDescriptionInput.value =
+    appState.subjectData.upcomingSubmissions[appState.activeSubject][
+      submissionId
+    ].date;
+  isSubmissionEditing = true;
+  selectedSubmissionId = submissionId;
+  addSubmissionPopupTitle.textContent = "Edit Submission";
+  fadeInEffect(addSubmissionPopupDeleteIcon);
+  fadeInEffect(addSubmissionPopup);
+}
+async function renderUpcomingSubmissions() {
+  if (
+    !appState.subjectData.upcomingSubmissions ||
+    !appState.subjectData.upcomingSubmissions[appState.activeSubject]
+  ) {
+    return;
+  }
+  const submissions =
+    appState.subjectData.upcomingSubmissions[appState.activeSubject];
+  fadeInEffect(upcomingSubmission);
+  const now = new Date();
+  const deleteCutoffHour = 17;
+  const deleteCutoffMinute = 30;
+  for (const key in submissions) {
+    let submission = submissions[key];
+    if (
+      typeof submission.date === "string" &&
+      /^\d{4}-\d{2}-\d{2}$/.test(submission.date)
+    ) {
+      const [year, month, day] = submission.date.split("-").map(Number);
+      const deleteTime = new Date(
+        year,
+        month - 1,
+        day,
+        deleteCutoffHour,
+        deleteCutoffMinute
+      );
+      if (now > deleteTime) {
+        await deleteData(
+          `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/upcomingSubmissions/${appState.activeSubject}/${key}`
+        );
+        continue;
+      }
+    }
+    const card = document.createElement("div");
+    card.className = "card p-4 bg-surface-2 rounded-[20px] text-center";
+    const description = document.createElement("p");
+    description.className = "description";
+    description.textContent = submission.title;
+    const submissionDate = document.createElement("p");
+    submissionDate.className = "submission-date";
+    submissionDate.textContent = formatDateBasedOnProximity(submission.date);
+    card.appendChild(description);
+    card.appendChild(submissionDate);
+    upcomingSubmissionCardContainer.appendChild(card);
+    card.addEventListener("click", () => {
+      if (appState.isEditing) {
+        editUpcomingSubmission(key);
+      }
+    });
+  }
+}
+function formatDateBasedOnProximity(rawDate) {
+  const dateObj = new Date(rawDate);
+  if (isNaN(dateObj)) return rawDate; //
+  const now = new Date();
+  const sevenDaysLater = new Date();
+  sevenDaysLater.setDate(now.getDate() + 7);
+  const day = dateObj.getDate().toString().padStart(2, "0");
+
+  if (dateObj <= sevenDaysLater) {
+    // Format: DD-Wed (within next 7 days)
+    const weekday = dateObj.toLocaleDateString("en-US", {
+      weekday: "short",
+    });
+    return `${day}-${weekday}`;
+  } else {
+    // Format: DD-Aug (more than 7 days away)
+    const month = dateObj.toLocaleDateString("en-US", {
+      month: "short",
+    });
+    return `${day}-${month}`;
+  }
+}
+swiper.on("init", updateNavVisibility);
+swiper.on("slideChange", updateNavVisibility);
+swiper.on("reachEnd", () => {
+  const nextBtn = document.querySelector(".custom-swiper-button-next");
+  fadeOutEffect(nextBtn);
+});
+function updateNavVisibility() {
+  const prevBtn = document.querySelector(".custom-swiper-button-prev");
+  const nextBtn = document.querySelector(".custom-swiper-button-next");
+
+  if (swiper.isBeginning) {
+    fadeOutEffect(prevBtn);
+  } else {
+    fadeInEffect(prevBtn);
   }
 
-  // Save to Firebase
-  const path = ref(
-    db,
-    `semesters/${activeSem}/divisions/${activeDiv}/subjects/notice/${activeSubject}`
-  );
-
-  push(path, {
-    attachmentURL,
-    attachmentId, // ✅ Save the file ID
-    title,
-    description,
-  })
-    .then(() => {
-      console.log("Notice added successfully");
-      createNoticeTitleInput.value = "";
-      createNoticeDescription.value = "";
-      fileInput.value = "";
-      fadeOutEffect(addNoticePopup);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-});
+  if (swiper.isEnd) {
+    fadeOutEffect(nextBtn);
+  } else {
+    fadeInEffect(nextBtn);
+  }
+}

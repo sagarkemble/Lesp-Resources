@@ -26,6 +26,7 @@ import {
   orderByChild,
 } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
 import { connectAuthEmulator } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+import { showErrorSection } from "./error";
 
 // Firebase config
 const firebaseConfig = {
@@ -40,6 +41,40 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
 
+// functions
+export function deleteData(path) {
+  return remove(ref(db, path))
+    .then(() => {
+      console.log("Data deleted successfully.");
+    })
+    .catch((error) => {
+      showErrorSection();
+      console.error("Error deleting data:", error);
+      return;
+    });
+}
+export function pushData(path, data) {
+  return push(ref(db, path), data)
+    .then(() => {
+      console.log("Data pushed successfully.");
+    })
+    .catch((error) => {
+      console.error("Error pushing data:", error);
+      showErrorSection();
+      return;
+    });
+}
+export function updateData(path, data) {
+  return update(ref(db, path), data)
+    .then(() => {
+      console.log("Data updated successfully.");
+    })
+    .catch((error) => {
+      console.error("Error pushing data:", error);
+      showErrorSection();
+      return;
+    });
+}
 export {
   app,
   getAuth,
