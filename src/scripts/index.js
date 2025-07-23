@@ -158,7 +158,9 @@ export async function applyEditModeUI() {
   const editorOnlyContentCard = document.querySelectorAll(
     ".editor-only-content-card"
   );
-  const upcomingSubmissions = document.querySelector(".upcoming-submissions");
+  const subjectSectionUpcomingSubmissions = document.querySelector(
+    ".subject-page-section .upcoming-submissions"
+  );
   if (appState.isEditing) {
     editorOnlyContent.forEach((content) => fadeInEffect(content));
     editorOnlyContentCard.forEach((card) => {
@@ -173,13 +175,15 @@ export async function applyEditModeUI() {
     });
     editorTool.forEach((tool) => fadeInEffect(tool));
     editModeToggleButton.textContent = "Exit editing";
-    fadeInEffect(upcomingSubmissions);
+    fadeInEffect(subjectSectionUpcomingSubmissions);
   } else {
     if (
-      !appState.subjectData.upcomingSubmissions ||
-      !appState.subjectData.upcomingSubmissions[appState.activeSubject]
+      !appState.subjectData.subjectSectionUpcomingSubmissions ||
+      !appState.subjectData.subjectSectionUpcomingSubmissions[
+        appState.activeSubject
+      ]
     ) {
-      fadeOutEffect(upcomingSubmissions);
+      fadeOutEffect(subjectSectionUpcomingSubmissions);
     }
     editorOnlyContent.forEach((content) => fadeOutEffect(content));
     editorOnlyContentCard.forEach((card) => {

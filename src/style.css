@@ -61,6 +61,12 @@ html {
   width: fit-content;
   height: fit-content;
   text-align: center;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+.button-hug:active {
+  background: var(--color-primary-300);
+  /* color: var(--color-primary-500); */
+  cursor: pointer;
 }
 .button-fill {
   width: 100%;
@@ -73,7 +79,6 @@ html {
   text-align: center;
   transition: background 0.3s ease, color 0.3s ease;
 }
-
 .button-fill:active {
   background: var(--color-primary-300);
   /* color: var(--color-primary-500); */
@@ -81,6 +86,10 @@ html {
 }
 @media (hover: hover) and (pointer: fine) {
   .button-fill:hover:not(:active) {
+    background: var(--color-primary-400);
+    cursor: pointer;
+  }
+  .button-hug:hover:not(:active) {
     background: var(--color-primary-400);
     cursor: pointer;
   }
@@ -229,4 +238,72 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   .navigation {
     box-shadow: none;
   }
+}
+.subject-page-section .swiper-button-prev,
+.subject-page-section .swiper-button-next {
+  background: var(--color-surface) !important;
+  border-radius: 50% !important;
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  margin-top: -1.25rem !important;
+  transition: opacity 0.3s ease, visibility 0.3s ease !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.subject-page-section .swiper-button-prev::after,
+.subject-page-section .swiper-button-next::after {
+  display: none !important;
+}
+
+.subject-page-section .swiper-button-prev::before {
+  content: "";
+  font-family: "remixicon" !important;
+  font-size: 1.5rem !important;
+  color: inherit;
+}
+
+.subject-page-section .swiper-button-next::before {
+  content: "";
+  font-family: "remixicon" !important;
+  font-size: 1.5rem !important;
+  color: inherit;
+}
+.subject-page-section .swiper-button-prev.swiper-button-disabled,
+.subject-page-section .swiper-button-next.swiper-button-disabled {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+#dashboard-time-table-swiper .swiper-button-prev,
+#dashboard-time-table-swiper .swiper-button-next {
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  transition: opacity 0.3s ease, visibility 0.3s ease !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+#dashboard-time-table-swiper .swiper-button-prev::after,
+#dashboard-time-table-swiper .swiper-button-next::after {
+  display: none !important;
+}
+
+#dashboard-time-table-swiper .swiper-button-prev::before {
+  font-family: "remixicon" !important;
+  font-size: 1rem !important;
+  color: var(--color-text-disabled);
+}
+
+#dashboard-time-table-swiper .swiper-button-next::before {
+  font-family: "remixicon" !important;
+  font-size: 1rem !important;
+  color: var(--color-text-disabled);
+}
+#dashboard-time-table-swiper .swiper-button-prev.swiper-button-disabled,
+#dashboard-time-table-swiper .swiper-button-next.swiper-button-disabled {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }

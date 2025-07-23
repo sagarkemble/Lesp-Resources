@@ -1,14 +1,14 @@
 const leaderboarSection = document.querySelector(".leaderboard-section");
 import { fadeInEffect, fadeOutEffect } from "./animation.js";
 import { get, ref, db, updateData } from "./firebase.js";
-import { hideSections } from "./index.js";
+import { hideSections, showSectionLoader, hideSectionLoader } from "./index.js";
 import { headerIcon, headerTitle } from "./navigation.js";
 import { appState, syncDbData } from "./appstate.js";
 let sortedRollNoWiseStudentData;
 let rawStudentData;
 let rankWiseSortedData;
 export async function loadLeaderboardSection() {
-  await unloadSubjectSection();
+  await unloadLeaderBoardSection();
   await getAllStudentsData();
   rankWiseSortedData = calculateRank();
   initLeaderBoardTopper();
@@ -23,7 +23,7 @@ export async function loadLeaderboardSection() {
   secondRankSwiper.autoplay.start();
   thirdRankSwiper.autoplay.start();
 }
-async function unloadSubjectSection() {
+async function unloadLeaderBoardSection() {
   await fadeOutEffect(leaderboarSection);
   leaderboardStudetCardContainer.innerHTML = "";
   leaderboardCardContainer.innerHTML = "";
@@ -251,7 +251,7 @@ function initLeaderBoardTopper() {
       swiperInstances[index].removeAllSlides();
       swiperInstances[index].appendSlide(slides);
       swiperInstances[index].update();
-      swiper.enable();
+      swiperInstances[index].enable();
     }
   });
 }
@@ -391,8 +391,11 @@ async function updateRanks(key) {
     { [currentEditingRank]: key }
   );
   fadeOutEffect(leaderboardStudetPopup);
+  showSectionLoader("Syncing data...");
   await syncDbData();
-  loadLeaderboardSection();
+  hideSectionLoader();
+  await loadLeaderboardSection();
+  showLeaderboardSection();
 }
 async function getAllStudentsData() {
   rawStudentData = await get(ref(db, "users"))

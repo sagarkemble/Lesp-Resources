@@ -1,10 +1,16 @@
 const sessionsSection = document.querySelector(".sessions-section");
 import { fadeInEffect, fadeOutEffect } from "./animation.js";
-import { hideSections, hideSectionLoader, showSectionLoader } from "./index.js";
+import {
+  hideSections,
+  hideSectionLoader,
+  showSectionLoader,
+  showConfirmationPopup,
+} from "./index.js";
 import { headerIcon, headerTitle } from "./navigation.js";
 import {
   pushData,
   updateData,
+  deleteData,
   query,
   get,
   child,
@@ -15,11 +21,11 @@ import {
   app,
 } from "./firebase.js";
 import { appState, syncDbData } from "./appstate.js";
-let testData;
+import { showErrorSection } from "./error.js";
 export async function loadSessionsSection() {
   await unloadSessionsSection();
-  renderUpcomingSession();
-  renderPreviousSession();
+  await renderUpcomingSession();
+  await renderPreviousSession();
 }
 export async function showSessionsSection() {
   headerIcon.src =
@@ -28,8 +34,8 @@ export async function showSessionsSection() {
   await hideSections();
   fadeInEffect(sessionsSection);
 }
-function unloadSessionsSection() {
-  fadeOutEffect(sessionsSection);
+async function unloadSessionsSection() {
+  await fadeOutEffect(sessionsSection);
   upcomingSessionsCardContainer.innerHTML = "";
   previousSessionsCardContainer.innerHTML = "";
 }
@@ -44,15 +50,19 @@ const upcomingSessionsCardContainer = upcomingSessions.querySelector(
   ".upcoming-sessions .card-container"
 );
 const addUpcomingSessions = upcomingSessions.querySelector(".add-btn");
+const noUpcomingSessions = upcomingSessions.querySelector(".no-sessions");
 //popup
 const upcomingSessionsPopup = document.querySelector(
   ".upcoming-session-popup-wrapper"
 );
 const upcomingSessionsPopupTitle = document.querySelector(".popup-title");
+// buttons inside popup
 const upcomingSessionsPopupCloseBtn =
   upcomingSessionsPopup.querySelector(".close-popup-btn");
 const upcomingSessionsAddBtn =
   upcomingSessionsPopup.querySelector(".create-btn");
+const upcomingSessionDeleteBtn =
+  upcomingSessionsPopup.querySelector(".delete-btn");
 // inputs
 
 const upcomingSessionsTitleInput =
@@ -93,13 +103,11 @@ const upcomingSessionDurationError = upcomingSessionsPopup.querySelector(
 );
 const upcomingSessionDateFakePlaceholder =
   upcomingSessionsPopup.querySelector(".fake-placeholder");
-const upcomingSessionDeleteBtn =
-  upcomingSessionsPopup.querySelector(".delete-btn");
 addUpcomingSessions.addEventListener("click", () => {
   fadeInEffect(upcomingSessionsPopup);
 });
-upcomingSessionsPopupCloseBtn.addEventListener("click", () => {
-  fadeOutEffect(upcomingSessionsPopup);
+upcomingSessionsPopupCloseBtn.addEventListener("click", async () => {
+  await fadeOutEffect(upcomingSessionsPopup);
   resetUpcomingSessionsPopup();
 });
 upcomingSessionsDateInput.addEventListener("input", () => {
@@ -127,15 +135,15 @@ upcomingSessionsAddBtn.addEventListener("click", async () => {
   const time = upcomingSessionsTimeInput.value.trim();
   const rollnoInput = upcomingSessionsRollnoInput.value.trim();
   const rollno = Number(rollnoInput);
+  const duration = upcomingSessionDurationInput.value.trim();
   let userId;
+  let isError;
   if (rollnoInput === "" || isNaN(rollno)) {
     upcomingSessionRollnoError.textContent =
       "Rollno is required and must be a number";
     fadeInEffect(upcomingSessionRollnoError);
     isError = true;
   }
-  const duration = upcomingSessionDurationInput.value.trim();
-  let isError;
   if (title === "") {
     upcomingSessionTitleError.textContent = "Title is required";
     fadeInEffect(upcomingSessionTitleError);
@@ -182,7 +190,7 @@ upcomingSessionsAddBtn.addEventListener("click", async () => {
       if (snapshot.exists()) {
         hideSectionLoader();
         const data = snapshot.val();
-        let isConfirm = await confirmationPopup(Object.values(data)[0]);
+        let isConfirm = await studentConfirmationPopup(Object.values(data)[0]);
         if (!isConfirm) {
           upcomingSessionsRollnoInput.value = "";
           upcomingSessionRollnoError.textContent = "Rollno required";
@@ -227,16 +235,33 @@ upcomingSessionsAddBtn.addEventListener("click", async () => {
       userId: userId,
     });
   }
-  hideSectionLoader();
-  fadeOutEffect(upcomingSessionsPopup);
+  showSectionLoader("Syncing data...");
+  await fadeOutEffect(upcomingSessionsPopup);
   resetUpcomingSessionsPopup();
-  syncDbData();
-  loadSessionsSection();
+  await syncDbData();
+  hideSectionLoader();
+  await loadSessionsSection();
+  showSessionsSection();
 });
-upcomingSessionDeleteBtn.addEventListener("click", async () => {});
-async function confirmationPopup(data) {
-  console.log(data);
-
+upcomingSessionDeleteBtn.addEventListener("click", async () => {
+  const isConfirmed = await showConfirmationPopup(
+    "Are you sure you want to delete this session?"
+  );
+  if (isConfirmed) {
+    showSectionLoader("Deleting session...");
+    await deleteData(
+      `globalData/sessions/upcomingSessions/${selectedUpcomingSessionId}`
+    );
+    showSectionLoader("Syncing data...");
+    await fadeOutEffect(upcomingSessionsPopup);
+    resetUpcomingSessionsPopup();
+    await syncDbData();
+    hideSectionLoader();
+    loadSessionsSection();
+    showSessionsSection();
+  }
+});
+async function studentConfirmationPopup(data) {
   return new Promise((resolve) => {
     const confirmationPopup = document.querySelector(
       ".sessions-section .confirmation-popup-wrapper"
@@ -291,31 +316,38 @@ function resetUpcomingSessionsPopup() {
   fadeOutEffect(upcomingSessionDurationError);
 }
 async function renderUpcomingSession() {
+  let isLink = false;
+  if (
+    !appState.globalData.sessions ||
+    !appState.globalData.sessions.upcomingSessions ||
+    Object.keys(appState.globalData.sessions.upcomingSessions).length === 0
+  ) {
+    fadeInEffect(noUpcomingSessions);
+    return;
+  } else fadeOutEffect(noUpcomingSessions);
   const data = appState.globalData.sessions.upcomingSessions;
   for (const key in data) {
     const session = data[key];
-
     const { title, description, link, date, time, duration, userId } = session;
+    if (link) isLink = true;
 
-    // Get mentor data from DB
     const mentorData = await get(ref(db, `users/${userId}`))
       .then((snapshot) => {
         if (snapshot.exists()) {
           return snapshot.val();
         }
-        return null;
+        console.error("No mentor data available");
       })
       .catch((error) => {
         console.error("Error fetching mentor data:", error);
-        return null;
+        showErrorSection();
+        return;
       });
 
     if (!mentorData) continue;
-
     const name = `${mentorData.firstName} ${mentorData.lastName}`;
     const mentorClass = getFormattedClass(mentorData.sem, mentorData.div);
     const pfp = mentorData.pfp;
-
     const card = document.createElement("div");
     card.className =
       "card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full rounded-3xl lg:max-w-[500px] p-6";
@@ -352,13 +384,14 @@ async function renderUpcomingSession() {
       </div>
    
     `;
-
     upcomingSessionsCardContainer.appendChild(card);
     card.addEventListener("click", () => {
       if (!appState.isEditing) return;
       editUpcomingSessionCard(key);
     });
   }
+  if (isLink) upcomingSessionsTitle.textContent = "Current ongoing Sessions";
+  else upcomingSessionsTitle.textContent = "Upcoming Sessions";
 }
 function getFormattedClass(sem, div) {
   const semMap = {
@@ -388,7 +421,6 @@ function editUpcomingSessionCard(id) {
   upcomingSessionsTimeInput.value = session.time;
   upcomingSessionDurationInput.value = session.duration;
   fadeInEffect(upcomingSessionDeleteBtn);
-
   fadeOutEffect(upcomingSessionDateFakePlaceholder);
   fadeInEffect(upcomingSessionsPopup);
 }
@@ -397,23 +429,23 @@ function editUpcomingSessionCard(id) {
 // ===== STATE =====
 let isPreviousSessionEditing = false;
 let selectedPreviousSessionId = null;
-
-// ===== ELEMENTS =====
 const previousSessions = document.querySelector(".previous-sessions");
 const previousSessionsCardContainer =
   previousSessions.querySelector(".card-container");
 const addPreviousSessionBtn = previousSessions.querySelector(".add-btn");
-
 const previousSessionsPopup = document.querySelector(
   ".previous-session-popup-wrapper"
 );
 const previousSessionsPopupTitle =
   previousSessionsPopup.querySelector(".popup-title");
+const noPreviousSessions = previousSessions.querySelector(
+  ".no-previous-sessions"
+);
+// btn insider popup
 const previousSessionsPopupCloseBtn =
   previousSessionsPopup.querySelector(".close-popup-btn");
 const previousSessionsAddBtn =
   previousSessionsPopup.querySelector(".create-btn");
-
 // Inputs
 const previousSessionsTitleInput =
   previousSessionsPopup.querySelector(".title-input");
@@ -469,12 +501,10 @@ previousSessionsDateInput.addEventListener("click", () => {
 addPreviousSessionBtn.addEventListener("click", () => {
   fadeInEffect(previousSessionsPopup);
 });
-
-previousSessionsPopupCloseBtn.addEventListener("click", () => {
-  fadeOutEffect(previousSessionsPopup);
+previousSessionsPopupCloseBtn.addEventListener("click", async () => {
+  await fadeOutEffect(previousSessionsPopup);
   resetPreviousSessionsPopup();
 });
-
 previousSessionsAddBtn.addEventListener("click", async () => {
   fadeOutEffect(previousSessionTitleError);
   fadeOutEffect(previousSessionDescriptionError);
@@ -483,7 +513,6 @@ previousSessionsAddBtn.addEventListener("click", async () => {
   fadeOutEffect(previousSessionTimeError);
   fadeOutEffect(previousSessionDurationError);
   fadeOutEffect(previousSessionLinkError);
-
   const title = previousSessionsTitleInput.value.trim();
   const description = previousSessionsDescriptionInput.value.trim();
   const rollnoInput = previousSessionsRollnoInput.value.trim();
@@ -494,7 +523,6 @@ previousSessionsAddBtn.addEventListener("click", async () => {
   const rollno = Number(rollnoInput);
   let userId;
   let isError;
-
   if (rollnoInput === "" || isNaN(rollno)) {
     previousSessionRollnoError.textContent =
       "Rollno is required and must be a number";
@@ -547,7 +575,7 @@ previousSessionsAddBtn.addEventListener("click", async () => {
       if (snapshot.exists()) {
         hideSectionLoader();
         const data = snapshot.val();
-        let isConfirm = await confirmationPopup(Object.values(data)[0]);
+        let isConfirm = await studentConfirmationPopup(Object.values(data)[0]);
         if (!isConfirm) {
           previousSessionsRollnoInput.value = "";
           previousSessionRollnoError.textContent = "Rollno required";
@@ -592,12 +620,13 @@ previousSessionsAddBtn.addEventListener("click", async () => {
       link,
     });
   }
-
-  hideSectionLoader();
-  fadeOutEffect(previousSessionsPopup);
+  showSectionLoader("Syncing data...");
+  await fadeOutEffect(previousSessionsPopup);
   resetPreviousSessionsPopup();
-  syncDbData();
-  loadSessionsSection();
+  await syncDbData();
+  hideSectionLoader();
+  await loadSessionsSection();
+  showSessionsSection();
 });
 
 function resetPreviousSessionsPopup() {
@@ -609,7 +638,6 @@ function resetPreviousSessionsPopup() {
   previousSessionsDurationInput.value = "";
   fadeOutEffect(previousSessionLinkError);
   fadeOutEffect(previousSessionDeleteBtn);
-
   fadeInEffect(previousSessionDateFakePlaceholder);
   fadeOutEffect(previousSessionTitleError);
   fadeOutEffect(previousSessionDescriptionError);
@@ -619,6 +647,14 @@ function resetPreviousSessionsPopup() {
   fadeOutEffect(previousSessionDurationError);
 }
 async function renderPreviousSession() {
+  if (
+    !appState.globalData.sessions ||
+    !appState.globalData.sessions.previousSessions ||
+    Object.keys(appState.globalData.sessions.previousSessions).length === 0
+  ) {
+    fadeInEffect(noPreviousSessions);
+    return;
+  } else fadeOutEffect(noPreviousSessions);
   const data = appState.globalData.sessions.previousSessions;
   for (const key in data) {
     const session = data[key];
@@ -699,6 +735,24 @@ function editPreviousSessionCard(id) {
   fadeOutEffect(previousSessionDateFakePlaceholder);
   fadeInEffect(previousSessionsPopup);
 }
+previousSessionDeleteBtn.addEventListener("click", async () => {
+  const isConfirmed = await showConfirmationPopup(
+    "Are you sure you want to delete this session?"
+  );
+  if (isConfirmed) {
+    showSectionLoader("Deleting session...");
+    await deleteData(
+      `globalData/sessions/previousSessions/${selectedPreviousSessionId}`
+    );
+    showSectionLoader("Syncing data...");
+    await fadeOutEffect(previousSessionsPopup);
+    resetPreviousSessionsPopup();
+    await syncDbData();
+    hideSectionLoader();
+    await loadSessionsSection();
+    showSessionsSection();
+  }
+});
 function formatDate(dateString) {
   const dateObj = new Date(dateString);
   const now = new Date();

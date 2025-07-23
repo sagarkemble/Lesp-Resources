@@ -9,7 +9,7 @@ import {
   applyEditModeUI,
   showConfirmationPopup,
 } from "./index.js";
-import { headerIcon, headerTitle } from "./navigation.js";
+import { headerIcon, headerTitle, subjectSelectorPopup } from "./navigation.js";
 import { showErrorSection } from "./error.js";
 const subjectPageSection = document.querySelector(".subject-page-section");
 export async function loadSubjectSection() {
@@ -22,13 +22,9 @@ export async function loadSubjectSection() {
   headerTitle.textContent =
     appState.subjectData.individualSubjects[appState.activeSubject].name;
   await hideSections();
+  swiper.slideTo(0, 0);
   swiper.update();
-  swiper.slideTo(0);
-  swiper.updateSlides();
-  swiper.updateProgress();
-  updateNavVisibility();
   await applyEditModeUI();
-
   await fadeInEffect(subjectPageSection);
 }
 async function unloadSubjectSection() {
@@ -37,12 +33,11 @@ async function unloadSubjectSection() {
     container.remove();
   });
   swiper.removeAllSlides();
-  swiper.update();
+
   upcomingSubmissionCardContainer.innerHTML = "";
 }
 
 // notice related functions and var
-
 const swiper = new Swiper("#subject-page-swiper", {
   direction: "horizontal",
   slidesPerView: "auto",
@@ -60,9 +55,8 @@ const swiper = new Swiper("#subject-page-swiper", {
     clickable: true,
   },
   navigation: {
-    size: "10px",
-    nextEl: ".custom-swiper-button-next",
-    prevEl: ".custom-swiper-button-prev",
+    nextEl: ".swiper-button-next",
+    prevEl: ".swiper-button-prev",
   },
 
   observer: true,
@@ -71,6 +65,8 @@ const swiper = new Swiper("#subject-page-swiper", {
 const Swiperwrapper = document.querySelector(
   "#subject-page-swiper .swiper-wrapper"
 );
+const swiperNxtBtn = document.querySelector(".custom-swiper-button-next");
+const swiperPrevBtn = document.querySelector(".custom-swiper-button-prev");
 const addNoticeBtn = subjectPageSection.querySelector(".add-notice-btn");
 // main add notice popup
 const addNoticePopup = subjectPageSection.querySelector(
@@ -112,7 +108,6 @@ const addNoticePopupErrorPopupOkayBtn =
 let selectedNotice;
 // functions
 async function renderSwiper() {
-  // return;
   if (!appState.subjectData.notice) return;
   if (!appState.subjectData.notice[appState.activeSubject]) return;
   const noticeEntries = Object.entries(
@@ -121,7 +116,7 @@ async function renderSwiper() {
   for (const [key, noticeData] of noticeEntries) {
     const swiperSlide = document.createElement("div");
     swiperSlide.className =
-      "swiper-slide w-full max-w-[600px] bg-surface-2 flex flex-col gap-4 lg:gap-5 rounded-2xl p-4 lg:p-5";
+      "swiper-slide w-full max-w-[600px] bg-surface-2 !flex !flex-col gap-3 rounded-2xl p-4 lg:p-5";
     const topWrapper = document.createElement("div");
     topWrapper.className = "wrapper flex items-center gap-4  justify-between";
 
@@ -131,10 +126,10 @@ async function renderSwiper() {
 
     const icon = document.createElement("div");
     icon.className =
-      "icon bg-surface flex h-10 w-10 items-center justify-center rounded-full";
+      "icon bg-surface flex h-[50px] w-[50px] items-center justify-center rounded-full shrink-0";
 
     const iconInner = document.createElement("i");
-    iconInner.className = "ri-file-text-line text-xl";
+    iconInner.className = "ri-file-text-line text-2xl";
     icon.appendChild(iconInner);
 
     const title = document.createElement("p");
@@ -238,7 +233,7 @@ async function deleteNotice(key, attachmentId) {
   );
   if (!confirmed) return;
   showSectionLoader("Deleting notice...");
-  if (attachmentId) {
+  if (attachmentId && attachmentId !== "custom-link") {
     showSectionLoader("Deleting attachment...");
     const deleted = await deleteDriveFile(attachmentId);
     if (!deleted) {
@@ -266,6 +261,7 @@ function resetAddNoticePopup() {
   fadeOutEffect(addNoticePopupdescriptionError);
   fadeOutEffect(addNoticePopuptitleError);
 }
+
 // listeners
 addNoticeFileAttachment.addEventListener("click", () => {
   addNoticefileInput.click();
@@ -901,14 +897,19 @@ function renderResources() {
 //
 //
 // upcoming submission var and function
-const upcomingSubmissionCardContainer = document.querySelector(
+const upcomingSubmission = subjectPageSection.querySelector(
+  ".upcoming-submissions"
+);
+const upcomingSubmissionCardContainer = upcomingSubmission.querySelector(
   ".upcoming-submissions .card-container"
 );
-const upcomingSubmission = document.querySelector(".upcoming-submissions");
+
 let isSubmissionEditing = false;
 let selectedSubmissionId = null;
-const addSubbmissionButton = document.querySelector(".add-submission-btn");
-const addSubmissionPopup = document.querySelector(
+const addSubbmissionButton = upcomingSubmission.querySelector(
+  ".add-submission-btn"
+);
+const addSubmissionPopup = subjectPageSection.querySelector(
   ".add-submission-popup-wrapper"
 );
 const addSubmissionPopupTitle =
@@ -1039,6 +1040,15 @@ addSubmissionPopupDeleteIcon.addEventListener("click", async () => {
   hideSectionLoader();
   loadSubjectSection();
 });
+addSubmissionPopupTitleInput.addEventListener("input", () => {
+  if (addSubmissionPopupTitleInput.value.length == 12) {
+    addSubmissionPopupTitleError.textContent =
+      "Max 12 characters reached (Use short words like Exp, Asign, etc)";
+    fadeInEffect(addSubmissionPopupTitleError);
+  } else {
+    fadeOutEffect(addSubmissionPopupTitleError);
+  }
+});
 function resetAddUpcomingSubmissionPopup() {
   fadeInEffect(addSubmissionPopupDateInputWrapper);
   fadeInEffect(addSubmissionPopupDescriptionInputWrapper);
@@ -1158,27 +1168,5 @@ function formatDateBasedOnProximity(rawDate) {
       month: "short",
     });
     return `${day}-${month}`;
-  }
-}
-swiper.on("init", updateNavVisibility);
-swiper.on("slideChange", updateNavVisibility);
-swiper.on("reachEnd", () => {
-  const nextBtn = document.querySelector(".custom-swiper-button-next");
-  fadeOutEffect(nextBtn);
-});
-function updateNavVisibility() {
-  const prevBtn = document.querySelector(".custom-swiper-button-prev");
-  const nextBtn = document.querySelector(".custom-swiper-button-next");
-
-  if (swiper.isBeginning) {
-    fadeOutEffect(prevBtn);
-  } else {
-    fadeInEffect(prevBtn);
-  }
-
-  if (swiper.isEnd) {
-    fadeOutEffect(nextBtn);
-  } else {
-    fadeInEffect(nextBtn);
   }
 }

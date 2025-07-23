@@ -1,15 +1,9 @@
+import { deleteData, pushData, updateData } from "./firebase.js";
 import {
-  db,
-  push,
-  remove,
-  update,
-  ref,
-  app,
-  deleteData,
-  pushData,
-  updateData,
-} from "./firebase.js";
-import { showSectionLoader, hideSectionLoader } from "./index.js";
+  showSectionLoader,
+  hideSectionLoader,
+  showConfirmationPopup,
+} from "./index.js";
 import { fadeInEffect, fadeOutEffect } from "./animation.js";
 import { hideSections } from "./index.js";
 import { headerIcon, headerTitle } from "./navigation.js";
@@ -18,122 +12,139 @@ import { uploadDriveFile } from "./driveApi.js";
 const testsSection = document.querySelector(".tests-section");
 export async function loadTestSection() {
   await unloadTestsSection();
-  renderUpcomingTests();
-  renderPreviousTestCard();
+  await renderUpcomingTests();
+  await renderPreviousTestCard();
 }
 export async function showTestsSection() {
   headerIcon.src =
     "https://ik.imagekit.io/yn9gz2n2g/others/test.png?updatedAt=1751607386764";
   headerTitle.textContent = "Tests";
-  await hideSections(true, true, true);
+  await hideSections();
   fadeInEffect(testsSection);
 }
 async function unloadTestsSection() {
   await fadeOutEffect(testsSection);
   previousTestCardWrapper.innerHTML = "";
 }
+
+// upcoming card elements
 const upcomingTestCard = document.querySelector(".upcoming-test .card");
 const upcomingTestCardTitle = upcomingTestCard.querySelector(".title");
 const upcomingTestCardDescription =
   upcomingTestCard.querySelector(".description");
-const upcomingTestCardDate = upcomingTestCard.querySelector(".day");
+const upcomingTestCardDay = upcomingTestCard.querySelector(".day");
 const upcomingTestCardDuration = upcomingTestCard.querySelector(".duration");
 const upcomingTestCardLink = upcomingTestCard.querySelector(".link");
 const upcomingTestJoinBtn = upcomingTestCard.querySelector(".join-btn");
 const upcomingTestTitle = document.querySelector(".upcoming-test .main-title");
 const comingSoonLabel = upcomingTestCard.querySelector(".coming-soon-label");
-// const headerIcon = document.querySelector(".nav-icon");
-// const headerTitle = document.querySelector(".nav-title");
+//no test elements
+const noTest = document.querySelector(".upcoming-test .no-test");
+const scheduleTestButton = noTest.querySelector(".schedule-test-btn");
+scheduleTestButton.addEventListener("click", async () => {
+  await resetUpcomingTestPopup();
+  upcomingTestDescriptionInput.value =
+    appState.divisionData.testData.upcomingTest.description;
+  fadeInEffect(upcomingTestPopup);
+});
 function renderUpcomingTests() {
-  console.log(appState);
-
-  const data = appState.divisionData.testData.upcomingTest;
-  upcomingTestCardTitle.textContent = data.title;
-  upcomingTestCardDescription.textContent = data.description;
-  upcomingTestCardDate.textContent = `Day : ${data.day}`;
-  upcomingTestCardDuration.textContent = `Duration : ${data.duration}`;
-  if (data.link) {
-    upcomingTestJoinBtn.href = data.link;
-    upcomingTestTitle.textContent = "Current Test";
-    fadeOutEffect(comingSoonLabel);
-    fadeInEffect(upcomingTestJoinBtn);
+  console.log(appState.divisionData.testData);
+  if (appState.divisionData.testData.upcomingTest.visible == false) {
+    console.log("no upcoming test");
+    fadeOutEffect(upcomingTestCard);
+    fadeInEffect(noTest);
+    return;
   } else {
-    upcomingTestTitle.textContent = "Upcoming Test";
-    fadeOutEffect(upcomingTestJoinBtn);
-    fadeInEffect(comingSoonLabel);
+    fadeInEffect(upcomingTestCard);
+    fadeOutEffect(noTest);
+    const data = appState.divisionData.testData.upcomingTest;
+    upcomingTestCardTitle.textContent = data.title;
+    upcomingTestCardDescription.textContent = data.description;
+    upcomingTestCardDay.textContent = `Day : ${data.day}`;
+    upcomingTestCardDuration.textContent = `Duration : ${data.duration}`;
+    if (data.link) {
+      upcomingTestJoinBtn.href = data.link;
+      upcomingTestTitle.textContent = "Current Test";
+      fadeOutEffect(comingSoonLabel);
+      fadeInEffect(upcomingTestJoinBtn);
+    } else {
+      upcomingTestTitle.textContent = "Upcoming Test";
+      fadeOutEffect(upcomingTestJoinBtn);
+      fadeInEffect(comingSoonLabel);
+    }
   }
 }
-//upcmoing test
-const addUpcomingTestPopup = document.querySelector(
+const upcomingTest = document.querySelector(".upcoming-test ");
+const upcomingTestPopup = document.querySelector(
   ".edit-upcoming-test-popup-wrapper"
 );
+const upcomingTestPopupTitle = upcomingTestPopup.querySelector(".popup-title");
+let toBeUnhide = null;
 // buttons inside popup
-const addUpcomingTestPopupCloseBtn =
-  addUpcomingTestPopup.querySelector(".close-popup-btn");
-const addUpcomingTestPopupCreateBtn =
-  addUpcomingTestPopup.querySelector(".create-btn");
+const upcomingTestPopupCloseBtn =
+  upcomingTestPopup.querySelector(".close-popup-btn");
+const upcomingTestPopupCreateBtn =
+  upcomingTestPopup.querySelector(".create-btn");
 // inputs
-const addUpcomingTestTitleInput =
-  addUpcomingTestPopup.querySelector(".title-input");
-const addUpcomingTestDescriptionInput =
-  addUpcomingTestPopup.querySelector(".description-input");
-const addUpcomingTestLinkInput =
-  addUpcomingTestPopup.querySelector(".link-input");
-const addUpcomingTestDayInput =
-  addUpcomingTestPopup.querySelector(".day-input");
-const addUpcomingTestDurationInput =
-  addUpcomingTestPopup.querySelector(".duration-input");
+const upcomingTestTitleInput = upcomingTestPopup.querySelector(".title-input");
+const upcomingTestDescriptionInput =
+  upcomingTestPopup.querySelector(".description-input");
+const upcomingTestLinkInput = upcomingTestPopup.querySelector(".link-input");
+const upcomingTestDayInput = upcomingTestPopup.querySelector(".day-input");
+const upcomingTestDurationInput =
+  upcomingTestPopup.querySelector(".duration-input");
 // error messages
-const addUpcomingTestTitleError = addUpcomingTestPopup.querySelector(
+const upcomingTestTitleError = upcomingTestPopup.querySelector(
   ".title-related-error"
 );
-const addUpcomingTestDescriptionError = addUpcomingTestPopup.querySelector(
+const upcomingTestDescriptionError = upcomingTestPopup.querySelector(
   ".description-related-error"
 );
-const addUpcomingTestLinkError = addUpcomingTestPopup.querySelector(
+const upcomingTestLinkError = upcomingTestPopup.querySelector(
   ".link-related-error"
 );
-const addUpcomingTestDayError =
-  addUpcomingTestPopup.querySelector(".day-related-error");
-const addUpcomingTestDurationError = addUpcomingTestPopup.querySelector(
+const upcomingTestDayError =
+  upcomingTestPopup.querySelector(".day-related-error");
+const upcomingTestDurationError = upcomingTestPopup.querySelector(
   ".duration-related-error"
 );
-
-addUpcomingTestPopupCloseBtn.addEventListener("click", () => {
-  fadeOutEffect(addUpcomingTestPopup);
+const hideUpcomingTestBtn = upcomingTestPopup.querySelector(".hide-icon");
+upcomingTestPopupCloseBtn.addEventListener("click", async () => {
+  await fadeOutEffect(upcomingTestPopup);
+  resetUpcomingTestPopup();
 });
-addUpcomingTestPopupCreateBtn.addEventListener("click", async () => {
+upcomingTestPopupCreateBtn.addEventListener("click", async () => {
   let isError = false;
-  const title = addUpcomingTestTitleInput.value.trim();
-  const description = addUpcomingTestDescriptionInput.value.trim();
-  const day = addUpcomingTestDayInput.value.trim();
-  const duration = addUpcomingTestDurationInput.value.trim();
-  const link = addUpcomingTestLinkInput.value.trim();
+  const title = upcomingTestTitleInput.value.trim();
+  const description = upcomingTestDescriptionInput.value.trim();
+  const day = upcomingTestDayInput.value.trim();
+  const duration = upcomingTestDurationInput.value.trim();
+  const link = upcomingTestLinkInput.value.trim();
   if (!title) {
-    addUpcomingTestTitleError.textContent = "Title is required";
-    fadeInEffect(addUpcomingTestTitleError);
+    upcomingTestTitleError.textContent = "Title is required";
+    fadeInEffect(upcomingTestTitleError);
     isError = true;
   }
   if (!description) {
-    addUpcomingTestDescriptionError.textContent = "Description is required";
-    fadeInEffect(addUpcomingTestDescriptionError);
+    upcomingTestDescriptionError.textContent = "Description is required";
+    fadeInEffect(upcomingTestDescriptionError);
     isError = true;
   }
   if (!day) {
-    addUpcomingTestDayError.textContent = "Day is required";
-    fadeInEffect(addUpcomingTestDayError);
+    upcomingTestDayError.textContent = "Day is required";
+    fadeInEffect(upcomingTestDayError);
     isError = true;
   }
   if (!duration) {
-    addUpcomingTestDurationError.textContent = "Duration is required";
-    fadeInEffect(addUpcomingTestDurationError);
+    upcomingTestDurationError.textContent = "Duration is required";
+    fadeInEffect(upcomingTestDurationError);
     isError = true;
   }
   if (link) {
     if (!/^https?:\/\//.test(link)) {
-      addUpcomingTestLinkError.textContent =
+      upcomingTestLinkError.textContent =
         "Enter a valid link starting with http:// or https://";
-      fadeInEffect(addUpcomingTestLinkError);
+      fadeInEffect(upcomingTestLinkError);
       isError = true;
     }
   }
@@ -142,45 +153,83 @@ addUpcomingTestPopupCreateBtn.addEventListener("click", async () => {
   await updateData(
     `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/testData/upcomingTest`,
     {
-      title: addUpcomingTestTitleInput.value.trim(),
-      description: addUpcomingTestDescriptionInput.value.trim(),
-      day: addUpcomingTestDayInput.value.trim(),
-      duration: addUpcomingTestDurationInput.value.trim(),
-      link: addUpcomingTestLinkInput.value.trim(),
+      title: upcomingTestTitleInput.value.trim(),
+      description: upcomingTestDescriptionInput.value.trim(),
+      day: upcomingTestDayInput.value.trim(),
+      duration: upcomingTestDurationInput.value.trim(),
+      link: upcomingTestLinkInput.value.trim(),
+      visible: true,
     }
   );
-  fadeOutEffect(addUpcomingTestPopup);
+  fadeOutEffect(upcomingTestPopup);
+  showSectionLoader("Syncing data...");
   resetPreviousTestPopup();
   await syncDbData();
   hideSectionLoader();
-  loadTestSection();
+  await loadTestSection();
+  showTestsSection();
 });
 upcomingTestCard.addEventListener("click", () => {
   if (!appState.isEditing) return;
-  addUpcomingTestTitleInput.value =
+  if (appState.divisionData.testData.upcomingTest.visible === true) {
+    fadeInEffect(hideUpcomingTestBtn);
+  }
+  upcomingTestTitleInput.value =
     appState.divisionData.testData.upcomingTest.title;
-  addUpcomingTestDescriptionInput.value =
+  upcomingTestDescriptionInput.value =
     appState.divisionData.testData.upcomingTest.description;
-  addUpcomingTestDayInput.value =
-    appState.divisionData.testData.upcomingTest.day;
-  addUpcomingTestDurationInput.value =
+  upcomingTestDayInput.value = appState.divisionData.testData.upcomingTest.day;
+  upcomingTestDurationInput.value =
     appState.divisionData.testData.upcomingTest.duration;
-  addUpcomingTestLinkInput.value =
+  upcomingTestLinkInput.value =
     appState.divisionData.testData.upcomingTest.link;
-  fadeInEffect(addUpcomingTestPopup);
-});
 
+  fadeInEffect(upcomingTestPopup);
+});
+hideUpcomingTestBtn.addEventListener("click", async () => {
+  const isConfirmed = await showConfirmationPopup(
+    "Are you sure you want to hide this test?"
+  );
+  if (!isConfirmed) return;
+  showSectionLoader("Hiding test...");
+  await updateData(
+    `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/testData/upcomingTest`,
+    {
+      visible: false,
+    }
+  );
+  fadeOutEffect(upcomingTestPopup);
+  showSectionLoader("Syncing data...");
+  await syncDbData();
+  hideSectionLoader();
+  resetUpcomingTestPopup();
+  await loadTestSection();
+  showTestsSection();
+});
+function resetUpcomingTestPopup() {
+  upcomingTestTitleInput.value = "";
+  upcomingTestDescriptionInput.value = "";
+  upcomingTestLinkInput.value = "";
+  upcomingTestDayInput.value = "";
+  upcomingTestDurationInput.value = "";
+  upcomingTestPopupTitle.textContent = "Edit";
+  fadeOutEffect(upcomingTestTitleError);
+  fadeOutEffect(upcomingTestDescriptionError);
+  fadeOutEffect(upcomingTestLinkError);
+  fadeOutEffect(upcomingTestDayError);
+  fadeOutEffect(upcomingTestDurationError);
+}
 //previous tests
+let isPreviousTestEditing = false;
+let previousTestEditingKey = null;
+const previousTest = document.querySelector(".previous-tests");
 const previousTestPopup = document.querySelector(
   ".previous-test-popup-wrapper"
 );
-let isPreviousTestEditing = false;
-let previousTestEditingKey = null;
 const previousTestFakePlaceholder =
   previousTestPopup.querySelector(".fake-placeholder");
 const addPreviousTestBtn = document.querySelector(".previous-tests .add-btn");
 const previousTestPopupTitle = previousTestPopup.querySelector(".popup-title");
-
 // button inside popup
 const previousTestPopupCreateBtn =
   previousTestPopup.querySelector(".create-btn");
@@ -201,7 +250,6 @@ const previousTestDurationInput = previousTestPopup.querySelector(
 );
 const resultFileInput = previousTestPopup.querySelector("#result-file-input");
 const answerFileInput = previousTestPopup.querySelector("#answer-file-input");
-
 // error messages
 const previousTestTitleError = previousTestPopup.querySelector(
   ".title-related-error"
@@ -218,7 +266,6 @@ const resultFileAttachmentError = previousTestPopup.querySelector(
 const answerFileAttachmentError = previousTestPopup.querySelector(
   ".answer-file-related-error"
 );
-
 // result upload ui
 const resultFileAttachment = previousTestPopup.querySelector(
   ".result-file-attachment"
@@ -251,7 +298,7 @@ resultFileInput.addEventListener("change", () => {
   if (file) {
     if (file.size > 20000000) {
       resultFileAttachmentError.textContent =
-        "File size must be less than 20mb";
+        "File size must be less than 20 mb";
       fadeInEffect(resultFileAttachmentError);
       return;
     }
@@ -301,7 +348,7 @@ previousTestPopupCreateBtn.addEventListener("click", async () => {
   const title = previousTestTitleInput.value.trim();
   const date = previousTestDateInput.value;
   const duration = previousTestDurationInput.value.trim();
-  const anserFile = answerFileInput.files[0];
+  const answerFile = answerFileInput.files[0];
   const resultFile = resultFileInput.files[0];
   let isError = false;
   let answerAttachmentUrl;
@@ -326,7 +373,6 @@ previousTestPopupCreateBtn.addEventListener("click", async () => {
   if (isPreviousTestEditing) {
     if (isError) return;
   }
-
   if (isPreviousTestEditing) {
     showSectionLoader("Updating data....");
     await updateData(
@@ -338,7 +384,7 @@ previousTestPopupCreateBtn.addEventListener("click", async () => {
       }
     );
   } else {
-    if (!anserFile) {
+    if (!answerFile) {
       answerFileAttachmentError.textContent = "Answer file is required";
       fadeInEffect(answerFileAttachmentError);
       isError = true;
@@ -351,10 +397,13 @@ previousTestPopupCreateBtn.addEventListener("click", async () => {
     if (isError) return;
     showSectionLoader("Uploading answer key...");
     let uploaded = await uploadDriveFile(
-      anserFile,
+      answerFile,
       `resources/${appState.activeSem}/${appState.activeDiv}/${appState.activeSubject}/testData`
     );
-    if (!uploaded) return;
+    if (!uploaded) {
+      hideSectionLoader();
+      return;
+    }
     answerAttachmentUrl = uploaded.webViewLink;
     answerAttachmentId = uploaded.fileId;
     showSectionLoader("Uploading result...");
@@ -362,7 +411,10 @@ previousTestPopupCreateBtn.addEventListener("click", async () => {
       resultFile,
       `resources/${appState.activeSem}/${appState.activeDiv}/${appState.activeSubject}/testData`
     );
-    if (!resultUploaded) return;
+    if (!resultUploaded) {
+      hideSectionLoader();
+      return;
+    }
     resultAttachmentUrl = resultUploaded.webViewLink;
     resultAttachmentId = resultUploaded.fileId;
     showSectionLoader("Adding data....");
@@ -379,14 +431,19 @@ previousTestPopupCreateBtn.addEventListener("click", async () => {
       }
     );
   }
-  await syncDbData();
+  showSectionLoader("Syncing data...");
   await fadeOutEffect(previousTestPopup);
+  await syncDbData();
   hideSectionLoader();
   resetPreviousTestPopup();
-  resetPreviousTestPopup();
-  loadTestSection();
+  await loadTestSection();
+  showTestsSection();
 });
 function renderPreviousTestCard() {
+  if (!appState.divisionData.testData.previousTests) {
+    fadeOutEffect(previousTest);
+    return;
+  }
   const previousTestsdata = appState.divisionData.testData.previousTests;
   for (const key in previousTestsdata) {
     const data = previousTestsdata[key];
@@ -394,7 +451,6 @@ function renderPreviousTestCard() {
     const resultUrl = data.resultFileUrl;
     const answerUrl = data.answerFileUrl;
     const date = data.date;
-    // Create outer card
     const card = document.createElement("div");
     card.classList.add(
       "card",
@@ -408,7 +464,6 @@ function renderPreviousTestCard() {
       "lg:max-w-[500px]",
       "p-6"
     );
-
     const wrapper = document.createElement("div");
     wrapper.classList.add(
       "wrapper",
@@ -457,7 +512,6 @@ function renderPreviousTestCard() {
     day.classList.add("date");
     const [year, month, dayPart] = date.split("-");
     day.textContent = `Date : ${dayPart}-${month}-${year.slice(2)}`;
-
     const answerLink = document.createElement("a");
     answerLink.href = answerUrl;
     answerLink.target = "_blank";
@@ -484,6 +538,7 @@ function editPreviousTestCard(key) {
   previousTestDateInput.value = data.date;
   previousTestDurationInput.value = data.duration;
   previousTestPopupTitle.textContent = "Edit test";
+  previousTestPopupCreateBtn.textContent = "Update";
   fadeOutEffect(previousTestFakePlaceholder);
   fadeOutEffect(answerFileInputWrapper);
   fadeOutEffect(resultFileInputWrapper);
@@ -495,6 +550,9 @@ function resetPreviousTestPopup() {
   previousTestDateInput.value = "";
   previousTestDurationInput.value = "";
   previousTestPopupTitle.textContent = "Add test";
+  previousTestPopupCreateBtn.textContent = "Create";
+  resultFileAttachmentText.textContent = "Upload Result Pdf";
+  answerFileAttachmentText.textContent = "Upload Answer Pdf";
   fadeOutEffect(previousTestDateError);
   fadeOutEffect(previousTestDurationError);
   fadeOutEffect(previousTestTitleError);
