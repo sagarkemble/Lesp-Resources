@@ -28,7 +28,6 @@ import {
 import { connectAuthEmulator } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
 import { showErrorSection } from "./error";
 
-// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyDxg1_YR4kZ2nnZ2hm32Oyjb4CUrnlXpvQ",
   authDomain: "lesp-resources-fd879.firebaseapp.com",

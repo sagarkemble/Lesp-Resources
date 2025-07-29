@@ -65,8 +65,8 @@ const swiper = new Swiper("#subject-page-swiper", {
 const Swiperwrapper = document.querySelector(
   "#subject-page-swiper .swiper-wrapper"
 );
-const swiperNxtBtn = document.querySelector(".custom-swiper-button-next");
-const swiperPrevBtn = document.querySelector(".custom-swiper-button-prev");
+// const swiperNxtBtn = document.querySelector(".custom-swiper-button-next");
+// const swiperPrevBtn = document.querySelector(".custom-swiper-button-prev");
 const addNoticeBtn = subjectPageSection.querySelector(".add-notice-btn");
 // main add notice popup
 const addNoticePopup = subjectPageSection.querySelector(
@@ -260,19 +260,19 @@ function resetAddNoticePopup() {
   fadeOutEffect(addNoticePopupLinkError);
   fadeOutEffect(addNoticePopupdescriptionError);
   fadeOutEffect(addNoticePopuptitleError);
-}
+} //
 
 // listeners
 addNoticeFileAttachment.addEventListener("click", () => {
   addNoticefileInput.click();
-});
+}); //
 addNoticeBtn.addEventListener("click", () => {
   fadeInEffect(addNoticePopup);
-});
+}); //
 addNoticePopupcloseBtn.addEventListener("click", async (e) => {
   await fadeOutEffect(addNoticePopup);
   resetAddNoticePopup();
-});
+}); //
 addNoticePopupcreateBtn.addEventListener("click", async () => {
   const title = addNoticeTitleInput.value.trim();
   const description = addNoticeDescriptionInput.value.trim();
@@ -328,6 +328,8 @@ addNoticePopupcreateBtn.addEventListener("click", async () => {
       title,
       description,
       createdAt: Date.now(),
+      scope: appState.activeSubject,
+      subject: appState.activeSubject,
     }
   );
   fadeOutEffect(addNoticePopup);
@@ -353,12 +355,12 @@ addNoticefileInput.addEventListener("change", () => {
     fadeInEffect(addNoticePopupFileAttachmentIcon);
     addNotivePopupFileAttachmentText.textContent = "Upload (Optional)";
   }
-});
+}); //
 addNoticePopupErrorPopupOkayBtn.addEventListener("click", async () => {
   await fadeOutEffect(addNoticePopup);
   fadeOutEffect(addNoticePopupErrorPopup);
   resetAddNoticePopup();
-});
+}); //
 
 //
 // add category related var and fucntion
@@ -682,7 +684,7 @@ addItemPopupCreateBtn.addEventListener("click", async () => {
     );
   } else {
     showSectionLoader("Adding item...");
-    pushData(
+    await pushData(
       `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/individualSubjects/${appState.activeSubject}/content/${selectedCategoryId}/items`,
       {
         title,
@@ -1101,6 +1103,7 @@ async function renderUpcomingSubmissions() {
     !appState.subjectData.upcomingSubmissions ||
     !appState.subjectData.upcomingSubmissions[appState.activeSubject]
   ) {
+    fadeOutEffect(upcomingSubmission);
     return;
   }
   const submissions =

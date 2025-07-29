@@ -1,0 +1,2750 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full lg:text-[0.8rem] 2xl:text-[1rem]">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <link rel="stylesheet" href="src/style.css" />
+    <script
+      src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs"
+      type="module"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.css"
+      integrity="sha512-kJlvECunwXftkPwyvHbclArO8wszgBGisiLeuDFwNM8ws+wKIw0sv1os3ClWZOcrEB2eRXULYUsm8OVRGJKwGA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+      integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+    </style>
+  </head>
+
+  <body class="text-text-primary bg-surface flex w-full h-full">
+    <!-- initial loading screen -->
+    <div
+      class="loading-screen bg-surface fixed top-0 left-0 z-60 flex hidden h-full w-full items-center justify-center py-4 transition-all"
+    >
+      <div class="loading-wrapper flex max-w-40 flex-col items-center gap-4">
+        <dotlottie-player
+          id="lotte-loader"
+          src="lotte-files/Animation - 1751119543160.lottie"
+          background="transparent"
+          speed="1"
+          direction="1"
+          playMode="normal"
+          loop
+          autoplay
+          class="h-full w-full"
+        ></dotlottie-player>
+        <p class="loading-text text-text-primary text-lg font-semibold">
+          Loading...
+        </p>
+      </div>
+    </div>
+    <!-- section loader -->
+    <div
+      class="section-loader-wrapper rounded-3xl transition-all duration-100 gap-2 bg-[#00000060] hidden fixed h-full w-full justify-center items-center flex flex-col left-0 top-0 z-60"
+    >
+      <div class="loader"></div>
+      <p class="loader-status">Loading</p>
+    </div>
+    <!-- navigation -->
+    <nav
+      class="transition-all duration-150 fixed hidden opacity-0 bottom-0 left-0 mb-7 flex justify-center lg:mb-0 lg:w-fit lg:top-0 lg:h-full z-40 w-full"
+    >
+      <div
+        class="side-bar-content border-surface-3 relative bg-surface flex w-fit translate-x-0 transform items-baseline gap-7 lg:flex-col lg:items-center rounded-full border-2 px-7 pt-2 pb-5 lg:rounded-none lg:border-0 lg:border-r-2 lg:px-2.5 lg:py-3 lg:shadow-none lg:h-full"
+      >
+        <img
+          src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m51.png?updatedAt=1750952706527"
+          alt=""
+          class="user-pfp hidden h-12 w-12 lg:inline-block"
+        />
+        <span
+          class="icon-wrapper cursor-pointer z-40 home-icon h-[1.55rem] lg:h-[1.875rem]"
+        >
+          <svg
+            width="18"
+            height="20"
+            viewBox="0 0 18 20"
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-full w-full"
+            fill="none"
+          >
+            <path
+              d="M6.2 18.5H1.7C1.3134 18.5 1 18.1866 1 17.8V8.31764C1 8.11578 1.08714 7.92376 1.23905 7.79083L8.53905 1.40333C8.80297 1.17241 9.19703 1.17241 9.46095 1.40333L16.761 7.79083C16.9129 7.92376 17 8.11578 17 8.31764V17.8C17 18.1866 16.6866 18.5 16.3 18.5H11.7143C11.3277 18.5 11.0143 18.1866 11.0143 17.8V12.7724C11.0143 12.3858 10.7009 12.0724 10.3143 12.0724H7.6C7.2134 12.0724 6.9 12.3858 6.9 12.7724V17.8C6.9 18.1866 6.5866 18.5 6.2 18.5Z"
+              stroke-width="1.5"
+            />
+          </svg>
+        </span>
+        <span
+          class="icon-wrapper cursor-pointer z-40 subject-icon h-6 lg:h-[1.875rem]"
+        >
+          <svg
+            width="27"
+            height="32"
+            viewBox="0 0 27 32"
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-full w-full"
+            fill="none"
+          >
+            <path
+              d="M1 27.5007C1 20.2056 1 5.1538 1 3.30766C1 1.46153 3.05128 1 4.07692 1H25.6154V24.0766H4.07692C3.05128 24.3081 1 25.3169 1 27.5007ZM1 27.5007C1 28.667 1.61538 30.9996 4.07692 30.9996C6.53846 30.9996 20.2308 30.9996 26.3846 30.9996"
+              stroke-width="2"
+            />
+            <path
+              d="M25.0965 24.0771C24.3273 25.6156 23.2504 29.154 25.0965 31.0001"
+              stroke-width="2"
+            />
+            <path
+              d="M20.5 7H6.5C6.22386 7 6 7.22386 6 7.5V11.5C6 11.7761 6.22386 12 6.5 12H20.5C20.7761 12 21 11.7761 21 11.5V7.5C21 7.22386 20.7761 7 20.5 7Z"
+              stroke-width="2"
+            />
+          </svg>
+        </span>
+        <span
+          class="icon-wrapper cursor-pointer z-40 timetabel-icon h-[1.6rem] lg:h-[1.875rem]"
+        >
+          <svg
+            width="20"
+            height="22"
+            viewBox="0 0 20 22"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-full w-full"
+          >
+            <path
+              d="M17.0996 3.2998H3.09961C1.99504 3.2998 1.09961 4.19524 1.09961 5.2998V18.2998C1.09961 19.4044 1.99504 20.2998 3.09961 20.2998H17.0996C18.2042 20.2998 19.0996 19.4044 19.0996 18.2998V5.2998C19.0996 4.19524 18.2042 3.2998 17.0996 3.2998Z"
+              stroke-width="1.5"
+            />
+            <path d="M1 8H19" stroke="" stroke-width="1.5" />
+            <path d="M5 1.5V5" stroke-width="1.5" stroke-linecap="round" />
+            <path d="M15 1.5V5" stroke-width="1.5" stroke-linecap="round" />
+          </svg>
+        </span>
+        <span
+          class="icon-wrapper cursor-pointer z-40 h-9 leaderboard-icon lg:h-10 transform translate-y-1 lg:translate-y-0"
+        >
+          <svg
+            width="35"
+            height="42"
+            viewBox="0 0 35 42"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-full w-full"
+          >
+            <g filter="url(#filter0_d_716_6310)">
+              <rect
+                x="5.1002"
+                y="20.9"
+                width="8.2"
+                height="12.2"
+                rx="1.1"
+                stroke-width="1.8"
+              />
+            </g>
+            <g filter="url(#filter1_d_716_6310)">
+              <rect
+                x="21.6998"
+                y="23.9"
+                width="8.2"
+                height="9.2"
+                rx="1.1"
+                stroke-width="2"
+              />
+            </g>
+            <g filter="url(#filter2_d_716_6310)">
+              <rect
+                x="13.4"
+                y="16.9"
+                width="8.2"
+                height="16.2"
+                rx="1.1"
+                stroke-width="1.8"
+              />
+            </g>
+            <path
+              d="M2.59961 33.2002H32.5996"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+            <path
+              d="M17.5 2.97363C17.5293 2.97363 17.5504 2.98278 17.5615 2.99023C17.5673 2.99408 17.5817 3.00326 17.5947 3.04102L18.4375 5.49121C18.7014 6.2582 19.4233 6.77344 20.2344 6.77344H22.835C22.8597 6.77346 22.8737 6.77716 22.8799 6.7793C22.8862 6.78152 22.891 6.78456 22.8955 6.78809C22.9057 6.79617 22.9215 6.8142 22.9307 6.84375C22.9397 6.87306 22.9374 6.8967 22.9336 6.90918C22.9319 6.9147 22.9289 6.92027 22.9248 6.92578C22.9208 6.93111 22.9118 6.94221 22.8916 6.95605L20.8877 8.33105C20.1835 8.81432 19.8882 9.70797 20.166 10.5156L20.9541 12.8066C20.9618 12.829 20.9629 12.8429 20.9629 12.8496C20.9629 12.8566 20.9619 12.8625 20.96 12.8682C20.9557 12.8807 20.9437 12.9009 20.9199 12.9189C20.8961 12.937 20.8735 12.9426 20.8604 12.9434C20.8545 12.9437 20.8484 12.9433 20.8418 12.9414C20.8353 12.9395 20.822 12.9351 20.8027 12.9219L18.5752 11.3926C17.9274 10.9481 17.0726 10.9481 16.4248 11.3926L14.1973 12.9219C14.178 12.9351 14.1647 12.9395 14.1582 12.9414C14.1516 12.9433 14.1455 12.9437 14.1396 12.9434C14.1265 12.9426 14.1039 12.937 14.0801 12.9189C14.0563 12.9009 14.0443 12.8807 14.04 12.8682C14.0381 12.8625 14.0371 12.8566 14.0371 12.8496C14.0371 12.8429 14.0382 12.829 14.0459 12.8066L14.834 10.5156C15.1118 9.70797 14.8165 8.81432 14.1123 8.33105L12.1084 6.95605C12.0882 6.94221 12.0792 6.93111 12.0752 6.92578C12.0711 6.92027 12.0681 6.9147 12.0664 6.90918C12.0626 6.8967 12.0603 6.87306 12.0693 6.84375C12.0785 6.8142 12.0943 6.79617 12.1045 6.78809C12.109 6.78456 12.1138 6.78152 12.1201 6.7793C12.1263 6.77716 12.1403 6.77346 12.165 6.77344H14.7656C15.5767 6.77344 16.2986 6.2582 16.5625 5.49121L17.4053 3.04102C17.4183 3.00326 17.4327 2.99408 17.4385 2.99023C17.4496 2.98278 17.4707 2.97363 17.5 2.97363Z"
+              stroke-width="1.8"
+            />
+            <defs>
+              <filter
+                id="filter0_d_716_6310"
+                x="0.200195"
+                y="20"
+                width="18"
+                height="22"
+                filterUnits="userSpaceOnUse"
+                color-interpolation-filters="sRGB"
+              >
+                <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                <feColorMatrix
+                  in="SourceAlpha"
+                  type="matrix"
+                  values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                  result="hardAlpha"
+                />
+                <feOffset dy="4" />
+                <feGaussianBlur stdDeviation="2" />
+                <feComposite in2="hardAlpha" operator="out" />
+                <feColorMatrix
+                  type="matrix"
+                  values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"
+                />
+                <feBlend
+                  mode="normal"
+                  in2="BackgroundImageFix"
+                  result="effect1_dropShadow_716_6310"
+                />
+                <feBlend
+                  mode="normal"
+                  in="SourceGraphic"
+                  in2="effect1_dropShadow_716_6310"
+                  result="shape"
+                />
+              </filter>
+              <filter
+                id="filter1_d_716_6310"
+                x="16.7998"
+                y="23"
+                width="18"
+                height="19"
+                filterUnits="userSpaceOnUse"
+                color-interpolation-filters="sRGB"
+              >
+                <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                <feColorMatrix
+                  in="SourceAlpha"
+                  type="matrix"
+                  values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                  result="hardAlpha"
+                />
+                <feOffset dy="4" />
+                <feGaussianBlur stdDeviation="2" />
+                <feComposite in2="hardAlpha" operator="out" />
+                <feColorMatrix
+                  type="matrix"
+                  values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"
+                />
+                <feBlend
+                  mode="normal"
+                  in2="BackgroundImageFix"
+                  result="effect1_dropShadow_716_6310"
+                />
+                <feBlend
+                  mode="normal"
+                  in="SourceGraphic"
+                  in2="effect1_dropShadow_716_6310"
+                  result="shape"
+                />
+              </filter>
+              <filter
+                id="filter2_d_716_6310"
+                x="8.5"
+                y="16"
+                width="18"
+                height="26"
+                filterUnits="userSpaceOnUse"
+                color-interpolation-filters="sRGB"
+              >
+                <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                <feColorMatrix
+                  in="SourceAlpha"
+                  type="matrix"
+                  values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                  result="hardAlpha"
+                />
+                <feOffset dy="4" />
+                <feGaussianBlur stdDeviation="2" />
+                <feComposite in2="hardAlpha" operator="out" />
+                <feColorMatrix
+                  type="matrix"
+                  values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"
+                />
+                <feBlend
+                  mode="normal"
+                  in2="BackgroundImageFix"
+                  result="effect1_dropShadow_716_6310"
+                />
+                <feBlend
+                  mode="normal"
+                  in="SourceGraphic"
+                  in2="effect1_dropShadow_716_6310"
+                  result="shape"
+                />
+              </filter>
+            </defs>
+          </svg>
+        </span>
+        <span
+          class="icon-wrapper cursor-pointer z-40 h-[1.7rem] lg:h-[2.2rem] tests-icon transform lg:-translate-x-0.5"
+        >
+          <svg
+            width="17"
+            height="22"
+            viewBox="0 0 17 22"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-full w-full"
+          >
+            <path
+              d="M2 4.27734H12.4004C12.7593 4.27745 13.0498 4.56881 13.0498 4.92773V18.7715C13.0498 19.1304 12.7593 19.4218 12.4004 19.4219H2C1.6411 19.4218 1.35059 19.1304 1.35059 18.7715V4.92773C1.35059 4.56881 1.6411 4.27745 2 4.27734Z"
+              stroke-width="1.3"
+            />
+            <path d="M4.2002 13.9004H10.2002" stroke-linecap="round" />
+            <path d="M4.2002 11.4004H10.2002" stroke-linecap="round" />
+            <path d="M4.2002 8.90039H10.2002" stroke-linecap="round" />
+            <path
+              d="M3.40039 3.38524V2.20039C3.40039 1.48242 3.98242 0.900391 4.70039 0.900391H14.8004C15.5184 0.900391 16.1004 1.48242 16.1004 2.20039V16.0004C16.1004 16.7184 15.5184 17.3004 14.8004 17.3004H13.3857"
+              stroke-width="1.3"
+              stroke-linecap="round"
+            />
+          </svg>
+        </span>
+        <span
+          class="icon-wrapper z-40 cursor-pointer h-5 lg:h-6 sessions-icon transform -translate-y-1 lg:translate-y-0"
+        >
+          <svg
+            width="24"
+            height="17"
+            viewBox="0 0 24 17"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-full w-full"
+          >
+            <rect
+              x="0.75"
+              y="0.75"
+              width="15.5"
+              height="15.5"
+              rx="2.75"
+              stroke-width="1.5"
+            />
+            <path
+              d="M16.5 5.5C16.8729 5.12708 20.4619 3.2765 22.5668 2.21731C22.766 2.11707 23 2.2624 23 2.48541V13.9977C23 14.2247 22.7576 14.3695 22.5578 14.2619L16.5 11"
+              stroke-width="1.5"
+            />
+          </svg>
+        </span>
+        <div
+          class="slider bg-primary-400 lg:bg-surface-2 lg:border-primary-400 left-0 h-1 w-6 translate-x-0 transform rounded-lg transition-all duration-100 absolute lg:h-12 lg:w-full lg:rounded-none lg:border-r-4 bottom-3 lg:bottom-auto z-10"
+        ></div>
+        <div
+          class="theme-icon from-primary-400 via-primary-300 via-primary-200 via-primary-100 to-primary-50 mt-auto hidden h-12 w-12 rounded-full bg-gradient-to-r lg:inline-block"
+        ></div>
+      </div>
+    </nav>
+    <main
+      class="flex h-full w-full flex-1 flex-col gap-4 px-4 py-3 min-w-0 lg:ml-[4.375rem]"
+    >
+      <!-- navbar -->
+      <header class="flex w-full items-center hidden gap-2 lg:gap-3">
+        <img
+          src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m51.png?updatedAt=1750952706527"
+          alt=""
+          class="h-3 user-pfp lg:hidden w-3 sm-md-header-pfp"
+        />
+        <img
+          src="https://ik.imagekit.io/yn9gz2n2g/image123.png?updatedAt=1751459031970"
+          alt=""
+          class="header-icon hidden h-11 w-11 lg:h-12 lg:w-12"
+        />
+        <p
+          class="header-title text-2xl hidden font-semibold h-12 text-center flex items-center"
+        ></p>
+        <button class="button-hug ml-auto edit-mode-toggle-btn">Edit</button>
+      </header>
+      <!-- are you sure popup -->
+      <div
+        class="confirmation-popup-wrapper hidden fixed top-0 left-0 z-60 w-full h-full flex justify-center items-center bg-[#00000060] transition-all duration-200 min-h-0"
+      >
+        <div
+          class="confirmation-popup bg-surface-2 rounded-3xl p-6 flex flex-col gap-4 w-fit max-w-[18.75rem] max-h-[90vh] overflow-y-auto"
+        >
+          <div class="wrapper flex flex-col items-center gap-2">
+            <i
+              class="fa-solid fa-triangle-exclamation text-4xl text-text-error"
+            ></i>
+            <p class="text-lg font-semibold title">Are you sure?</p>
+            <p class="text-sm text-text-secondary description text-center">
+              This action cannot be undone.
+            </p>
+          </div>
+          <div class="flex justify-end gap-2">
+            <button class="button-outline cancel-btn">Cancel</button>
+            <button class="button-fill confirm-btn">Confirm</button>
+          </div>
+        </div>
+      </div>
+      <!-- login-section -->
+      <section
+        class="login-section flex hidden w-full flex-col items-center justify-center gap-2 transition-all duration-200 min-h-full h-full"
+      >
+        <form
+          id="login-form"
+          class="bg-surface-2 flex w-full max-w-[22.5rem] lg:max-w-[21.25rem] flex-col items-center gap-4 rounded-3xl p-6"
+        >
+          <div class="swiper-text-wrapper flex flex-col items-center gap-2">
+            <div class="swiper h-4 w-4" id="login-section-swiper">
+              <!-- Additional required wrapper -->
+              <div class="swiper-wrapper">
+                <!-- Slides -->
+                <div class="swiper-slide">
+                  <img
+                    src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m14.png?updatedAt=1750951353530"
+                    alt=""
+                  />
+                </div>
+                <div class="swiper-slide">
+                  <img
+                    src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Female/female114.png?updatedAt=1750987518953"
+                    alt=""
+                  />
+                </div>
+                <div class="swiper-slide">
+                  <img
+                    src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m51.png?updatedAt=1750952706527"
+                    alt=""
+                  />
+                </div>
+                <div class="swiper-slide">
+                  <img
+                    src="https://ik.imagekit.io/yn9gz2n2g/Avatars/image(1).png?updatedAt=1751521326535"
+                    alt=""
+                  />
+                </div>
+                <!-- <div class="swiper-slide">
+                  <img
+                    src="https://ik.imagekit.io/yn9gz2n2g/Avatars/image.png?updatedAt=1750763928136"
+                    alt=""
+                  />
+                </div>
+                <div class="swiper-slide">
+                  <img
+                    src="https://ik.imagekit.io/yn9gz2n2g/Avatars/f1?updatedAt=1750750439823"
+                    alt=""
+                  />
+                </div> -->
+              </div>
+            </div>
+            <p class="text-text-primary text-2xl font-medium">Login</p>
+            <p id="form-related-error" class="text-text-error text-sm"></p>
+          </div>
+          <div class="email-input-wrapper w-full flex flex-col gap-1">
+            <label class="text-text-primary px-1 text-sm" for="email-input"
+              >Email</label
+            >
+
+            <input
+              type="email"
+              autocomplete="off"
+              id="email-input"
+              class="bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+            />
+            <p
+              id="email-related-error"
+              class="text-text-error px-1 text-sm"
+            ></p>
+          </div>
+          <div class="password-input-wrapper w-full flex flex-col gap-1">
+            <label class="text-text-primary px-1 text-sm" for="email-input"
+              >Password</label
+            >
+            <input
+              type="password"
+              id="password-input"
+              class="bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+            />
+            <p
+              id="password-related-error"
+              class="text-text-error px-1 text-sm"
+            ></p>
+            <div class="wrapper flex w-full justify-between">
+              <div class="checkbox-wrapper flex items-center gap-2">
+                <div class="flex items-center">
+                  <div class="relative flex cursor-pointer items-center">
+                    <input
+                      type="checkbox"
+                      class="peer bg-surface-3 checked:bg-primary-400 !h-4 !w-4 cursor-pointer appearance-none rounded transition-all"
+                      id="keep-login-check"
+                    />
+                    <span
+                      class="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform text-white opacity-0 peer-checked:opacity-100"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-3 w-3"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        stroke="currentColor"
+                        stroke-width="1"
+                      >
+                        <path
+                          fill-rule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clip-rule="evenodd"
+                        ></path>
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+                <label
+                  for="remember-me-checkbox "
+                  class="text-text-tertiary text-sm"
+                  >Remember me</label
+                >
+              </div>
+              <a
+                href=""
+                class="text-text-link text-sm"
+                id="forgot-password-link"
+                >Forgot password?</a
+              >
+            </div>
+          </div>
+          <button class="login-btn button-fill mt-3 relative">
+            <div
+              class="btn-loader transition-all duration-100 hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+            ></div>
+            <span class="text transition-all duration-100">Login</span>
+          </button>
+        </form>
+        <div class="no-account-wrppaer flex justify-center gap-1 text-sm">
+          <p class="text-text-primary">New here?</p>
+          <a href="https://forms.gle/cMrEpJVpojtJKuvz6" class="text-text-link">
+            Create account</a
+          >
+        </div>
+      </section>
+      <!-- reset password section -->
+      <section
+        class="reset-password-section flex hidden w-full flex-col items-center justify-center gap-2 transition-all duration-200 h-full"
+      >
+        <form
+          id="reset-password-form"
+          class="bg-surface-2 flex w-full max-w-[22.5rem] lg:max-w-[21.25rem] flex-col items-center gap-4 rounded-3xl p-6"
+        >
+          <p class="text-text-primary w-full text-start text-2xl font-semibold">
+            Reset Password
+          </p>
+          <div class="registered-email-input-wrapper flex flex-col gap-1">
+            <label
+              class="text-text-primary px-1 text-sm"
+              for="registered-email-input"
+              >Registered Email</label
+            >
+
+            <input
+              type="email"
+              autocomplete="off"
+              id="registered-email-input"
+              class="bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+            />
+            <p
+              id="registered-email-related-error"
+              class="text-text-error px-1 text-sm"
+            ></p>
+          </div>
+
+          <button class="reset-password-btn button-fill relative">
+            <div
+              class="btn-loader transition-all duration-100 hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+            ></div>
+            <span class="text transition-all duration-100">Reset password</span>
+          </button>
+          <button class="button-outline back-to-login-btn" type="button">
+            Back to login
+          </button>
+        </form>
+      </section>
+      <!-- readmore-popup -->
+      <div
+        id="readmore-popup"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center"
+      >
+        <div
+          class="bg-surface-2 max-w-[37.5rem] w-full max-h-[90vh] p-5 rounded-2xl text-white relative overflow-hidden flex flex-col gap-4"
+        >
+          <!-- Top section: Icon + Title + New badge -->
+          <div class="wrapper flex items-center justify-between">
+            <div class="slide-icon-title-wrapper flex items-center gap-3">
+              <div
+                class="icon bg-surface flex h-10 w-10 items-center justify-center rounded-full"
+              >
+                <i class="ri-file-text-line text-xl"></i>
+              </div>
+              <p
+                id="readmore-popup-title"
+                class="slider-title text-xl font-semibold"
+              >
+                update-1
+              </p>
+            </div>
+            <i class="fa-solid fa-xmark text-xl" id="close-readmore-popup"></i>
+          </div>
+
+          <!-- Scrollable Description -->
+          <div
+            id="readmore-popup-content"
+            class="description text-text-secondary text-sm overflow-auto max-h-[50vh] leading-relaxed pr-2"
+          >
+            Full notice content will appear here and scroll if too long...
+          </div>
+
+          <!-- Action links -->
+          <a
+            id="popup-attachment-link"
+            class="text-text-link underline cursor-pointer"
+          >
+            See attachment
+          </a>
+        </div>
+      </div>
+      <!-- subjectselector-popup -->
+      <div
+        class="bg-surface subject-selector-popup z-40 flex bottom-24 lg:bottom-auto lg:left-20 lg:top-36 hidden flex-col rounded-2xl p-3 border-2 border-surface-2 transition-all duration-100 transform -translate-x-16 lg:translate-x-0 fixed"
+      >
+        <!-- <p class="text-lg font-semibold">Select Subject</p> -->
+        <div class="card-wrapper flex flex-col gap-3"></div>
+      </div>
+      <!-- dashboard home page section  -->
+      <section
+        class="dashboard-section hidden transition-all duration-200 flex flex-col gap-4 lg:gap-5 w-full h-full"
+      >
+        <div class="w-full overflow-x-auto flex shrink-0">
+          <div
+            class="swiper-slide w-full max-w-[37.5rem] bg-surface-2 !flex !flex-col gap-3 rounded-2xl p-4 lg:p-5 swiper-slide-active shrink-0"
+            role="group"
+            aria-label="1 / 1"
+            style="margin-right: 1.8rem"
+          >
+            <div class="wrapper flex items-center gap-4 justify-between">
+              <div
+                class="slide-icon-title-wrapper w-full flex items-center gap-2 lg:gap-3"
+              >
+                <div
+                  class="icon bg-surface flex h-12 w-12 items-center justify-center rounded-full shrink-0"
+                >
+                  <i class="ri-file-text-line text-2xl"></i>
+                </div>
+                <p class="slider-title text-xl font-semibold">
+                  His name is John Cena
+                </p>
+              </div>
+              <div
+                class="delete-icon hidden editor-tool ml-auto flex items-center"
+              >
+                <i
+                  class="fa-solid fa-trash text-xl cursor-pointer text-text-error"
+                ></i>
+              </div>
+            </div>
+            <div class="wrapper">
+              <div class="description text-text-secondary line-clamp-5">
+                Sjwjskdksksnsnxnxnnxxnsjsksk sjsjsksskskks djsjsksjzxnz
+                djsjsksnznzb djsmsnsmsns djsjsjajs suiiiiiiiii
+                snsjsksksjsjsnsnsnsj dskjsnsjsns fjsksjsnsns fksjsnssb
+              </div>
+              <div
+                class="wrapper text-text-link underline text-sm flex gap-4 pb-4 md:pb-0"
+              >
+                <p class="cursor-pointer" style="display: none">Readmore</p>
+                <a class="cursor-pointer hidden" target="_blank"
+                  >See attachment</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="upcoming-submissions gap-4 lg:gap-5 flex flex-col w-full">
+          <div class="wrapper gap-2 lg:gap-3 flex items-center w-full">
+            <p class="text-2xl font-semibold">Upcoming submissions</p>
+            <div class="plus-icon editor-tool add-submission-btn">
+              <i class="fa-solid fa-plus text-2xl cursor-pointer"></i>
+            </div>
+          </div>
+          <div class="card-container grid-auto-fit lg:gap-2">
+            <div
+              class="card p-4 bg-surface-2 rounded-[1.25rem] flex flex-col lg:gap-3"
+            >
+              <div class="wrapper flex items-center gap-1 lg:gap-3 pt-1">
+                <img
+                  src="https://ik.imagekit.io/yn9gz2n2g/Subject%20icons/Semester%204/sem4pwp.png?updatedAt=1751046739300"
+                  alt=""
+                  class="w-6 h-6 lg:w-10 lg:h-10"
+                />
+                <p class="subject-name font-semibold text-text-primary">PWP</p>
+              </div>
+              <div class="wrapper flex flex-col lg:gap-1 text-text-secondary">
+                <p class="description">Manual 4-5</p>
+                <p class="submission-date">04-March</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="dashboard-diff-section-container flex flex-col md:flex-row flex-wrap gap-4 lg:gap-5 w-full"
+        >
+          <!-- stats upcoming test pyq wrapper -->
+          <div
+            class="stats-upcoming-test-PYQ-wrapper flex gap-4 lg:flex-col lg:w-[21.18rem]"
+          >
+            <!-- stats -->
+            <div
+              class="stats flex flex-col gap-2 lg:gap-3 md:w-fit w-full shrink-0"
+            >
+              <p class="text-2xl font-semibold main-title">Class rank</p>
+              <div
+                class="card w-full bg-surface-2 md:w-fit rounded-3xl flex justify-between md:justify-center md:gap-6 items-center p-6 md:h-full md:flex-col lg:flex-row gap-6 w-fit"
+              >
+                <div
+                  class="rank-wrapper md:flex flex-col items-center text-center"
+                >
+                  <p class="rank text-2xl font-semibold">01</p>
+                  <p
+                    class="total-student text-xs font-light leading-tight text-center text-text-link"
+                  >
+                    Rank <br />
+                    out of 70
+                  </p>
+                </div>
+                <div class="points-wrapper flex gap-1 items-center">
+                  <img
+                    src="https://ik.imagekit.io/yn9gz2n2g/others/coin.png?updatedAt=1751607575051"
+                    class="h-5 w-5"
+                    alt=""
+                  />
+
+                  <p class="points text-2xl">136</p>
+                </div>
+                <div class="medal-wrapper gap-4 flex items-center text-sm">
+                  <div class="gold-medal-wrapper flex items-center gap-1">
+                    <img
+                      class="h-5"
+                      src="https://ik.imagekit.io/yn9gz2n2g/others/gold.png?updatedAt=1751607550552"
+                      alt=""
+                    />
+                    <p class="">x3</p>
+                  </div>
+                  <div class="silver-medal-wrapper flex items-center gap-1">
+                    <img
+                      class="h-5"
+                      src="https://ik.imagekit.io/yn9gz2n2g/others/silver.png?updatedAt=1751607529476"
+                      alt=""
+                    />
+                    <p class="">x3</p>
+                  </div>
+                  <div class="bronz-medal-wrapper flex items-center gap-1">
+                    <img
+                      class="h-5"
+                      src="https://ik.imagekit.io/yn9gz2n2g/others/bronze.png?updatedAt=1751607503968"
+                      alt=""
+                    />
+                    <p class="">x3</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- pyq -->
+            <div
+              class="dashboard-PYQ gap-2 hidden lg:gap-3 flex-col lg:flex flex-1"
+            >
+              <p class="text-2xl font-semibold main-title lg:hidden">PYQ</p>
+              <div
+                class="card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full lg:w-fit md:h-full md:justify-between rounded-3xl p-6"
+              >
+                Practice important questions from past exams. Learn the pattern
+                and prepare better!
+                <a href="http://localhost:5173/?test=%27%27">
+                  <button class="button-hug">
+                    <span class="text">View All PYQ</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                  </button>
+                </a>
+              </div>
+            </div>
+          </div>
+          <!-- timetable -->
+          <div class="time-table gap-2 lg:gap-3 flex-col w-fit hidden lg:flex">
+            <p class="text-2xl font-semibold main-title">Time table</p>
+            <div
+              class="card bg-surface-2 flex flex-col gap-5 w-fit rounded-3xl p-6 pt-4"
+            >
+              <div
+                class="swiper !w-[18.75rem] !h-[18.75rem]"
+                id="dashboard-time-table-swiper"
+              >
+                <div class="swiper-wrapper">
+                  <div class="swiper-slide !flex !flex-col gap-3">
+                    <div
+                      class="day font-semibold text-center text-xl w-full translate leading-tight -translatey-1"
+                    >
+                      Monday
+                    </div>
+
+                    <div
+                      class="card flex flex-col gap-4 border border-neutral-500 rounded-xl p-4 overflow-y-auto scrollbar-hide h-full"
+                    >
+                      <div
+                        class="wrapper flex items-center justify-between w-full"
+                      >
+                        <div class="name-icon-wrapper flex items-center gap-2">
+                          <img
+                            src="https://ik.imagekit.io/yn9gz2n2g/Subject%20icons/Semester%204/sem4pwp.png?updatedAt=1751046739300"
+                            alt=""
+                            class="h-[2.0rem] w-2[2.0rem]"
+                          />
+                          <p class="subject-name">DCN</p>
+                        </div>
+                        <p class="type">Lec</p>
+                        <p class="time text-text-tertiary">10:00-10:40</p>
+                      </div>
+                      <div
+                        class="wrapper flex items-center justify-between w-full"
+                      >
+                        <div class="name-icon-wrapper flex items-center gap-2">
+                          <img
+                            src="https://ik.imagekit.io/yn9gz2n2g/Subject%20icons/Semester%204/sem4pwp.png?updatedAt=1751046739300"
+                            alt=""
+                            class="h-[2.0rem] w-[2.0rem]"
+                          />
+                          <p class="subject-name">DCN</p>
+                        </div>
+                        <p class="type">Lec</p>
+                        <p class="time text-text-tertiary">10:00-10:40</p>
+                      </div>
+                      <div
+                        class="wrapper flex items-center justify-between w-full"
+                      >
+                        <div class="name-icon-wrapper flex items-center gap-2">
+                          <img
+                            src="https://ik.imagekit.io/yn9gz2n2g/Subject%20icons/Semester%204/sem4pwp.png?updatedAt=1751046739300"
+                            alt=""
+                            class="h-[2.0rem] w-[2.0rem]"
+                          />
+                          <p class="subject-name">DCN</p>
+                        </div>
+                        <p class="type">Lec</p>
+                        <p class="time text-text-tertiary">10:00-10:40</p>
+                      </div>
+                      <div
+                        class="wrapper flex items-center justify-between w-full"
+                      >
+                        <div class="name-icon-wrapper flex items-center gap-2">
+                          <img
+                            src="https://ik.imagekit.io/yn9gz2n2g/Subject%20icons/Semester%204/sem4pwp.png?updatedAt=1751046739300"
+                            alt=""
+                            class="h-[2.0rem] w-[2.0rem]"
+                          />
+                          <p class="subject-name">DCN</p>
+                        </div>
+                        <p class="type">Lec</p>
+                        <p class="time text-text-tertiary">10:00-10:40</p>
+                      </div>
+                      <div
+                        class="wrapper flex items-center justify-between w-full"
+                      >
+                        <div class="name-icon-wrapper flex items-center gap-2">
+                          <img
+                            src="https://ik.imagekit.io/yn9gz2n2g/Subject%20icons/Semester%204/sem4pwp.png?updatedAt=1751046739300"
+                            alt=""
+                            class="h-[2.0rem] w-[2.0rem]"
+                          />
+                          <p class="subject-name">DCN</p>
+                        </div>
+                        <p class="type">Lec</p>
+                        <p class="time text-text-tertiary">10:00-10:40</p>
+                      </div>
+                      <div
+                        class="wrapper flex items-center justify-between w-full"
+                      >
+                        <div class="name-icon-wrapper flex items-center gap-2">
+                          <img
+                            src="https://ik.imagekit.io/yn9gz2n2g/Subject%20icons/Semester%204/sem4pwp.png?updatedAt=1751046739300"
+                            alt=""
+                            class="h-[2.0rem] w-[2.0rem]"
+                          />
+                          <p class="subject-name">DCN</p>
+                        </div>
+                        <p class="type">Lec</p>
+                        <p class="time text-text-tertiary">10:00-10:40</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="swiper-button-prev rounded-full transform !top-0 translate-y-[1.2rem] translate-x-3"
+                >
+                  <i
+                    class="ri-arrow-left-s-line text-2xl text-text-tertiary -translate-x-[0.05rem]"
+                  ></i>
+                </div>
+                <div
+                  class="swiper-button-next rounded-full transform !top-0 translate-y-[1.2rem] -translate-x-3"
+                >
+                  <i
+                    class="ri-arrow-right-s-line text-2xl text-text-tertiary transform translate-x-[0.05rem]"
+                  ></i>
+                </div>
+                <div class="swiper-pagination"></div>
+              </div>
+            </div>
+          </div>
+          <!-- upcoming test -->
+          <div
+            class="dashboard-upcoming-test gap-2 lg:gap-3 flex flex-col lg:w-[18.75rem] md:w-25 grow w-full"
+          >
+            <p class="text-2xl font-semibold main-title">Upcoming Test</p>
+
+            <div
+              class="card bg-surface-2 flex flex-col gap-4 lg:gap-5 h-full w-full rounded-3xl p-6"
+            >
+              <div class="wrapper w-full flex items-center justify-between">
+                <div class="flex items-center gap-2 lg:gap-3 icon-name-wrapper">
+                  <img
+                    src="https://ik.imagekit.io/yn9gz2n2g/others/test.png?updatedAt=1751607386764"
+                    class="h-11"
+                    alt=""
+                  />
+                  <p class="text-xl font-semibold title">Test-01</p>
+                </div>
+                <p class="text-xs text-text-link link coming-soon-label">
+                  Coming soon
+                </p>
+                <a href="" class="join-btn hidden">
+                  <button class="button-hug">Join</button>
+                </a>
+              </div>
+              <div class="description">
+                This test includes questions only from the topics taught during
+                this week. A quick way to revise what you just learned.
+              </div>
+              <div
+                class="duration-date-wrapper text-xs font-light flex flex-col gap-1"
+              >
+                <p class="day">Day : Friday</p>
+                <p class="duration">Duration : 30mins</p>
+              </div>
+              <button class="button-hug mt-auto">
+                <span class="text">View previous sessions</span>
+                <i class="fa-solid fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+          <!-- upcoming sessions -->
+          <div
+            class="dashboard-upcoming-sessions gap-2 lg:gap-3 flex flex-col w-full lg:w-[18.75rem] md:w-25 grow max-w-[31.25rem]"
+          >
+            <p class="text-2xl font-semibold main-title">Upcoming Sessions</p>
+
+            <div
+              class="wrapper h-fit w-full bg-surface-2 rounded-3xl p-6 flex flex-col gap-4 lg:gap-5"
+            >
+              <div
+                class="swiper !h-fit !w-full"
+                id="dashboard-upcoming-sessions-swiper"
+              >
+                <div class="swiper-wrapper">
+                  <div class="swiper-slide">
+                    <div
+                      class="card flex flex-col gap-4 lg:gap-5 w-full rounded-3xl"
+                    >
+                      <div
+                        class="wrapper w-full flex items-center justify-between"
+                      >
+                        <div
+                          class="flex items-center gap-2 lg:gap-3 icon-name-wrapper"
+                        >
+                          <img
+                            src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m11.png?updatedAt=1750951276570"
+                            class="h-11 w-11 object-cover rounded-full"
+                            alt="Mentor"
+                          />
+                          <div class="wrapper">
+                            <p class="text-xl">student studnet</p>
+                            <p class="text-xs text-text-tertiary">FYCO-A</p>
+                          </div>
+                        </div>
+                        <p class="status text-xs text-text-link">Coming soon</p>
+                      </div>
+                      <div class="wrapper flex flex-col gap-2">
+                        <p class="title text-xl font-semibold">
+                          Open source contributions
+                        </p>
+                        <div class="description text-text-secondary">
+                          By completing this session you will get to know the
+                          working of the open source community and what is it
+                          really
+                        </div>
+                      </div>
+                      <div
+                        class="duration-date-wrapper text-xs font-light flex flex-col gap-1"
+                      >
+                        <p class="day">Tuesday at 123321</p>
+                        <p class="duration">Duration : 1233121</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="swiper-pagination"></div>
+              </div>
+              <button class="button-hug mt-auto">View previous sessions</button>
+            </div>
+          </div>
+          <!-- pyq -->
+          <div
+            class="dashboard-PYQ gap-2 flex flex-col w-full md:w-[12.5rem] lg:hidden"
+          >
+            <p class="text-2xl font-semibold main-title">PYQ</p>
+            <div
+              class="card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full md:h-full md:justify-between rounded-3xl p-6"
+            >
+              Practice important questions from past exams. Learn the pattern
+              and prepare better!
+              <a href="http://localhost:5173/?test=%27%27">
+                <button class="button-hug">
+                  <span class="text">View All PYQ</span>
+                  <i class="fa-solid fa-arrow-right"></i>
+                </button>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- subject page section  -->
+      <section
+        class="subject-page-section hidden transition-all duration-200 flex flex-col gap-4 lg:gap-5 w-full h-full"
+      >
+        <!-- add notice popup -->
+        <div
+          class="add-notice-popup-wrapper hidden transition-all duration-200 w-full h-full fixed z-50 flex justify-center items-center top-0 left-0 bg-[#00000060]"
+        >
+          <div
+            class="popup p-6 flex flex-col relative bg-surface-2 rounded-3xl overflow-y-auto max-h-[90vh] gap-4 w-full max-w-[18.75rem]"
+          >
+            <!-- popup related error poup -->
+            <div
+              class="error-popup-wrapper hidden transition-all duration-100 fixed top-0 left-0 w-full flex justify-center h-full bg-[#00000060] z-60 items-center"
+            >
+              <div
+                class="error-popup bg-surface-2 h-fit rounded-3xl flex flex-col gap-4 lg:gap-5 items-center justify-center p-6 overflow-y-auto max-h-[90vh]"
+              >
+                <p class="text-white">
+                  only 1 can be uploaded link or the attachment
+                </p>
+                <button class="button-fill okay-btn">Okay</button>
+              </div>
+            </div>
+            <div class="wrapper w-full flex justify-between items-center">
+              <p class="title text-2xl font-semibold">Add Notice</p>
+              <i class="fa-solid fa-xmark text-xl close-popup-btn"></i>
+            </div>
+            <div class="title-input-wrapper flex flex-col gap-1">
+              <label class="text-text-primary px-1" for="add-notice-popup-title"
+                >Title</label
+              >
+              <input
+                type="text"
+                autocomplete="off"
+                id="add-notice-popup-title"
+                class="title-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+              />
+              <p
+                class="title-related-error hidden text-text-error px-1 text-sm"
+              ></p>
+            </div>
+            <div class="description-input-wrapper flex flex-col gap-1">
+              <label
+                class="text-text-primary px-1"
+                for="add-notice-popup-description"
+                >Description</label
+              >
+              <textarea
+                id="add-notice-popup-description"
+                autocomplete="off"
+                class="description-input bg-surface-3 border-surface-4 resize-none focus:border-surface-3 min-h-[6rem] focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+              ></textarea>
+              <p
+                class="description-related-error hidden text-text-error px-1 text-sm"
+              ></p>
+            </div>
+            <div class="link-input-wrapper flex flex-col gap-1">
+              <label class="text-text-primary px-1" for="add-notice-popup-link"
+                >Link (Optional)</label
+              >
+              <input
+                type="text"
+                autocomplete="off"
+                id="add-notice-popup-link"
+                class="link-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+              />
+              <p
+                class="link-related-error hidden text-text-error px-1 text-sm"
+              ></p>
+            </div>
+            <div
+              class="file-attachment bg-surface-3 border-2 border-surface-4 py-6 flex justify-center rounded-3xl gap-2 justify-center"
+            >
+              <div
+                class="wrapper file-attachment-icon transition-all duration-100"
+              >
+                <i
+                  class="fa-solid fa-arrow-up-from-bracket text-xl font-thin"
+                ></i>
+              </div>
+              <span class="upload-text">Upload (Optional)</span>
+              <input type="file" class="hidden" id="notice-file-input" />
+            </div>
+            <button class="button-fill create-btn" type="button">Create</button>
+          </div>
+        </div>
+        <!-- add category popup -->
+        <div
+          class="add-category-popup-wrapper hidden transition-all duration-200 w-full h-full fixed z-50 flex justify-center items-center top-0 left-0 bg-[#00000060]"
+        >
+          <div
+            class="popup p-6 flex flex-col relative bg-surface-2 rounded-3xl gap-4 w-full max-w-[18.75rem]"
+          >
+            <div class="wrapper w-full flex justify-between items-center">
+              <p class="popup-title text-2xl font-semibold">Add Category</p>
+              <i
+                class="fa-solid fa-xmark text-xl close-popup-btn cursor-pointer"
+              ></i>
+            </div>
+            <div class="title-input-wrapper flex flex-col gap-1">
+              <label class="text-text-primary px-1" for="category-title-input"
+                >Title</label
+              >
+              <input
+                type="text"
+                autocomplete="off"
+                class="title-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+                id="category-title-input"
+              />
+              <p
+                class="title-related-error hidden text-text-error px-1 text-sm"
+              ></p>
+            </div>
+            <button class="button-fill create-btn" type="button">Create</button>
+          </div>
+        </div>
+        <!-- Add item Popup -->
+        <div
+          class="add-item-popup-wrapper hidden transition-all duration-200 w-full h-full fixed z-50 flex justify-center items-center top-0 left-0 bg-[#00000060]"
+        >
+          <div
+            class="popup overflow-y-auto max-h-[90vh] p-6 flex flex-col relative bg-surface-2 rounded-3xl gap-4 w-full max-w-[18.75rem]"
+          >
+            <!-- popup error-->
+            <div
+              class="error-popup-wrapper hidden transition-all duration-100 fixed top-0 left-0 w-full flex justify-center h-full bg-[#00000060] z-60 items-center"
+            >
+              <div
+                class="error-popup bg-surface-2 h-fit rounded-3xl flex flex-col gap-4 lg:gap-5 items-center justify-center p-6"
+              >
+                <p class="text-white">
+                  Only 1 can be uploaded: link or the attachment
+                </p>
+                <button class="button-fill okay-btn">Okay</button>
+              </div>
+            </div>
+            <div class="wrapper w-full flex justify-between items-center">
+              <p class="title text-2xl font-semibold popup-title">Add item</p>
+              <i class="fa-solid fa-xmark text-xl close-popup-btn"></i>
+            </div>
+            <div class="wrapper flex gap-2 items-center edit-tools">
+              <div
+                class="wrapper hidden delete-icon flex gap-2 items-center hidden rounded-lg border w-fit border-text-error px-3 py-1 text-text-error"
+              >
+                <i class="fa-solid fa-trash"></i>
+                <p class="text-sm">Delete</p>
+              </div>
+              <div
+                class="wrapper unhide-icon flex gap-2 items-center hidden rounded-lg border w-fit border-text-primary px-3 py-1"
+              >
+                <i class="fa-regular fa-eye"></i>
+                <p class="text-sm">Unhide</p>
+              </div>
+              <div
+                class="wrapper hidden hide-icon flex gap-2 items-center hidden rounded-lg border w-fit border-text-primary px-3 py-1"
+              >
+                <i class="fa-regular fa-eye-slash"></i>
+                <p class="text-sm">Hide</p>
+              </div>
+            </div>
+
+            <div class="title-input-wrapper flex flex-col gap-1">
+              <label class="text-text-primary px-1" for="item-title-input"
+                >Name</label
+              >
+              <input
+                type="text"
+                autocomplete="off"
+                id="item-title-input"
+                class="title-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+              />
+              <p class="title-error hidden text-text-error px-1 text-sm"></p>
+            </div>
+
+            <div class="link-input-wrapper flex flex-col gap-1">
+              <label
+                class="text-text-primary px-1 link-input-label"
+                for="item-link-input"
+                >Link
+              </label>
+              <input
+                type="text"
+                autocomplete="off"
+                id="item-link-input"
+                class="link-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+              />
+              <p class="link-error hidden text-text-error px-1 text-sm"></p>
+            </div>
+            <div class="flex w-full text-center gap-2 items-center or-line">
+              <div class="line w-full h-0.5 bg-surface-4"></div>
+              <p class="text-sm">or</p>
+              <div class="line w-full h-0.5 bg-surface-4"></div>
+            </div>
+            <div
+              class="upload-attachment bg-surface-3 border-2 border-surface-4 py-6 flex justify-center rounded-3xl gap-2 justify-center"
+            >
+              <div
+                class="wrapper upload-attachment-icon transition-all duration-100"
+              >
+                <i
+                  class="fa-solid fa-arrow-up-from-bracket text-xl font-thin"
+                ></i>
+              </div>
+              <span class="upload-text">Upload(Optional)</span>
+              <input type="file" class="hidden" id="item-file-input" />
+            </div>
+
+            <button class="button-fill create-btn" type="button">Create</button>
+            <button
+              class="button-fill hidden change-attachment-btn"
+              type="button"
+            >
+              Change attachment
+            </button>
+          </div>
+        </div>
+        <!-- add submisssion popup -->
+        <div
+          class="add-submission-popup-wrapper hidden transition-all duration-200 w-full h-full fixed z-50 flex justify-center items-center top-0 left-0 bg-[#00000060]"
+        >
+          <div
+            class="error-popup-wrapper hidden transition-all duration-100 fixed top-0 left-0 w-full flex justify-center h-full bg-[#00000060] z-60 items-center"
+          >
+            <div
+              class="error-popup bg-surface-2 h-fit rounded-3xl flex flex-col gap-4 lg:gap-5 items-center justify-center p-6"
+            >
+              <p class="text-white">Only 1 date from calender or description</p>
+
+              <button class="button-fill okay-btn">Okay</button>
+            </div>
+          </div>
+          <div
+            class="popup overflow-y-auto max-h-[90vh] p-6 flex flex-col relative bg-surface-2 rounded-3xl gap-4 w-full max-w-[18.75rem]"
+          >
+            <div class="wrapper w-full flex justify-between items-center">
+              <p class="popup-title text-2xl font-semibold popup-title">
+                Add submission
+              </p>
+
+              <i
+                class="fa-solid fa-xmark text-xl close-popup-btn cursor-pointer"
+              ></i>
+            </div>
+            <div
+              class="delete-icon w-full justify-start flex gap-2 items-center hidden"
+            >
+              <div
+                class="wrapper flex gap-2 items-center rounded-lg border w-fit border-text-error px-3 py-1 text-text-error"
+              >
+                <i class="fa-solid fa-trash"></i>
+                <p class="text-sm">Delete</p>
+              </div>
+            </div>
+            <div class="submission-title-input-wrapper flex flex-col gap-1">
+              <label class="text-text-primary px-1" for="submission-title-input"
+                >Submission name</label
+              >
+              <input
+                type="text"
+                autocomplete="off"
+                maxlength="12"
+                placeholder="e.g. Assignment 1"
+                class="title-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none placeholder:text-text-tertiary"
+                id="submission-title-input"
+              />
+              <p
+                class="title-related-error hidden text-text-error px-1 text-sm"
+              ></p>
+            </div>
+            <div class="description-input-wrapper flex flex-col gap-1 relative">
+              <label
+                class="text-text-primary px-1"
+                for="submission-description-input"
+              >
+                Submission date
+              </label>
+              <input
+                type="text"
+                id="submission-description-input"
+                autocomplete="off"
+                placeholder="e.g. Within next week"
+                class="title-input bg-surface-3 border-surface-4 focus:border-surface-3 placeholder:text-text-tertiary focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none pr-10"
+              />
+
+              <p
+                class="submission-description-related-error hidden text-text-error px-1 text-sm"
+              ></p>
+            </div>
+            <div class="flex w-full text-center gap-2 items-center or-line">
+              <div class="line w-full h-0.5 bg-surface-4"></div>
+              <p class="text-sm">or</p>
+              <div class="line w-full h-0.5 bg-surface-4"></div>
+            </div>
+            <div class="date-input-wrapper flex flex-col gap-1 relative">
+              <label class="text-text-primary px-1" for="submission-date-input">
+                Click to choose from calendar
+              </label>
+
+              <div class="relative w-full calender-input-wrapper">
+                <input
+                  type="date"
+                  id="submission-date-input"
+                  class="date-input w-full bg-surface-3 border-surface-4 text-primary-50 caret-primary-50 rounded-lg border-2 px-3 py-1.5 pr-10 focus:outline-none focus:!ring-primary-400 focus:!ring-1 !appearance-none"
+                />
+
+                <!-- placeholder -->
+                <p
+                  class="fake-placeholder absolute left-3 bg-surface-3 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none transition-all duration-200"
+                >
+                  Click to select date
+                </p>
+
+                <!-- Calendar icon -->
+                <i
+                  class="fa-solid fa-calendar absolute right-3 cursor-pointer top-1/2 -translate-y-1/2 text-gray-400"
+                ></i>
+              </div>
+            </div>
+            <button class="button-fill change-date-btn hidden">
+              Change date
+            </button>
+            <button class="button-fill create-btn" type="button">
+              Add submission
+            </button>
+          </div>
+        </div>
+        <!-- notice slider container -->
+        <div
+          class="swiper w-full max-w-full relative w-1 h-fit shrink-0"
+          id="subject-page-swiper"
+        >
+          <div class="swiper-wrapper w-full"></div>
+          <div class="swiper-pagination md:hidden"></div>
+          <div
+            class="swiper-button-prev bg-amber-100 rounded-full !w-10 !h-10 !hidden md:!flex transform -ttranslate-x-4"
+          >
+            <i
+              class="ri-arrow-left-s-line text-2xl text-white text-2xl -translate-x-[0.05rem]"
+            ></i>
+          </div>
+          <div
+            class="swiper-button-next rounded-full !w-10 !h-10 !hidden md:!flex transform ttranslate-x-4"
+          >
+            <i
+              class="ri-arrow-right-s-line text-2xl text-white text-2xl transform translate-x-[0.05rem]"
+            ></i>
+          </div>
+        </div>
+        <button
+          class="button-hug hidden add-notice-btn editor-tool"
+          type="button"
+        >
+          Add notice
+        </button>
+        <button
+          class="button-hug hidden editor-tool add-category-container-btn"
+          type="button"
+        >
+          Add Container
+        </button>
+        <!-- upcoming submissions -->
+        <div class="upcoming-submissions gap-4 lg:gap-5 flex flex-col">
+          <div class="wrapper gap-2 lg:gap-3 flex items-center w-full">
+            <p class="text-2xl font-semibold">Upcoming submissions</p>
+            <div class="plus-icon editor-tool add-submission-btn">
+              <i class="fa-solid fa-plus text-2xl cursor-pointer"></i>
+            </div>
+          </div>
+
+          <div class="card-container grid-auto-fit">
+            <div class="card p-4 bg-surface-2 rounded-[1.25rem]">
+              <p class="description">Manual 4-5</p>
+              <p class="submission-date">04-March</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- test section -->
+      <section
+        class="tests-section hidden transition-all duration-200 flex flex-col gap-4 lg:gap-5 w-full h-full"
+      >
+        <!-- edit upcoming test popup -->
+        <div
+          class="edit-upcoming-test-popup-wrapper hidden transition-all duration-200 w-full h-full fixed z-50 flex justify-center items-center top-0 left-0 bg-[#00000060]"
+        >
+          <div
+            class="popup overflow-y-auto max-h-[90vh] p-6 flex flex-col relative bg-surface-2 rounded-3xl gap-4 w-full max-w-[18.75rem]"
+          >
+            <div class="wrapper w-full flex justify-between items-center">
+              <p class="popup-title text-2xl font-semibold">Edit</p>
+              <i
+                class="fa-solid fa-xmark text-xl close-popup-btn cursor-pointer"
+              ></i>
+            </div>
+
+            <div
+              class="wrapper hidden hide-icon flex gap-2 items-center hidden rounded-lg border w-fit border-text-primary px-3 py-1"
+            >
+              <i class="fa-regular fa-eye-slash"></i>
+              <p class="text-sm">Hide</p>
+            </div>
+
+            <div class="title-input-wrapper flex flex-col gap-1">
+              <label
+                class="text-text-primary px-1"
+                for="upcoming-test-popup-title"
+                >Title</label
+              >
+              <input
+                type="text"
+                autocomplete="off"
+                id="upcoming-test-popup-title"
+                class="title-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+              />
+              <p
+                class="title-related-error hidden text-text-error px-1 text-sm"
+              >
+                Title required
+              </p>
+            </div>
+            <div class="description-input-wrapper flex flex-col gap-1">
+              <label
+                class="text-text-primary px-1"
+                for="upcoming-test-popup-description"
+                >Description</label
+              >
+              <textarea
+                id="upcoming-test-popup-description"
+                autocomplete="off"
+                class="description-input bg-surface-3 border-surface-4 resize-none focus:border-surface-3 min-h-[6rem] focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+              ></textarea>
+              <p
+                class="description-related-error hidden text-text-error px-1 text-sm"
+              >
+                Description required
+              </p>
+            </div>
+            <div class="link-input-wrapper flex flex-col gap-1">
+              <label class="text-text-primary px-1" for="add-test-popup-link"
+                >Link
+              </label>
+              <input
+                type="text"
+                autocomplete="off"
+                id="add-test-popup-link"
+                class="link-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+              />
+              <p class="link-related-error hidden text-text-error px-1 text-sm">
+                Enter a valid link
+              </p>
+            </div>
+            <div class="day-input-wrapper flex flex-col gap-1">
+              <label
+                class="text-text-primary px-1"
+                for="upcoming-test-popup-day"
+                >Day</label
+              >
+              <input
+                type="text"
+                autocomplete="off"
+                id="upcoming-test-popup-day"
+                class="day-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+              />
+              <p class="day-related-error hidden text-text-error px-1 text-sm">
+                Day required
+              </p>
+            </div>
+            <div class="duration-input-wrapper flex flex-col gap-1">
+              <label
+                class="text-text-primary px-1"
+                for="upcoming-test-popup-duration"
+                >Duration</label
+              >
+              <input
+                type="text"
+                autocomplete="off"
+                id="upcoming-test-popup-duration"
+                class="duration-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+              />
+              <p
+                class="duration-related-error hidden text-text-error px-1 text-sm"
+              >
+                Duration required
+              </p>
+            </div>
+            <button class="button-fill create-btn" type="button">Edit</button>
+          </div>
+        </div>
+        <!-- previous test popup -->
+        <div
+          class="previous-test-popup-wrapper hidden transition-all duration-200 w-full h-full fixed z-50 flex justify-center items-center top-0 left-0 bg-[#00000060]"
+        >
+          <div
+            class="popup p-6 flex overflow-y-auto max-h-[90vh] flex-col relative bg-surface-2 rounded-3xl gap-4 w-full max-w-[18.75rem]"
+          >
+            <div class="wrapper w-full flex justify-between items-center">
+              <p class="popup-title text-2xl font-semibold">Add test</p>
+              <i class="fa-solid fa-xmark text-xl close-popup-btn"></i>
+            </div>
+            <div class="title-input-wrapper flex flex-col gap-1">
+              <label
+                class="text-text-primary px-1"
+                for="previous-test-title-input"
+                >Title</label
+              >
+              <input
+                type="text"
+                autocomplete="off"
+                id="previous-test-title-input"
+                class="title-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+              />
+              <p
+                class="title-related-error hidden text-text-error px-1 text-sm"
+              >
+                Title required
+              </p>
+            </div>
+            <div class="date-input-wrapper flex flex-col gap-1 relative">
+              <label
+                class="text-text-primary px-1"
+                for="previous-test-date-input"
+              >
+                Pick a date from calendar
+              </label>
+              <div class="relative w-full calender-input-wrapper">
+                <input
+                  type="date"
+                  id="previous-test-date-input"
+                  class="date-input w-full bg-surface-3 border-surface-4 text-primary-50 caret-primary-50 rounded-lg border-2 px-3 py-1.5 pr-10 focus:outline-none focus:!ring-primary-400 focus:!ring-1 !appearance-none"
+                />
+                <!-- placeholder -->
+                <p
+                  class="fake-placeholder absolute left-3 bg-surface-3 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none transition-all duration-200"
+                >
+                  Click to select date
+                </p>
+                <!-- Calendar icon -->
+                <i
+                  class="fa-solid fa-calendar absolute right-3 cursor-pointer top-1/2 -translate-y-1/2 text-gray-400"
+                ></i>
+              </div>
+              <p class="date-related-error hidden text-text-error px-1 text-sm">
+                date required
+              </p>
+            </div>
+            <div class="duration-input-wrapper flex flex-col gap-1">
+              <label
+                class="text-text-primary px-1"
+                for="upcoming-test-duration-input"
+                >Duration</label
+              >
+              <input
+                type="text"
+                autocomplete="off"
+                id="previous-test-duration-input"
+                class="duration-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+              />
+              <p
+                class="duration-related-error hidden text-text-error px-1 text-sm"
+              >
+                Duration required
+              </p>
+            </div>
+            <div class="answer-file-input-wrapper flex flex-col gap-1">
+              <label class="text-text-primary px-1" for="answer-file-input"
+                >Answer Key</label
+              >
+              <div
+                class="answer-file-attachment bg-surface-3 border-2 border-surface-4 py-6 flex rounded-3xl gap-2 justify-center"
+              >
+                <div
+                  class="wrapper upload-attachment-icon transition-all duration-100"
+                >
+                  <i
+                    class="fa-solid fa-arrow-up-from-bracket text-xl font-thin"
+                  ></i>
+                </div>
+                <span class="upload-text">Upload Answer Pdf</span>
+                <input type="file" class="hidden" id="answer-file-input" />
+              </div>
+              <p
+                class="answer-file-related-error hidden text-text-error px-1 text-sm"
+              >
+                File required
+              </p>
+            </div>
+
+            <div class="result-file-input-wrapper flex flex-col gap-1">
+              <label class="text-text-primary px-1" for="result-file-input"
+                >Result
+              </label>
+              <div
+                class="result-file-attachment bg-surface-3 border-2 border-surface-4 py-6 flex justify-center rounded-3xl gap-2 justify-center"
+              >
+                <div
+                  class="wrapper upload-attachment-icon transition-all duration-100"
+                >
+                  <i
+                    class="fa-solid fa-arrow-up-from-bracket text-xl font-thin"
+                  ></i>
+                </div>
+                <span class="upload-text">Upload Result Pdf</span>
+                <input type="file" class="hidden" id="result-file-input" />
+              </div>
+              <p
+                class="result-file-related-error hidden text-text-error px-1 text-sm"
+              >
+                File required
+              </p>
+            </div>
+            <button class="button-fill create-btn" type="button">Create</button>
+          </div>
+        </div>
+        <!-- upcoming test -->
+        <div
+          class="upcoming-test gap-2 lg:gap-3 flex flex-col w-full order-1 lg:order-2"
+        >
+          <p class="text-2xl font-semibold main-title">Upcoming Test</p>
+          <div
+            class="no-test hidden w-full flex flex-col gap-2 lg:gap-3 items-center justify-center p-4"
+          >
+            <p class="text-center text-text-tertiary">
+              Test will be scheduled soon.
+            </p>
+            <button class="button-hug editor-tool schedule-test-btn">
+              Schedule Test
+            </button>
+          </div>
+          <div
+            class="card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full rounded-3xl lg:max-w-[31.25rem] p-6"
+          >
+            <div class="wrapper w-full flex items-center justify-between">
+              <div class="flex items-center gap-2 lg:gap-3 icon-name-wrapper">
+                <img
+                  src="https://ik.imagekit.io/yn9gz2n2g/others/test.png?updatedAt=1751607386764"
+                  class="h-11"
+                  alt=""
+                />
+                <p class="text-xl font-semibold title">Test-01</p>
+              </div>
+              <p class="text-xs text-text-link link coming-soon-label">
+                Coming soon
+              </p>
+              <a href="" class="join-btn hidden">
+                <button class="button-hug">Join</button>
+              </a>
+            </div>
+            <div class="description">
+              This test includes questions only from the topics taught during
+              this week. A quick way to revise what you just learned.
+            </div>
+            <div
+              class="duration-date-wrapper text-xs font-light flex flex-col gap-1"
+            >
+              <p class="day">Day : Friday</p>
+              <p class="duration">Duration : 30mins</p>
+            </div>
+          </div>
+        </div>
+        <!-- about tests -->
+        <div
+          class="about-tests flex flex-col gap-4 lg:gap-5 p-6 rounded-3xl border-2 border-surface-2 order-2 lg:order-1"
+        >
+          <div class="wrapper flex-col flex gap-2 lg:gap-3">
+            <p class="title text-2xl font-semibold">About Test</p>
+            <p class="description text-text-secondary">
+              The tests we conduct include questions from all subjects based on
+              the topics taught during the week. Test's are designed in such a
+              way to prevent copying, cause each test will have a time limit and
+              timer will start as soon as you start test, You can't copy if you
+              try, you'll have less time to attempt the remaining questions due
+              to very strict time limit. Test scores are used for ranking and
+              points are awarded accordingly.
+            </p>
+          </div>
+          <div class="wrapper flex-col flex gap-2 lg:gap-3">
+            <p class="title font-semibold">How ranks are assigned?</p>
+            <p class="description text-text-secondary">
+              The top 3 scorer's of test are assigned medal's accordingly, each
+              medal have points such as
+            </p>
+            <div class="wrapper gap-3 flex items-center">
+              <div class="wrapper flex items-center gap-1">
+                <img
+                  class="h-5"
+                  src="https://ik.imagekit.io/yn9gz2n2g/others/gold.png?updatedAt=1751607550552"
+                  alt=""
+                />
+                <p class="">= 30 pts</p>
+              </div>
+              <div class="wrapper flex items-center gap-1">
+                <img
+                  class="h-5"
+                  src="https://ik.imagekit.io/yn9gz2n2g/others/silver.png?updatedAt=1751607529476"
+                  alt=""
+                />
+                <p class="">= 20 pts</p>
+              </div>
+              <div class="wrapper flex items-center gap-1">
+                <img
+                  class="h-5"
+                  src="https://ik.imagekit.io/yn9gz2n2g/others/bronze.png?updatedAt=1751607503968"
+                  alt=""
+                />
+                <p class="">= 10 pts</p>
+              </div>
+            </div>
+            <p class="text-text-secondary">
+              In case if two students score 29, the one who finishes faster will
+              be ranked higher.
+            </p>
+          </div>
+        </div>
+        <!-- previous tests -->
+        <div class="previous-tests gap-2 lg:gap-3 flex flex-col w-full order-3">
+          <div class="wrapper flex items-center gap-2 lg:gap-3">
+            <p class="text-2xl font-semibold">Previous Test</p>
+            <div class="plus-icon editor-tool add-btn">
+              <i class="fa-solid fa-plus text-2xl cursor-pointer"></i>
+            </div>
+          </div>
+          <div class="card-container flex flex-wrap gap-4 lg:gap-5"></div>
+        </div>
+      </section>
+      <!-- sessions section -->
+      <section
+        class="sessions-section hidden transition-all duration-200 flex flex-col gap-4 lg:gap-5 w-full h-full"
+      >
+        <!-- are you sure popup -->
+        <div
+          class="confirmation-popup-wrapper hidden fixed top-0 left-0 z-60 w-full h-full flex justify-center items-center bg-[#00000060] transition-all duration-200"
+        >
+          <div
+            class="confirmation-popup overflow-y-auto max-h-[90vh] bg-surface-2 rounded-3xl p-6 flex flex-col gap-4 w-fit max-w-[18.75rem]"
+          >
+            <p class="text-xl font-semibold">Students Details</p>
+            <div class="wrapper flex flex-col gap-2">
+              <p class="name">Name : sagar kemble</p>
+              <p class="sem">Sem : 3</p>
+              <p class="div">Div : A</p>
+              <p class="rollno">Roll No : 21CE1001</p>
+            </div>
+            <div class="flex justify-end gap-2">
+              <button class="button-outline cancel-btn">Cancel</button>
+              <button class="button-fill confirm-btn">Confirm</button>
+            </div>
+          </div>
+        </div>
+        <!-- upcoming sessions popup -->
+        <div
+          class="upcoming-session-popup-wrapper hidden transition-all duration-200 w-full h-full fixed z-50 flex justify-center items-center top-0 left-0 bg-[#00000060] min-h-0"
+        >
+          <div
+            class="popup h-fit overflow-y-auto p-6 flex flex-col relative bg-surface-2 rounded-3xl gap-4 w-full max-w-[18.75rem] min-h-0 max-h-[90vh]"
+          >
+            <div class="wrapper w-full flex justify-between items-center">
+              <p class="popup-title text-2xl font-semibold">Add session</p>
+              <div class="wrapper hidden delete-btn">
+                <i class="fa-solid fa-trash text-text-error"></i>
+              </div>
+              <i class="fa-solid fa-xmark text-xl close-popup-btn"></i>
+            </div>
+            <div class="title-input-wrapper flex flex-col gap-1">
+              <label
+                class="text-text-primary px-1"
+                for="upcoming-session-popup-title"
+                >Title</label
+              >
+              <input
+                type="text"
+                autocomplete="off"
+                id="upcoming-session-popup-title"
+                class="title-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+              />
+              <p
+                class="title-related-error hidden text-text-error px-1 text-sm"
+              >
+                Title required
+              </p>
+            </div>
+            <div class="description-input-wrapper flex flex-col gap-1">
+              <label
+                class="text-text-primary px-1"
+                for="add-session-popup-description"
+                >Description</label
+              >
+              <textarea
+                id="add-session-popup-description"
+                autocomplete="off"
+                class="description-input bg-surface-3 border-surface-4 resize-none focus:border-surface-3 min-h-[6rem] focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+              ></textarea>
+              <p
+                class="description-related-error hidden text-text-error px-1 text-sm"
+              >
+                Description required
+              </p>
+            </div>
+            <div class="rollno-input-wrapper flex flex-col gap-1">
+              <label
+                class="text-text-primary px-1"
+                for="upcoming-session-popup-rollno"
+                >Roll no</label
+              >
+              <input
+                type="text"
+                autocomplete="off"
+                id="upcoming-session-popup-rollno"
+                class="rollno-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+              />
+              <p
+                class="rollno-related-error hidden text-text-error px-1 text-sm"
+              >
+                Roll no required
+              </p>
+            </div>
+            <div class="link-input-wrapper flex flex-col gap-1">
+              <label class="text-text-primary px-1" for="add-session-popup-link"
+                >Link
+              </label>
+              <input
+                type="text"
+                autocomplete="off"
+                id="add-session-popup-link"
+                class="link-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+              />
+              <p class="link-related-error hidden text-text-error px-1 text-sm">
+                Enter a valid link
+              </p>
+            </div>
+            <div class="date-input-wrapper flex flex-col gap-1 relative">
+              <label class="text-text-primary px-1" for="submission-date-input">
+                Click to choose from calendar
+              </label>
+              <div class="relative w-full calender-input-wrapper">
+                <input
+                  type="date"
+                  id="submission-date-input"
+                  class="date-input w-full bg-surface-3 border-surface-4 text-primary-50 caret-primary-50 rounded-lg border-2 px-3 py-1.5 pr-10 focus:outline-none focus:!ring-primary-400 focus:!ring-1 !appearance-none"
+                />
+                <!-- placeholder -->
+                <p
+                  class="fake-placeholder absolute left-3 bg-surface-3 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none transition-all duration-200"
+                >
+                  Click to select date
+                </p>
+                <!-- Calendar icon -->
+                <i
+                  class="fa-solid fa-calendar absolute right-3 cursor-pointer top-1/2 -translate-y-1/2 text-gray-400"
+                ></i>
+              </div>
+              <p class="date-related-error hidden text-text-error px-1 text-sm">
+                date required
+              </p>
+            </div>
+            <div class="time-input-wrapper flex flex-col gap-1">
+              <label
+                class="text-text-primary px-1"
+                for="upcoming-session-popup-time"
+                >Time</label
+              >
+              <input
+                type="text"
+                autocomplete="off"
+                id="upcoming-session-popup-time"
+                class="time-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+              />
+              <p class="time-related-error hidden text-text-error px-1 text-sm">
+                Duration required
+              </p>
+            </div>
+            <div class="duration-input-wrapper flex flex-col gap-1">
+              <label
+                class="text-text-primary px-1"
+                for="upcoming-session-popup-duration"
+                >Duration</label
+              >
+              <input
+                type="text"
+                autocomplete="off"
+                id="upcoming-session-popup-duration"
+                class="duration-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+              />
+              <p
+                class="duration-related-error hidden text-text-error px-1 text-sm"
+              >
+                Duration required
+              </p>
+            </div>
+            <button class="button-fill create-btn" type="button">Edit</button>
+          </div>
+        </div>
+        <!-- previous session popup -->
+        <div
+          class="previous-session-popup-wrapper hidden transition-all duration-200 w-full h-full fixed z-50 flex justify-center items-center top-0 left-0 bg-[#00000060]"
+        >
+          <div
+            class="popup p-6 flex flex-col relative overflow-y-auto max-h-[90vh] bg-surface-2 rounded-3xl gap-4 w-full max-w-[18.75rem]"
+          >
+            <div class="wrapper w-full flex justify-between items-center">
+              <p class="popup-title text-2xl font-semibold">Add Session</p>
+              <div class="wrapper hidden delete-btn">
+                <i class="fa-solid fa-trash text-text-error"></i>
+              </div>
+              <i class="fa-solid fa-xmark text-xl close-popup-btn"></i>
+            </div>
+            <!-- Title -->
+            <div class="title-input-wrapper flex flex-col gap-1">
+              <label
+                class="text-text-primary px-1"
+                for="previous-session-popup-title"
+                >Title</label
+              >
+              <input
+                type="text"
+                autocomplete="off"
+                id="previous-session-popup-title"
+                class="title-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+              />
+              <p
+                class="title-related-error hidden text-text-error px-1 text-sm"
+              >
+                Title required
+              </p>
+            </div>
+
+            <!-- Description -->
+            <div class="description-input-wrapper flex flex-col gap-1">
+              <label
+                class="text-text-primary px-1"
+                for="previous-session-popup-description"
+                >Description</label
+              >
+              <textarea
+                id="previous-session-popup-description"
+                autocomplete="off"
+                class="description-input bg-surface-3 border-surface-4 resize-none focus:border-surface-3 min-h-[6rem] focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+              ></textarea>
+              <p
+                class="description-related-error hidden text-text-error px-1 text-sm"
+              >
+                Description required
+              </p>
+            </div>
+
+            <!-- Date -->
+            <div class="date-input-wrapper flex flex-col gap-1 relative">
+              <label
+                class="text-text-primary px-1"
+                for="previous-session-date-input"
+              >
+                Click to choose from calendar
+              </label>
+              <div class="relative w-full calender-input-wrapper">
+                <input
+                  type="date"
+                  id="previous-session-date-input"
+                  class="date-input w-full bg-surface-3 border-surface-4 text-primary-50 caret-primary-50 rounded-lg border-2 px-3 py-1.5 pr-10 focus:outline-none focus:!ring-primary-400 focus:!ring-1 !appearance-none"
+                />
+                <!-- placeholder -->
+                <p
+                  class="fake-placeholder absolute left-3 bg-surface-3 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none transition-all duration-200"
+                >
+                  Click to select date
+                </p>
+                <!-- Calendar icon -->
+                <i
+                  class="fa-solid fa-calendar absolute right-3 cursor-pointer top-1/2 -translate-y-1/2 text-gray-400"
+                ></i>
+              </div>
+              <p class="date-related-error hidden text-text-error px-1 text-sm">
+                date required
+              </p>
+            </div>
+
+            <!-- Time -->
+            <div class="time-input-wrapper flex flex-col gap-1">
+              <label
+                class="text-text-primary px-1"
+                for="previous-session-popup-time"
+                >Time</label
+              >
+              <input
+                type="text"
+                autocomplete="off"
+                id="previous-session-popup-time"
+                class="time-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+              />
+              <p class="time-related-error hidden text-text-error px-1 text-sm">
+                Time required
+              </p>
+            </div>
+
+            <!-- Duration -->
+            <div class="duration-input-wrapper flex flex-col gap-1">
+              <label
+                class="text-text-primary px-1"
+                for="previous-session-popup-duration"
+                >Duration</label
+              >
+              <input
+                type="text"
+                autocomplete="off"
+                id="previous-session-popup-duration"
+                class="duration-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+              />
+              <p
+                class="duration-related-error hidden text-text-error px-1 text-sm"
+              >
+                Duration required
+              </p>
+            </div>
+
+            <!-- Roll No -->
+            <div class="rollno-input-wrapper flex flex-col gap-1">
+              <label
+                class="text-text-primary px-1"
+                for="previous-session-popup-rollno"
+                >Roll no</label
+              >
+              <input
+                type="text"
+                autocomplete="off"
+                id="previous-session-popup-rollno"
+                class="rollno-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+              />
+              <p
+                class="rollno-related-error hidden text-text-error px-1 text-sm"
+              >
+                Roll no required
+              </p>
+            </div>
+
+            <!-- View Link -->
+            <div class="link-input-wrapper flex flex-col gap-1">
+              <label
+                class="text-text-primary px-1"
+                for="previous-session-popup-link"
+                >View Link</label
+              >
+              <input
+                type="text"
+                autocomplete="off"
+                id="previous-session-popup-link"
+                class="link-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+              />
+              <p class="link-related-error hidden text-text-error px-1 text-sm">
+                Valid link required
+              </p>
+            </div>
+
+            <!-- Submit Button -->
+            <button class="button-fill create-btn" type="button">Add</button>
+          </div>
+        </div>
+        <!-- upcoming sessions -->
+        <div
+          class="upcoming-sessions gap-2 lg:gap-3 flex flex-col w-full order-1 lg:order-2"
+        >
+          <div class="wrapper flex items-center gap-2 lg:gap-3">
+            <p class="text-2xl font-semibold main-title">Upcoming Sessions</p>
+            <div class="plus-icon editor-tool add-btn">
+              <i class="fa-solid fa-plus text-2xl cursor-pointer"></i>
+            </div>
+          </div>
+          <div
+            class="no-sessions hidden w-full flex flex-col gap-2 lg:gap-3 items-center justify-center p-4"
+          >
+            <p class="text-center text-text-tertiary">
+              No upcoming sessions scheduled.
+            </p>
+          </div>
+          <div class="card-container flex flex-wrap gap-4 lg:gap-5"></div>
+        </div>
+        <!-- about sessions -->
+        <div
+          class="about-sessions flex flex-col gap-4 lg:gap-5 p-6 rounded-3xl border-2 border-surface-2 order-2 lg:order-1"
+        >
+          <div class="wrapper flex-col flex gap-2 lg:gap-3">
+            <p class="title text-2xl font-semibold">About Sessions</p>
+            <p class="description text-text-secondary">
+              Our sessions are open to students from all years and are designed
+              to be beginner-friendly. We cover essential topics in computer
+              science and also share some interesting knowledge like how
+              databases are managed, live API demos, and more. Whether you're
+              starting out or just curious to learn something new. If interested
+              about a topic and willing to teach or share your thoughts, you can
+              even take a session yourself and share your knowledge,you're
+              welcome to join us.
+            </p>
+          </div>
+          <div class="button-hug">Take a session</div>
+        </div>
+        <!-- previous sessions -->
+        <div
+          class="previous-sessions gap-2 lg:gap-3 flex flex-col w-full order-3"
+        >
+          <div class="wrapper flex items-center gap-2 lg:gap-3">
+            <p class="text-2xl font-semibold main-title">Previous Sessions</p>
+            <div class="plus-icon editor-tool add-btn hidden">
+              <i class="fa-solid fa-plus text-2xl cursor-pointer"></i>
+            </div>
+          </div>
+          <div
+            class="no-previous-sessions hidden w-full flex flex-col gap-2 lg:gap-3 items-center justify-center p-4"
+          >
+            <p class="text-center text-text-tertiary">
+              Recorded sessions will be uploaded soon.
+            </p>
+          </div>
+          <div class="card-container flex flex-wrap gap-4 lg:gap-5">
+            <div
+              class="card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full rounded-3xl lg:max-w-[31.25rem] p-6"
+            >
+              <div class="flex items-center gap-2 lg:gap-3 icon-name-wrapper">
+                <img
+                  src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m30.png?updatedAt=1751608418404"
+                  class="h-11"
+                  alt=""
+                />
+                <div class="wrapper">
+                  <p class="text-xl">Sagar Kemble</p>
+                  <p class="text-xs text-text-tertiary">TYCO A</p>
+                </div>
+              </div>
+              <div class="wrapper flex flex-col gap-2">
+                <p class="title text-xl font-semibold">
+                  Take your first step into OS!
+                </p>
+                <div class="description text-text-secondary">
+                  Learn how to contribute to real projects, use version control,
+                  and join a global developer community. Perfect for students,
+                  hobbyists, and beginners looking to grow their skills and give
+                  back.
+                </div>
+              </div>
+              <div
+                class="duration-date-wrapper text-xs font-light flex flex-col gap-1"
+              >
+                <p class="day">17-03-2025 at 8:30pm</p>
+                <p class="duration">Duration : 45mins</p>
+              </div>
+              <div class="button-hug">View Session</div>
+            </div>
+            <div
+              class="card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full rounded-3xl lg:max-w-[31.25rem] p-6"
+            >
+              <div class="flex items-center gap-2 lg:gap-3 icon-name-wrapper">
+                <img
+                  src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m30.png?updatedAt=1751608418404"
+                  class="h-11"
+                  alt=""
+                />
+                <div class="wrapper">
+                  <p class="text-xl">Sagar Kemble</p>
+                  <p class="text-xs text-text-tertiary">TYCO A</p>
+                </div>
+              </div>
+              <div class="wrapper flex flex-col gap-2">
+                <p class="title text-xl font-semibold">
+                  Take your first step into OS!
+                </p>
+                <div class="description text-text-secondary">
+                  Learn how to contribute to real projects, use version control,
+                  and join a global developer community. Perfect for students,
+                  hobbyists, and beginners looking to grow their skills and give
+                  back.
+                </div>
+              </div>
+              <div
+                class="duration-date-wrapper text-xs font-light flex flex-col gap-1"
+              >
+                <p class="day">17-03-2025 at 8:30pm</p>
+                <p class="duration">Duration : 45mins</p>
+              </div>
+              <div class="button-hug">View Session</div>
+            </div>
+            <div
+              class="card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full rounded-3xl lg:max-w-[31.25rem] p-6"
+            >
+              <div class="flex items-center gap-2 lg:gap-3 icon-name-wrapper">
+                <img
+                  src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m30.png?updatedAt=1751608418404"
+                  class="h-11"
+                  alt=""
+                />
+                <div class="wrapper">
+                  <p class="text-xl">Sagar Kemble</p>
+                  <p class="text-xs text-text-tertiary">TYCO A</p>
+                </div>
+              </div>
+              <div class="wrapper flex flex-col gap-2">
+                <p class="title text-xl font-semibold">
+                  Take your first step into OS!
+                </p>
+                <div class="description text-text-secondary">
+                  Learn how to contribute to real projects, use version control,
+                  and join a global developer community. Perfect for students,
+                  hobbyists, and beginners looking to grow their skills and give
+                  back.
+                </div>
+              </div>
+              <div
+                class="duration-date-wrapper text-xs font-light flex flex-col gap-1"
+              >
+                <p class="day">17-03-2025 at 8:30pm</p>
+                <p class="duration">Duration : 45mins</p>
+              </div>
+              <div class="button-hug">View Session</div>
+            </div>
+            <div
+              class="card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full rounded-3xl lg:max-w-[31.25rem] p-6"
+            >
+              <div class="flex items-center gap-2 lg:gap-3 icon-name-wrapper">
+                <img
+                  src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m30.png?updatedAt=1751608418404"
+                  class="h-11"
+                  alt=""
+                />
+                <div class="wrapper">
+                  <p class="text-xl">Sagar Kemble</p>
+                  <p class="text-xs text-text-tertiary">TYCO A</p>
+                </div>
+              </div>
+              <div class="wrapper flex flex-col gap-2">
+                <p class="title text-xl font-semibold">
+                  Take your first step into OS!
+                </p>
+                <div class="description text-text-secondary">
+                  Learn how to contribute to real projects, use version control,
+                  and join a global developer community. Perfect for students,
+                  hobbyists, and beginners looking to grow their skills and give
+                  back.
+                </div>
+              </div>
+              <div
+                class="duration-date-wrapper text-xs font-light flex flex-col gap-1"
+              >
+                <p class="day">17-03-2025 at 8:30pm</p>
+                <p class="duration">Duration : 45mins</p>
+              </div>
+              <div class="button-hug">View Session</div>
+            </div>
+            <div
+              class="card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full rounded-3xl lg:max-w-[31.25rem] p-6"
+            >
+              <div class="flex items-center gap-2 lg:gap-3 icon-name-wrapper">
+                <img
+                  src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m30.png?updatedAt=1751608418404"
+                  class="h-11"
+                  alt=""
+                />
+                <div class="wrapper">
+                  <p class="text-xl">Sagar Kemble</p>
+                  <p class="text-xs text-text-tertiary">TYCO A</p>
+                </div>
+              </div>
+              <div class="wrapper flex flex-col gap-2">
+                <p class="title text-xl font-semibold">
+                  Take your first step into OS!
+                </p>
+                <div class="description text-text-secondary">
+                  Learn how to contribute to real projects, use version control,
+                  and join a global developer community. Perfect for students,
+                  hobbyists, and beginners looking to grow their skills and give
+                  back.
+                </div>
+              </div>
+              <div
+                class="duration-date-wrapper text-xs font-light flex flex-col gap-1"
+              >
+                <p class="day">17-03-2025 at 8:30pm</p>
+                <p class="duration">Duration : 45mins</p>
+              </div>
+              <div class="button-hug">View Session</div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- leaderboard section -->
+      <section
+        class="leaderboard-section hidden transition-all duration-200 flex flex-col gap-4 lg:gap-5 w-full h-full max-w-[93.75rem] mr-auto ml-auto"
+      >
+        <div
+          class="pick-leaderboard-studet-popup-wrapper hidden transition-all duration-200 w-full h-full fixed z-50 flex justify-center items-center top-0 left-0 bg-[#00000060] p-5"
+        >
+          <div
+            class="popup h-full p-6 flex flex-col relative bg-surface-2 rounded-3xl gap-4 w-full max-w-[25.0rem]"
+          >
+            <div class="wrapper w-full flex justify-between items-center">
+              <p class="popup-title text-2xl font-semibold">Pick student</p>
+              <i class="fa-solid fa-xmark text-xl close-popup-btn"></i>
+            </div>
+            <div
+              class="card-container h-full overflow-y-scroll flex flex-col gap-4"
+            ></div>
+          </div>
+        </div>
+        <div
+          class="stats-card p-6 bg-surface-2 flex flex-col rounded-3xl gap-4 md:gap-0 md:justify-between lg:px-8 items-center h-fit md:flex-row max-w-[62.5rem] lg:justify-center lg:gap-12 mr-auto ml-auto w-full"
+        >
+          <div class="rank-wrapper hidden md:flex flex-col items-center">
+            <p class="rank text-2xl font-semibold">01</p>
+            <p
+              class="total-student text-xs font-light leading-tight text-center text-text-link"
+            >
+              Rank <br />
+              out of 70
+            </p>
+          </div>
+          <div class="image-name-wrapper flex items-center gap-3">
+            <img
+              src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m53.png?updatedAt=1750952781028"
+              alt=""
+              class="h-12 w-h-12"
+            />
+            <p class="name text-2xl font-semibold">Sagar Kemble</p>
+          </div>
+          <div
+            class="wrapper flex w-full justify-between max-w-[18.75rem] md:w-full"
+          >
+            <div class="rank-wrapper md:hidden flex flex-col items-center">
+              <p class="rank text-2xl font-semibold">01</p>
+              <p
+                class="total-student text-xs font-light leading-tight text-center text-text-link"
+              >
+                Rank <br />
+                out of 70
+              </p>
+            </div>
+            <div class="points-wrapper flex gap-1 items-center">
+              <img
+                src="https://ik.imagekit.io/yn9gz2n2g/others/coin.png?updatedAt=1751607575051"
+                class="h-5 w-5"
+                alt=""
+              />
+
+              <p class="points text-2xl">136</p>
+            </div>
+            <div class="medal-wrapper gap-2 md:gap-8 flex items-center">
+              <div class="gold-medal-wrapper flex items-center gap-1">
+                <img
+                  class="h-5"
+                  src="https://ik.imagekit.io/yn9gz2n2g/others/gold.png?updatedAt=1751607550552"
+                  alt=""
+                />
+                <p class="">x 3</p>
+              </div>
+              <div class="silver-medal-wrapper flex items-center gap-1">
+                <img
+                  class="h-5"
+                  src="https://ik.imagekit.io/yn9gz2n2g/others/silver.png?updatedAt=1751607529476"
+                  alt=""
+                />
+                <p class="">x 3</p>
+              </div>
+              <div class="bronz-medal-wrapper flex items-center gap-1">
+                <img
+                  class="h-5"
+                  src="https://ik.imagekit.io/yn9gz2n2g/others/bronze.png?updatedAt=1751607503968"
+                  alt=""
+                />
+                <p class="">x 3</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="wrapper flex flex-col w-full md:flex-row md:justify-between relative gap-4 md:gap-0 h-fit"
+        >
+          <!-- previous test winners  -->
+          <div
+            class="wrapper gap-4 lg:gap-5 w-full flex flex-col items-center order-1 md:order-3"
+          >
+            <p class="text-2xl font-semibold">Previous test winners</p>
+            <div
+              class="previous-test-rank-container flex justify-between md:justify-center md:gap-5 xl:gap-9 w-full items-end"
+            >
+              <div
+                class="winner-column second flex flex-col items-center gap-2 lg:gap-3"
+              >
+                <div class="winner-profile flex flex-col items-center gap-2">
+                  <img
+                    src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m54.png?updatedAt=1751608964260"
+                    alt=""
+                    class="pfp h-12 w-h-12"
+                  />
+                  <p
+                    class="winner-name font-semibold truncate w-24 lg:w-32 xl:w-40 text-center"
+                  >
+                    Unranked
+                  </p>
+                </div>
+                <div
+                  class="winner-podium w-[6.25rem] h-32 border-2 rounded-tr-lg rounded-tl-lg border-surface-3 border-b-0 bg-surface-2 flex items-center justify-center xl:w-40 lg:w-32"
+                >
+                  <div class="podium-details gap-1 flex flex-col items-center">
+                    <div class="medal-display flex items-center flex-col">
+                      <img
+                        src="https://ik.imagekit.io/yn9gz2n2g/others/silver.png?updatedAt=1751607529476"
+                        alt=""
+                        class="h-9 medal"
+                      />
+                      <p class="font-semibold rank-text">2nd</p>
+                    </div>
+                    <div class="points-display flex items-center gap-2">
+                      <p class="text-xl points">+20</p>
+                      <img
+                        src="https://ik.imagekit.io/yn9gz2n2g/others/coin.png?updatedAt=1751607575051"
+                        alt=""
+                        class="w-5 h-5"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- First Place -->
+              <div
+                class="winner-column first flex flex-col items-center gap-2 lg:gap-3"
+              >
+                <div class="winner-profile flex flex-col items-center gap-2">
+                  <img
+                    src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Common/common83.png?updatedAt=1750991402045"
+                    alt=""
+                    class="pfp w-12 h-w-12"
+                  />
+
+                  <p
+                    class="winner-name font-semibold truncate w-24 lg:w-32 xl:w-40 text-center"
+                  >
+                    Unranked
+                  </p>
+                </div>
+                <div
+                  class="winner-podium w-24 h-40 border-2 rounded-tr-lg rounded-tl-lg border-surface-3 border-b-0 bg-surface-2 flex items-center justify-center lg:w-32 xl:w-40"
+                >
+                  <div class="podium-details gap-1 flex flex-col items-center">
+                    <div class="medal-display flex items-center flex-col">
+                      <img
+                        src="https://ik.imagekit.io/yn9gz2n2g/others/gold.png?updatedAt=1751607550552"
+                        alt=""
+                        class="h-9 medal"
+                      />
+                      <p class="font-semibold rank-text">1st</p>
+                    </div>
+                    <div class="points-display flex items-center gap-2">
+                      <p class="text-xl points">+30</p>
+                      <img
+                        src="https://ik.imagekit.io/yn9gz2n2g/others/coin.png?updatedAt=1751607575051"
+                        alt=""
+                        class="w-5 h-5"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Third Place -->
+              <div
+                class="winner-column third flex flex-col items-center gap-2 lg:gap-3"
+              >
+                <div class="winner-profile flex flex-col items-center gap-2">
+                  <img
+                    src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Memes/me2.png?updatedAt=1750954163478"
+                    alt=""
+                    class="w-12 pfp h-12"
+                  />
+                  <p
+                    class="winner-name font-semibold truncate w-24 lg:w-32 xl:w-40 text-center"
+                  >
+                    Unranked
+                  </p>
+                </div>
+                <div
+                  class="winner-podium w-24 h-32 border-2 rounded-tr-lg rounded-tl-lg border-surface-3 border-b-0 bg-surface-2 flex items-center justify-center lg:w-32 xl:w-40"
+                >
+                  <div class="podium-details gap-1 flex flex-col items-center">
+                    <div class="medal-display flex items-center flex-col">
+                      <img
+                        src="https://ik.imagekit.io/yn9gz2n2g/others/bronze.png?updatedAt=1751607503968"
+                        alt=""
+                        class="h-9 medal"
+                      />
+                      <p class="font-semibold rank-text">3rd</p>
+                    </div>
+                    <div class="points-display flex items-center gap-2">
+                      <p class="text-xl points">+10</p>
+                      <img
+                        src="https://ik.imagekit.io/yn9gz2n2g/others/coin.png?updatedAt=1751607575051"
+                        alt=""
+                        class="w-5 h-5"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- divider -->
+          <div
+            class="divider order-2 h-0.5 w-full shrink-0 bg-surface-3 mt-2 md:w-0.5 md:mt-0 md:h-full"
+          ></div>
+
+          <!-- leaderboard top rankers winners  -->
+          <div
+            class="wrapper gap-4 lg:gap-5 w-full flex flex-col items-center order-3 md:order-1"
+          >
+            <p class="text-2xl font-semibold">Leaderboard top rankers</p>
+            <div
+              class="top-ranker-rank-container flex justify-between md:justify-center md:gap-5 xl:gap-9 w-full items-end"
+            >
+              <!-- Second Place -->
+              <div
+                class="winner-column second flex flex-col items-center gap-2 lg:gap-3"
+              >
+                <div
+                  class="swiper w-24 lg:w-32 xl:w-40 h-fit"
+                  id="second-place-swiper"
+                >
+                  <!-- Additional required wrapper -->
+                  <div class="swiper-wrapper">
+                    <div class="swiper-slide">
+                      <div
+                        class="winner-profile flex flex-col items-center gap-2"
+                      >
+                        <img
+                          src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m54.png?updatedAt=1751608964260"
+                          alt=""
+                          class="pfp h-12 w-12"
+                        />
+                        <p
+                          class="winner-name font-semibold truncate w-24 lg:w-32 xl:w-40 text-center"
+                        >
+                          Unranked
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  class="winner-podium w-24 h-32 border-2 rounded-tr-lg rounded-tl-lg border-surface-3 border-b-0 bg-surface-2 flex items-center justify-center xl:w-40 lg:w-32"
+                >
+                  <div class="podium-details gap-1 flex flex-col items-center">
+                    <div class="medal-display flex items-center flex-col">
+                      <img
+                        src="https://ik.imagekit.io/yn9gz2n2g/others/silver.png?updatedAt=1751607529476"
+                        alt=""
+                        class="h-9 medal"
+                      />
+                      <p class="font-semibold rank-text">2nd</p>
+                    </div>
+                    <div class="points-display flex items-center gap-2">
+                      <p class="text-xl points">0</p>
+                      <img
+                        src="https://ik.imagekit.io/yn9gz2n2g/others/coin.png?updatedAt=1751607575051"
+                        alt=""
+                        class="w-5 h-5"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- First Place -->
+              <div
+                class="winner-column first flex flex-col items-center gap-2 lg:gap-3"
+              >
+                <div
+                  class="swiper w-24 lg:w-32 xl:w-40 h-fit"
+                  id="first-place-swiper"
+                >
+                  <div class="swiper-wrapper">
+                    <div class="swiper-slide">
+                      <div
+                        class="winner-profile flex flex-col items-center gap-2"
+                      >
+                        <img
+                          src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m54.png?updatedAt=1751608964260"
+                          alt=""
+                          class="pfp h-12 w-12"
+                        />
+                        <p
+                          class="winner-name font-semibold truncate w-24 lg:w-32 xl:w-40 text-center"
+                        >
+                          Unranked
+                        </p>
+                      </div>
+                    </div>
+                    <div class="swiper-slide">
+                      <div
+                        class="winner-profile flex flex-col items-center gap-2"
+                      >
+                        <img
+                          src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m54.png?updatedAt=1751608964260"
+                          alt=""
+                          class="pfp h-12 w-12"
+                        />
+                        <p
+                          class="winner-name font-semibold truncate w-24 lg:w-32 xl:w-40 text-center"
+                        >
+                          Unranked
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="winner-podium w-24 h-40 border-2 rounded-tr-lg rounded-tl-lg border-surface-3 border-b-0 bg-surface-2 flex items-center justify-center lg:w-32 xl:w-40"
+                >
+                  <div class="podium-details gap-1 flex flex-col items-center">
+                    <div class="medal-display flex items-center flex-col">
+                      <img
+                        src="https://ik.imagekit.io/yn9gz2n2g/others/gold.png?updatedAt=1751607550552"
+                        alt=""
+                        class="h-9 medal"
+                      />
+                      <p class="font-semibold rank-text">1st</p>
+                    </div>
+                    <div class="points-display flex items-center gap-2">
+                      <p class="text-xl points">0</p>
+                      <img
+                        src="https://ik.imagekit.io/yn9gz2n2g/others/coin.png?updatedAt=1751607575051"
+                        alt=""
+                        class="w-5 h-5"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- third place -->
+              <div
+                class="winner-column third flex flex-col items-center gap-2 lg:gap-3"
+              >
+                <div
+                  class="swiper w-24 lg:w-32 xl:w-40 h-fit"
+                  id="third-place-swiper"
+                >
+                  <!-- Additional required wrapper -->
+                  <div class="swiper-wrapper">
+                    <!-- Slides -->
+                    <div class="swiper-slide">
+                      <div
+                        class="winner-profile flex flex-col items-center gap-2"
+                      >
+                        <img
+                          src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m54.png?updatedAt=1751608964260"
+                          alt=""
+                          class="pfp h-12 w-12"
+                        />
+                        <p
+                          class="winner-name font-semibold truncate w-24 lg:w-32 xl:w-40 text-center"
+                        >
+                          Unranked
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="winner-podium w-24 h-32 border-2 rounded-tr-lg rounded-tl-lg border-surface-3 border-b-0 bg-surface-2 flex items-center justify-center lg:w-32 xl:w-40"
+                >
+                  <div class="podium-details gap-1 flex flex-col items-center">
+                    <div class="medal-display flex items-center flex-col">
+                      <img
+                        src="https://ik.imagekit.io/yn9gz2n2g/others/bronze.png?updatedAt=1751607503968"
+                        alt=""
+                        class="h-9 medal"
+                      />
+                      <p class="font-semibold rank-text">3rd</p>
+                    </div>
+                    <div class="points-display flex items-center gap-2">
+                      <p class="text-xl points">0</p>
+                      <img
+                        src="https://ik.imagekit.io/yn9gz2n2g/others/coin.png?updatedAt=1751607575051"
+                        alt=""
+                        class="w-5 h-5"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="leaderboard-card-container w-full gap-4 lg:gap-5 flex flex-col"
+        ></div>
+      </section>
+      <!-- error section -->
+      <section
+        class="error-section h-full w-full flex hidden justify-center items-center flex-col gap-4"
+      >
+        <img src="/error-images/error.png" alt="" class="max-w-[22.5rem]" />
+        <div
+          class="text-text-primary flex flex-wrap items-center justify-center gap-2 text-center text-2xl font-semibold"
+        >
+          <p class=""></p>
+          Ooops! , something went wrong
+          <p class="shrink-0">: &#40;</p>
+        </div>
+        <a href="">
+          <button class="button-hug">Reload</button>
+        </a>
+      </section>
+    </main>
+    <script src="src/scripts/dashboard.js" type="module"></script>
+    <script src="src/scripts/subject.js" type="module"></script>
+    <script src="src/scripts/login.js" type="module"></script>
+    <script src="src/scripts/navigation.js" type="module"></script>
+    <script src="src/scripts/tests.js" type="module"></script>
+    <script src="src/scripts/sessions.js" type="module"></script>
+    <script src="src/scripts/leaderboard.js" type="module"></script>
+    <script src="src/scripts/index.js" type="module"></script>
+  </body>
+</html>

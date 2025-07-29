@@ -275,9 +275,48 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   visibility: hidden !important;
   pointer-events: none !important;
 }
+#dashboard-notice-swiper .swiper-button-prev,
+#dashboard-notice-swiper .swiper-button-next {
+  background: var(--color-surface) !important;
+  border-radius: 50% !important;
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  margin-top: -1.25rem !important;
+  transition: opacity 0.3s ease, visibility 0.3s ease !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
 
-#dashboard-time-table-swiper .swiper-button-prev,
-#dashboard-time-table-swiper .swiper-button-next {
+#dashboard-notice-swiper .swiper-button-prev::after,
+#dashboard-notice-swiper .swiper-button-next::after {
+  display: none !important;
+}
+
+#dashboard-notice-swiper .swiper-button-prev::before {
+  content: "";
+  font-family: "remixicon" !important;
+  font-size: 1.5rem !important;
+  color: inherit;
+}
+
+#dashboard-notice-swiper .swiper-button-next::before {
+  content: "";
+  font-family: "remixicon" !important;
+  font-size: 1.5rem !important;
+  color: inherit;
+}
+
+#dashboard-notice-swiper .swiper-button-prev.swiper-button-disabled,
+#dashboard-notice-swiper .swiper-button-next.swiper-button-disabled {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+#time-table-swiper .swiper-button-prev,
+#time-table-swiper .swiper-button-next,
+#time-table-popup-swiper .swiper-button-prev,
+#time-table-popup-swiper .swiper-button-next {
   width: 2.5rem !important;
   height: 2.5rem !important;
   transition: opacity 0.3s ease, visibility 0.3s ease !important;
@@ -285,25 +324,57 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   visibility: visible !important;
 }
 
-#dashboard-time-table-swiper .swiper-button-prev::after,
-#dashboard-time-table-swiper .swiper-button-next::after {
+/* Hide Swiper default arrow icons for both swipers */
+#time-table-swiper .swiper-button-prev::after,
+#time-table-swiper .swiper-button-next::after,
+#time-table-popup-swiper .swiper-button-prev::after,
+#time-table-popup-swiper .swiper-button-next::after {
   display: none !important;
 }
 
-#dashboard-time-table-swiper .swiper-button-prev::before {
-  font-family: "remixicon" !important;
-  font-size: 1rem !important;
-  color: var(--color-text-disabled);
-}
-
-#dashboard-time-table-swiper .swiper-button-next::before {
-  font-family: "remixicon" !important;
-  font-size: 1rem !important;
-  color: var(--color-text-disabled);
-}
-#dashboard-time-table-swiper .swiper-button-prev.swiper-button-disabled,
-#dashboard-time-table-swiper .swiper-button-next.swiper-button-disabled {
+/* Disabled buttons styling for both swipers */
+#time-table-swiper .swiper-button-prev.swiper-button-disabled,
+#time-table-swiper .swiper-button-next.swiper-button-disabled,
+#time-table-popup-swiper .swiper-button-prev.swiper-button-disabled,
+#time-table-popup-swiper .swiper-button-next.swiper-button-disabled {
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
+}
+
+select {
+  appearance: none; /* Removes native arrow */
+  -webkit-appearance: none; /* Safari/Chrome */
+  -moz-appearance: none; /* Firefox */
+}
+/* Hide time text when empty */
+input[type="time"]:not(:focus):not(:valid)::-webkit-datetime-edit {
+  color: transparent;
+}
+
+/* Show it when focused or value is selected */
+input[type="time"]:focus::-webkit-datetime-edit,
+input[type="time"]:valid::-webkit-datetime-edit {
+  color: inherit; /* or your desired color */
+}
+
+input[type="time"]::-webkit-calendar-picker-indicator {
+  display: none;
+}
+
+.success-loading-wrapper {
+  transition: gap 0.5s ease;
+}
+
+.success-loading-text {
+  max-width: 0;
+  opacity: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: max-width 0.5s ease, opacity 0.8s ease;
+}
+
+.success-loading-text.show {
+  max-width: 200px;
+  opacity: 1;
 }

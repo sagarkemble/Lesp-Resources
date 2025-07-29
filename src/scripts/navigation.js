@@ -1,5 +1,10 @@
 import { initRouting } from "./index.js";
-import { fadeInEffect, fadeOutEffect } from "./animation.js";
+import {
+  fadeInEffect,
+  fadeInEffectOpacity,
+  fadeOutEffect,
+} from "./animation.js";
+import { timetablePopupSwiper, timetablePopup } from "./dashboard.js";
 const sideBarContent = document.querySelector(".side-bar-content");
 import { appState } from "./appstate.js";
 export const sideBar = document.querySelector("nav");
@@ -54,7 +59,6 @@ export const testsIcon = document.querySelector(".tests-icon");
 const smMdHeaderPfp = document.querySelector(".sm-md-header-pfp");
 const loginSection = document.querySelector(".login-section");
 dashboardIcon.addEventListener("click", (e) => {
-  console.log(e.target);
   history.pushState({}, "", "/?dashboard=''");
   initRouting();
 });
@@ -62,12 +66,12 @@ subjectIcon.addEventListener("click", (e) => {
   if (window.innerWidth <= 1024) {
     const rect = subjectIcon.getBoundingClientRect();
     const f = rect.left;
-    console.log(f);
     subjectSelectorPopup.style.left = `${f}px`;
   }
   if (!subjectSelectorPopup.classList.contains("hidden")) {
     fadeOutEffect(subjectSelectorPopup);
   } else fadeInEffect(subjectSelectorPopup);
+
   // setActiveNavIcon(subjectIcon);
 });
 leaderboardIcon.addEventListener("click", () => {
@@ -78,16 +82,16 @@ sessionsIcon.addEventListener("click", () => {
   history.pushState({}, "", '?sessions=""');
   initRouting();
 });
-timeTabelIcon.addEventListener("click", () => {
-  setActiveNavIcon(timeTabelIcon);
+timeTabelIcon.addEventListener("click", async () => {
+  await fadeInEffect(timetablePopup);
+  timetablePopupSwiper.slideTo(0, 0);
+  timetablePopupSwiper.update();
 });
 testsIcon.addEventListener("click", () => {
   history.pushState({}, "", '?tests=""');
   initRouting();
 });
 export function loadSubjectSelectionList() {
-  console.log(appState.subjectData);
-
   for (const key in appState.subjectData.individualSubjects) {
     const subject = appState.subjectData.individualSubjects[key];
     const subjectCard = document.createElement("div");

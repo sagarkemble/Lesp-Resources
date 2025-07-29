@@ -24,7 +24,14 @@ import {
   loadLeaderboardSection,
   showLeaderboardSection,
 } from "./leaderboard.js";
-import { appState, initAppState } from "./appstate.js";
+import { initAdminRouting } from "./admin.js";
+import {
+  appState,
+  initAppState,
+  getUserData,
+  adminAppState,
+  signOutUser,
+} from "./appstate.js";
 import { showErrorSection } from "./error.js";
 const loadingScreen = document.querySelector(".loading-screen");
 const lotteLoader = document.querySelector("#lotte-loader");
@@ -69,9 +76,20 @@ export async function showConfirmationPopup(
   });
 }
 document.addEventListener("DOMContentLoaded", async () => {
+  // if (true) {
+  //   await signOutUser();
+  //   // return;
+  // }
   await fadeInEffect(loadingScreen);
   onAuthStateChanged(auth, async (userCredential) => {
     if (userCredential) {
+      const user = await getUserData();
+      if (user.role === "admin") {
+        console.log("Admin user detected");
+        await fadeOutEffect(loadingScreen);
+        initAdminRouting(user);
+        return;
+      }
       await initAppState();
       await fadeInEffect(loadingScreen);
       await hideSections();
@@ -128,6 +146,9 @@ export async function hideSections(
   showSidebar = true,
   showHeader = true
 ) {
+  if (!showSidebar)
+    document.querySelector("main").classList.remove("lg:ml-[4.375rem]");
+  else document.querySelector("main").classList.add("lg:ml-[4.375rem]");
   await (showHeaderIcon ? fadeInEffect(headerIcon) : fadeOutEffect(headerIcon));
   await (showHeaderTitle
     ? fadeInEffect(headerTitle)
@@ -142,8 +163,7 @@ export async function hideSections(
 }
 editModeToggleButton.addEventListener("click", () => {
   appState.isEditing = !appState.isEditing;
-  console.log("this is from the index page");
-  console.log(appState.isEditing);
+  // console.log(appState.isEditing);
   if (appState.isEditing) {
     editModeToggleButton.textContent = "Exit mode";
     applyEditModeUI();
@@ -196,5 +216,10 @@ export async function applyEditModeUI() {
   }
 }
 window.addEventListener("popstate", () => {
-  initRouting();
+  if (appState.userData.role === "admin") {
+    initAdminRouting();
+  } else {
+    initRouting();
+  }
+  // initRouting();
 });

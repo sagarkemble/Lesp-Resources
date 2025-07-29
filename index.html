@@ -16,10 +16,7 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
-    />
+
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
@@ -28,6 +25,11 @@
       referrerpolicy="no-referrer"
     />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+    />
+
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <style>
       @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
@@ -75,7 +77,7 @@
           class="user-pfp hidden h-12 w-12 lg:inline-block"
         />
         <span
-          class="icon-wrapper cursor-pointer z-40 home-icon h-[1.55rem] lg:h-[30px]"
+          class="icon-wrapper cursor-pointer z-40 home-icon h-[1.55rem] lg:h-[1.875rem]"
         >
           <svg
             width="18"
@@ -92,7 +94,7 @@
           </svg>
         </span>
         <span
-          class="icon-wrapper cursor-pointer z-40 subject-icon h-6 lg:h-[30px]"
+          class="icon-wrapper cursor-pointer z-40 subject-icon h-6 lg:h-[1.875rem]"
         >
           <svg
             width="27"
@@ -117,7 +119,7 @@
           </svg>
         </span>
         <span
-          class="icon-wrapper cursor-pointer z-40 timetabel-icon h-[1.6rem] lg:h-[30px]"
+          class="icon-wrapper cursor-pointer z-40 timetabel-icon h-[1.6rem] lg:h-[1.875rem]"
         >
           <svg
             width="20"
@@ -137,7 +139,7 @@
           </svg>
         </span>
         <span
-          class="icon-wrapper cursor-pointer z-40 h-9 leaderboard-icon lg:h-[40px] transform translate-y-1 lg:translate-y-0"
+          class="icon-wrapper cursor-pointer z-40 h-9 leaderboard-icon lg:h-10 transform translate-y-1 lg:translate-y-0"
         >
           <svg
             width="35"
@@ -321,7 +323,7 @@
           </svg>
         </span>
         <span
-          class="icon-wrapper z-40 cursor-pointer h-5 lg:h-[25px] sessions-icon transform -translate-y-1 lg:translate-y-0"
+          class="icon-wrapper z-40 cursor-pointer h-5 lg:h-6 sessions-icon transform -translate-y-1 lg:translate-y-0"
         >
           <svg
             width="24"
@@ -346,39 +348,42 @@
           </svg>
         </span>
         <div
-          class="slider bg-primary-400 lg:bg-surface-2 lg:border-primary-400 left-0 h-1 w-6 translate-x-0 transform rounded-lg transition-all duration-100 absolute lg:h-[50px] lg:w-full lg:rounded-none lg:border-r-4 bottom-3 lg:bottom-auto z-10"
+          class="slider bg-primary-400 lg:bg-surface-2 lg:border-primary-400 left-0 h-1 w-6 translate-x-0 transform rounded-lg transition-all duration-100 absolute lg:h-12 lg:w-full lg:rounded-none lg:border-r-4 bottom-3 lg:bottom-auto z-10"
         ></div>
         <div
-          class="theme-icon from-primary-400 via-primary-300 via-primary-200 via-primary-100 to-primary-50 mt-auto hidden h-[50px] w-[50px] rounded-full bg-gradient-to-r lg:inline-block"
+          class="theme-icon from-primary-400 via-primary-300 via-primary-200 via-primary-100 to-primary-50 mt-auto hidden h-12 w-12 rounded-full bg-gradient-to-r lg:inline-block"
         ></div>
       </div>
     </nav>
     <main
-      class="flex h-full w-full flex-1 flex-col gap-4 px-4 py-3 min-w-0 lg:ml-[70px]"
+      class="flex h-full w-full flex-1 flex-col gap-4 px-4 py-3 min-w-0 lg:ml-[4.375rem]"
     >
       <!-- navbar -->
       <header class="flex w-full items-center hidden gap-2 lg:gap-3">
         <img
           src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m51.png?updatedAt=1750952706527"
           alt=""
-          class="h-[50px] user-pfp lg:hidden w-[50px] sm-md-header-pfp"
+          class="h-11 user-pfp lg:hidden w-11 sm-md-header-pfp"
         />
         <img
           src="https://ik.imagekit.io/yn9gz2n2g/image123.png?updatedAt=1751459031970"
           alt=""
-          class="header-icon hidden h-[45px] w-[45px] lg:h-[50px] lg:w-[50px]"
+          class="header-icon hidden h-11 w-11 lg:h-12 lg:w-12"
         />
         <p
-          class="header-title text-2xl hidden font-semibold h-[50px] text-center flex items-center"
+          class="header-title text-2xl hidden font-semibold h-12 text-center flex items-center"
         ></p>
         <button class="button-hug ml-auto edit-mode-toggle-btn">Edit</button>
+        <button class="button-hug ml-auto visit-classroom-btn hidden">
+          Visit classroom
+        </button>
       </header>
       <!-- are you sure popup -->
       <div
         class="confirmation-popup-wrapper hidden fixed top-0 left-0 z-60 w-full h-full flex justify-center items-center bg-[#00000060] transition-all duration-200 min-h-0"
       >
         <div
-          class="confirmation-popup bg-surface-2 rounded-3xl p-6 flex flex-col gap-4 w-fit max-w-[300px] max-h-[90vh] overflow-y-auto"
+          class="confirmation-popup bg-surface-2 rounded-3xl p-6 flex flex-col gap-4 w-fit max-w-[18.75rem] max-h-[90vh] overflow-y-auto"
         >
           <div class="wrapper flex flex-col items-center gap-2">
             <i
@@ -395,16 +400,196 @@
           </div>
         </div>
       </div>
+      <!-- time table popup -->
+      <div
+        class="time-table-popup-wrapper hidden fixed top-0 left-0 z-40 w-full h-full flex justify-center items-center bg-[#00000060] transition-all duration-200 min-h-0 opacity-0"
+      >
+        <div class="time-table gap-2 lg:gap-3 flex-col w-fit lg:flex">
+          <div class="wrapper flex justify-between items-center">
+            <p class="text-2xl font-semibold main-title ml-4">Time table</p>
+            <i class="fa-solid fa-xmark text-2xl mr-4 close-popup-btn"></i>
+          </div>
+          <div
+            class="card bg-surface-2 flex flex-col gap-5 w-fit rounded-3xl p-6 pt-4"
+          >
+            <div
+              class="swiper !w-[18.75rem] !h-[18.75rem]"
+              id="time-table-popup-swiper"
+            >
+              <div class="swiper-wrapper"></div>
+              <div
+                class="swiper-button-prev rounded-full transform !top-0 translate-y-[1.2rem] translate-x-3"
+              >
+                <i
+                  class="ri-arrow-left-s-line text-2xl text-text-tertiary -translate-x-[0.05rem]"
+                ></i>
+              </div>
+              <div
+                class="swiper-button-next rounded-full transform !top-0 translate-y-[1.2rem] -translate-x-3"
+              >
+                <i
+                  class="ri-arrow-right-s-line text-2xl text-text-tertiary transform translate-x-[0.05rem]"
+                ></i>
+              </div>
+              <div class="swiper-pagination"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- add time table popup -->
+      <div
+        class="add-time-table-popup-wrapper transition-all duration-200 hidden w-full h-full fixed z-50 flex justify-center items-center top-0 left-0 bg-[#00000060]"
+      >
+        <div
+          class="popup p-6 flex flex-col relative bg-surface-2 rounded-3xl overflow-y-auto max-h-[90vh] gap-4 w-full max-w-80"
+        >
+          <div class="wrapper w-full flex justify-between items-center">
+            <p class="popup-title text-2xl font-semibold">Add Slot</p>
+            <i class="fa-solid fa-xmark text-xl close-popup-btn"></i>
+          </div>
+          <div
+            class="wrapper hidden delete-icon flex gap-2 items-center hidden rounded-lg border w-fit border-text-error px-3 py-1 text-text-error"
+          >
+            <i class="fa-solid fa-trash"></i>
+            <p class="text-sm">Delete</p>
+          </div>
+          <div class="subject-type-wrapper flex w-full gap-4">
+            <div class="subject-input-wrapper flex flex-col gap-1 w-1/2">
+              <label class="text-text-primary px-1" for="add-notice-popup-title"
+                >Subject</label
+              >
+              <div class="wrapper relative">
+                <select
+                  name="subject"
+                  class="bg-surface-3 border-surface-4 resize-none focus:border-surface-3 focus:!ring-primary-400 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+                  id="timetable-subject-selection-drop-down"
+                >
+                  <option
+                    value=""
+                    class="text-text-secondary"
+                    disabled
+                    selected
+                    hidden
+                  >
+                    Subject
+                  </option>
+                </select>
+                <p
+                  class="subject-placeholder absolute left-3 bg-surface-3 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none transition-all duration-200 flex items-center gap-8"
+                >
+                  Subject
+                  <i class="fa-solid fa-angle-down"></i>
+                </p>
+              </div>
+
+              <p
+                class="subject-related-error hidden text-text-error px-1 text-sm"
+              ></p>
+            </div>
+            <div class="type-input-wrapper flex flex-col gap-1 w-1/2">
+              <label class="text-text-primary px-1" for="add-notice-popup-title"
+                >Type</label
+              >
+              <div class="wrapper relative">
+                <select
+                  name="type"
+                  class="bg-surface-3 border-surface-4 resize-none focus:border-surface-3 focus:!ring-primary-400 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+                  id="timetable-type-selection-drop-down"
+                >
+                  <option
+                    value=""
+                    class="!text-text-secondary"
+                    disabled
+                    selected
+                    hidden
+                  >
+                    Type
+                  </option>
+                  <option value="Lecture">Lecture</option>
+                  <option value="Practical">Practical</option>
+                  <option value="Tutorial">Tutorial</option>
+                </select>
+                <p
+                  class="type-placeholder absolute left-3 bg-surface-3 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none transition-all duration-200 flex items-center gap-[3.4rem]"
+                >
+                  Type
+                  <i class="fa-solid fa-angle-down"></i>
+                </p>
+              </div>
+
+              <p
+                class="type-related-error hidden text-text-error px-1 text-sm"
+              ></p>
+            </div>
+          </div>
+
+          <div class="from-time-to-time-wrapper flex w-full gap-4">
+            <div class="from-input-wrapper flex flex-col gap-1 min-w-0 w-1/2">
+              <label
+                class="text-text-primary px-1"
+                for="timetable-from-time-input"
+                >From</label
+              >
+
+              <div class="wrapper relative">
+                <input
+                  type="time"
+                  autocomplete="off"
+                  id="timetable-from-time-input"
+                  class="time-from-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none placeholder:text-text-secondary"
+                  placeholder="From"
+                />
+                <p
+                  class="time-from-placeholder absolute left-3 bg-surface-3 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none transition-all duration-200 flex items-center gap-[3.3rem]"
+                >
+                  From
+                  <i class="fa-regular fa-clock"></i>
+                </p>
+              </div>
+              <p
+                class="time-from-related-error hidden text-text-error px-1 text-sm"
+              ></p>
+            </div>
+            <div class="to-input-wrapper flex flex-col gap-1 min-w-0 w-1/2">
+              <label
+                class="text-text-primary px-1"
+                for="timetable-to-time-input"
+                >To</label
+              >
+              <div class="wrapper relative">
+                <input
+                  type="time"
+                  autocomplete="off"
+                  id="timetable-to-time-input"
+                  class="time-to-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none placeholder:text-text-secondary"
+                  placeholder="To"
+                />
+                <p
+                  class="time-to-placeholder absolute left-3 bg-surface-3 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none transition-all duration-200 flex items-center gap-[4.6rem]"
+                >
+                  To
+                  <i class="fa-regular fa-clock"></i>
+                </p>
+              </div>
+              <p
+                class="time-to-related-error hidden text-text-error px-1 text-sm"
+              ></p>
+            </div>
+          </div>
+
+          <button class="button-fill add-btn" type="button">Add Slot</button>
+        </div>
+      </div>
       <!-- login-section -->
       <section
         class="login-section flex hidden w-full flex-col items-center justify-center gap-2 transition-all duration-200 min-h-full h-full"
       >
         <form
           id="login-form"
-          class="bg-surface-2 flex w-full max-w-[360px] lg:max-w-[340px] flex-col items-center gap-4 rounded-3xl p-6"
+          class="bg-surface-2 flex w-full max-w-[22.5rem] lg:max-w-[21.25rem] flex-col items-center gap-4 rounded-3xl p-6"
         >
           <div class="swiper-text-wrapper flex flex-col items-center gap-2">
-            <div class="swiper h-[64px] w-[64px]" id="login-section-swiper">
+            <div class="swiper h-16 w-16" id="login-section-swiper">
               <!-- Additional required wrapper -->
               <div class="swiper-wrapper">
                 <!-- Slides -->
@@ -541,7 +726,7 @@
       >
         <form
           id="reset-password-form"
-          class="bg-surface-2 flex w-full max-w-[360px] lg:max-w-[340px] flex-col items-center gap-4 rounded-3xl p-6"
+          class="bg-surface-2 flex w-full max-w-[22.5rem] lg:max-w-[21.25rem] flex-col items-center gap-4 rounded-3xl p-6"
         >
           <p class="text-text-primary w-full text-start text-2xl font-semibold">
             Reset Password
@@ -582,7 +767,7 @@
         class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center"
       >
         <div
-          class="bg-surface-2 max-w-[600px] w-full max-h-[90vh] p-5 rounded-2xl text-white relative overflow-hidden flex flex-col gap-4"
+          class="bg-surface-2 max-w-[37.5rem] w-full max-h-[90vh] p-5 rounded-2xl text-white relative overflow-hidden flex flex-col gap-4"
         >
           <!-- Top section: Icon + Title + New badge -->
           <div class="wrapper flex items-center justify-between">
@@ -628,53 +813,166 @@
       </div>
       <!-- dashboard home page section  -->
       <section
-        class="dashboard-section hidden transition-all duration-200 flex flex-col gap-4 lg:gap-5 w-full h-full"
+        class="dashboard-section hidden opacity-0 transition-all duration-200 flex flex-col gap-4 lg:gap-5 w-full h-full"
       >
-        <div class="w-full overflow-x-auto flex shrink-0">
+        <!-- add notice popup -->
+        <div
+          class="add-notice-popup-wrapper hidden opacity-0 transition-all duration-200 w-full h-full fixed z-50 flex justify-center items-center top-0 left-0 bg-[#00000060]"
+        >
           <div
-            class="swiper-slide w-full max-w-[600px] bg-surface-2 !flex !flex-col gap-3 rounded-2xl p-4 lg:p-5 swiper-slide-active shrink-0"
-            role="group"
-            aria-label="1 / 1"
-            style="margin-right: 30px"
+            class="popup p-6 flex flex-col relative bg-surface-2 rounded-3xl overflow-y-auto max-h-[90vh] gap-4 w-full max-w-[18.75rem]"
           >
-            <div class="wrapper flex items-center gap-4 justify-between">
+            <!-- popup related error poup -->
+            <div
+              class="error-popup-wrapper hidden transition-all duration-100 fixed top-0 left-0 w-full flex justify-center h-full bg-[#00000060] z-60 items-center"
+            >
               <div
-                class="slide-icon-title-wrapper w-full flex items-center gap-2 lg:gap-3"
+                class="error-popup bg-surface-2 h-fit rounded-3xl flex flex-col gap-4 lg:gap-5 items-center justify-center p-6 overflow-y-auto max-h-[90vh]"
               >
-                <div
-                  class="icon bg-surface flex h-[50px] w-[50px] items-center justify-center rounded-full shrink-0"
+                <p class="text-white">
+                  only 1 can be uploaded link or the attachment
+                </p>
+                <button class="button-fill okay-btn">Okay</button>
+              </div>
+            </div>
+            <div class="wrapper w-full flex justify-between items-center">
+              <p class="title text-2xl font-semibold">Add Notice</p>
+              <i class="fa-solid fa-xmark text-xl close-popup-btn"></i>
+            </div>
+            <div class="title-input-wrapper flex flex-col gap-1">
+              <label
+                class="text-text-primary px-1"
+                for="dashboard-notice-popup-title"
+                >Title</label
+              >
+              <input
+                type="text"
+                autocomplete="off"
+                id="dashboard-notice-popup-title"
+                class="title-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+              />
+              <p
+                class="title-related-error hidden text-text-error px-1 text-sm"
+              ></p>
+            </div>
+
+            <div class="type-input-wrapper flex flex-col gap-1 w-full">
+              <label
+                class="text-text-primary px-1"
+                for="dashboard-notice-popup-scope"
+                >Scope</label
+              >
+              <div class="wrapper relative">
+                <select
+                  name="scope"
+                  class="bg-surface-3 border-surface-4 resize-none focus:border-surface-3 focus:!ring-primary-400 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none scope-input"
+                  id="dashboard-notice-popup-scope"
                 >
-                  <i class="ri-file-text-line text-2xl"></i>
-                </div>
-                <p class="slider-title text-xl font-semibold">
-                  His name is John Cena
+                  <option
+                    value=""
+                    class="!text-text-secondary"
+                    disabled
+                    selected
+                    hidden
+                  >
+                    Type
+                  </option>
+                  <option value="semester">For semester</option>
+                  <option value="division">For division</option>
+                  <option value="department">For department</option>
+                </select>
+                <p
+                  class="scope-placeholder absolute left-3 bg-surface-3 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none transition-all duration-200 flex items-center gap-x-44"
+                >
+                  Type
+                  <i class="fa-solid fa-angle-down"></i>
                 </p>
               </div>
+
+              <p
+                class="scope-related-error hidden text-text-error px-1 text-sm"
+              ></p>
+            </div>
+
+            <div class="description-input-wrapper flex flex-col gap-1">
+              <label
+                class="text-text-primary px-1"
+                for="dashboard-notice-popup-description"
+                >Description</label
+              >
+              <textarea
+                id="dashboard-notice-popup-description"
+                autocomplete="off"
+                class="description-input bg-surface-3 border-surface-4 resize-none focus:border-surface-3 min-h-[6rem] focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+              ></textarea>
+              <p
+                class="description-related-error hidden text-text-error px-1 text-sm"
+              ></p>
+            </div>
+            <div class="link-input-wrapper flex flex-col gap-1">
+              <label
+                class="text-text-primary px-1"
+                for="dashboard-notice-popup-link"
+                >Link (Optional)</label
+              >
+              <input
+                type="text"
+                autocomplete="off"
+                id="dashboard-notice-popup-link"
+                class="link-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+              />
+              <p
+                class="link-related-error hidden text-text-error px-1 text-sm"
+              ></p>
+            </div>
+            <div
+              class="file-attachment bg-surface-3 border-2 border-surface-4 py-6 flex justify-center rounded-3xl gap-2"
+            >
               <div
-                class="delete-icon hidden editor-tool ml-auto flex items-center"
+                class="wrapper file-attachment-icon transition-all duration-100"
               >
                 <i
-                  class="fa-solid fa-trash text-xl cursor-pointer text-text-error"
+                  class="fa-solid fa-arrow-up-from-bracket text-xl font-thin"
                 ></i>
               </div>
+              <span class="upload-text">Upload (Optional)</span>
+              <input
+                type="file"
+                class="hidden file-input"
+                id="dashboard-notice-file-input"
+              />
             </div>
-            <div class="wrapper">
-              <div class="description text-text-secondary line-clamp-5">
-                Sjwjskdksksnsnxnxnnxxnsjsksk sjsjsksskskks djsjsksjzxnz
-                djsjsksnznzb djsmsnsmsns djsjsjajs suiiiiiiiii
-                snsjsksksjsjsnsnsnsj dskjsnsjsns fjsksjsnsns fksjsnssb
-              </div>
-              <div
-                class="wrapper text-text-link underline text-sm flex gap-4 pb-4 md:pb-0"
-              >
-                <p class="cursor-pointer" style="display: none">Readmore</p>
-                <a class="cursor-pointer hidden" target="_blank"
-                  >See attachment</a
-                >
-              </div>
-            </div>
+            <button class="button-fill create-btn" type="button">Create</button>
           </div>
         </div>
+        <!-- notice slider container -->
+        <div
+          class="swiper w-full max-w-full relative w-1 h-fit shrink-0"
+          id="dashboard-notice-swiper"
+        >
+          <div class="swiper-wrapper w-full"></div>
+          <div class="swiper-pagination md:hidden"></div>
+          <div
+            class="swiper-button-prev bg-amber-100 rounded-full !w-10 !h-10 !hidden md:!flex transform -ttranslate-x-4"
+          >
+            <i
+              class="ri-arrow-left-s-line text-2xl text-white text-2xl -translate-x-[0.05rem]"
+            ></i>
+          </div>
+          <div
+            class="swiper-button-next rounded-full !w-10 !h-10 !hidden md:!flex transform ttranslate-x-4"
+          >
+            <i
+              class="ri-arrow-right-s-line text-2xl text-white text-2xl transform translate-x-[0.05rem]"
+            ></i>
+          </div>
+        </div>
+        <button
+          class="button-hug hidden add-notice-btn editor-tool"
+          type="button"
+        >
+          Add notice
+        </button>
         <div class="upcoming-submissions gap-4 lg:gap-5 flex flex-col w-full">
           <div class="wrapper gap-2 lg:gap-3 flex items-center w-full">
             <p class="text-2xl font-semibold">Upcoming submissions</p>
@@ -683,14 +981,14 @@
             </div>
           </div>
           <div class="card-container grid-auto-fit lg:gap-2">
-            <div
-              class="card p-4 bg-surface-2 rounded-[20px] flex flex-col lg:gap-3"
+            <!-- <div
+              class="card p-4 bg-surface-2 rounded-[1.25rem] flex flex-col lg:gap-3"
             >
               <div class="wrapper flex items-center gap-1 lg:gap-3 pt-1">
                 <img
                   src="https://ik.imagekit.io/yn9gz2n2g/Subject%20icons/Semester%204/sem4pwp.png?updatedAt=1751046739300"
                   alt=""
-                  class="w-[25px] h-[25px] lg:w-[40px] lg:h-[40px]"
+                  class="w-6 h-6 lg:w-10 lg:h-10"
                 />
                 <p class="subject-name font-semibold text-text-primary">PWP</p>
               </div>
@@ -698,7 +996,7 @@
                 <p class="description">Manual 4-5</p>
                 <p class="submission-date">04-March</p>
               </div>
-            </div>
+            </div> -->
           </div>
         </div>
         <div
@@ -706,7 +1004,7 @@
         >
           <!-- stats upcoming test pyq wrapper -->
           <div
-            class="stats-upcoming-test-PYQ-wrapper flex gap-4 lg:flex-col lg:w-[339px]"
+            class="stats-upcoming-test-PYQ-wrapper flex gap-4 lg:flex-col lg:w-[21.18rem]"
           >
             <!-- stats -->
             <div
@@ -739,7 +1037,7 @@
                 <div class="medal-wrapper gap-4 flex items-center text-sm">
                   <div class="gold-medal-wrapper flex items-center gap-1">
                     <img
-                      class="h-[20px]"
+                      class="h-5"
                       src="https://ik.imagekit.io/yn9gz2n2g/others/gold.png?updatedAt=1751607550552"
                       alt=""
                     />
@@ -747,7 +1045,7 @@
                   </div>
                   <div class="silver-medal-wrapper flex items-center gap-1">
                     <img
-                      class="h-[20px]"
+                      class="h-5"
                       src="https://ik.imagekit.io/yn9gz2n2g/others/silver.png?updatedAt=1751607529476"
                       alt=""
                     />
@@ -755,7 +1053,7 @@
                   </div>
                   <div class="bronz-medal-wrapper flex items-center gap-1">
                     <img
-                      class="h-[20px]"
+                      class="h-5"
                       src="https://ik.imagekit.io/yn9gz2n2g/others/bronze.png?updatedAt=1751607503968"
                       alt=""
                     />
@@ -783,114 +1081,18 @@
               </div>
             </div>
           </div>
-          <!-- timetable -->
-          <div class="time-table gap-2 lg:gap-3 flex-col w-fit hidden lg:flex">
-            <p class="text-2xl font-semibold main-title">Time table</p>
+          <!-- time table -->
+          <div class="time-table gap-2 lg:gap-3 hidden flex-col w-fit lg:flex">
+            <p class="text-2xl font-semibold main-title ml-4">Time table</p>
+
             <div
               class="card bg-surface-2 flex flex-col gap-5 w-fit rounded-3xl p-6 pt-4"
             >
               <div
-                class="swiper !w-[300px] !h-[300px]"
-                id="dashboard-time-table-swiper"
+                class="swiper !w-[18.75rem] !h-[18.75rem]"
+                id="time-table-swiper"
               >
-                <div class="swiper-wrapper">
-                  <div class="swiper-slide !flex !flex-col gap-3">
-                    <div
-                      class="day font-semibold text-center text-xl w-full translate leading-tight -translatey-1"
-                    >
-                      Monday
-                    </div>
-
-                    <div
-                      class="card flex flex-col gap-4 border border-neutral-500 rounded-xl p-4 overflow-y-auto scrollbar-hide h-full"
-                    >
-                      <div
-                        class="wrapper flex items-center justify-between w-full"
-                      >
-                        <div class="name-icon-wrapper flex items-center gap-2">
-                          <img
-                            src="https://ik.imagekit.io/yn9gz2n2g/Subject%20icons/Semester%204/sem4pwp.png?updatedAt=1751046739300"
-                            alt=""
-                            class="h-[32px] w-[32px]"
-                          />
-                          <p class="subject-name">DCN</p>
-                        </div>
-                        <p class="type">Lec</p>
-                        <p class="time text-text-tertiary">10:00-10:40</p>
-                      </div>
-                      <div
-                        class="wrapper flex items-center justify-between w-full"
-                      >
-                        <div class="name-icon-wrapper flex items-center gap-2">
-                          <img
-                            src="https://ik.imagekit.io/yn9gz2n2g/Subject%20icons/Semester%204/sem4pwp.png?updatedAt=1751046739300"
-                            alt=""
-                            class="h-[32px] w-[32px]"
-                          />
-                          <p class="subject-name">DCN</p>
-                        </div>
-                        <p class="type">Lec</p>
-                        <p class="time text-text-tertiary">10:00-10:40</p>
-                      </div>
-                      <div
-                        class="wrapper flex items-center justify-between w-full"
-                      >
-                        <div class="name-icon-wrapper flex items-center gap-2">
-                          <img
-                            src="https://ik.imagekit.io/yn9gz2n2g/Subject%20icons/Semester%204/sem4pwp.png?updatedAt=1751046739300"
-                            alt=""
-                            class="h-[32px] w-[32px]"
-                          />
-                          <p class="subject-name">DCN</p>
-                        </div>
-                        <p class="type">Lec</p>
-                        <p class="time text-text-tertiary">10:00-10:40</p>
-                      </div>
-                      <div
-                        class="wrapper flex items-center justify-between w-full"
-                      >
-                        <div class="name-icon-wrapper flex items-center gap-2">
-                          <img
-                            src="https://ik.imagekit.io/yn9gz2n2g/Subject%20icons/Semester%204/sem4pwp.png?updatedAt=1751046739300"
-                            alt=""
-                            class="h-[32px] w-[32px]"
-                          />
-                          <p class="subject-name">DCN</p>
-                        </div>
-                        <p class="type">Lec</p>
-                        <p class="time text-text-tertiary">10:00-10:40</p>
-                      </div>
-                      <div
-                        class="wrapper flex items-center justify-between w-full"
-                      >
-                        <div class="name-icon-wrapper flex items-center gap-2">
-                          <img
-                            src="https://ik.imagekit.io/yn9gz2n2g/Subject%20icons/Semester%204/sem4pwp.png?updatedAt=1751046739300"
-                            alt=""
-                            class="h-[32px] w-[32px]"
-                          />
-                          <p class="subject-name">DCN</p>
-                        </div>
-                        <p class="type">Lec</p>
-                        <p class="time text-text-tertiary">10:00-10:40</p>
-                      </div>
-                      <div
-                        class="wrapper flex items-center justify-between w-full"
-                      >
-                        <div class="name-icon-wrapper flex items-center gap-2">
-                          <img
-                            src="https://ik.imagekit.io/yn9gz2n2g/Subject%20icons/Semester%204/sem4pwp.png?updatedAt=1751046739300"
-                            alt=""
-                            class="h-[32px] w-[32px]"
-                          />
-                          <p class="subject-name">DCN</p>
-                        </div>
-                        <p class="type">Lec</p>
-                        <p class="time text-text-tertiary">10:00-10:40</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <div class="swiper-wrapper"></div>
                 <div
                   class="swiper-button-prev rounded-full transform !top-0 translate-y-[1.2rem] translate-x-3"
                 >
@@ -909,9 +1111,10 @@
               </div>
             </div>
           </div>
+
           <!-- upcoming test -->
           <div
-            class="dashboard-upcoming-test gap-2 lg:gap-3 flex flex-col lg:w-[300px] md:w-[400px] grow w-full"
+            class="dashboard-upcoming-test gap-2 lg:gap-3 flex flex-col lg:w-[18.75rem] md:w-25 grow w-full"
           >
             <p class="text-2xl font-semibold main-title">Upcoming Test</p>
 
@@ -922,7 +1125,7 @@
                 <div class="flex items-center gap-2 lg:gap-3 icon-name-wrapper">
                   <img
                     src="https://ik.imagekit.io/yn9gz2n2g/others/test.png?updatedAt=1751607386764"
-                    class="h-[45px]"
+                    class="h-11"
                     alt=""
                   />
                   <p class="text-xl font-semibold title">Test-01</p>
@@ -952,7 +1155,7 @@
           </div>
           <!-- upcoming sessions -->
           <div
-            class="dashboard-upcoming-sessions gap-2 lg:gap-3 flex flex-col w-full lg:w-[300px] md:w-[400px] grow max-w-[500px]"
+            class="dashboard-upcoming-sessions gap-2 lg:gap-3 flex flex-col w-full lg:w-96 md:w-25 grow max-w-[31.25rem]"
           >
             <p class="text-2xl font-semibold main-title">Upcoming Sessions</p>
 
@@ -976,7 +1179,7 @@
                         >
                           <img
                             src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m11.png?updatedAt=1750951276570"
-                            class="h-[45px] w-[45px] object-cover rounded-full"
+                            class="h-11 w-11 object-cover rounded-full"
                             alt="Mentor"
                           />
                           <div class="wrapper">
@@ -1012,7 +1215,7 @@
           </div>
           <!-- pyq -->
           <div
-            class="dashboard-PYQ gap-2 flex flex-col w-full md:w-[200px] lg:hidden"
+            class="dashboard-PYQ gap-2 flex flex-col w-full md:w-[12.5rem] lg:hidden"
           >
             <p class="text-2xl font-semibold main-title">PYQ</p>
             <div
@@ -1039,7 +1242,7 @@
           class="add-notice-popup-wrapper hidden transition-all duration-200 w-full h-full fixed z-50 flex justify-center items-center top-0 left-0 bg-[#00000060]"
         >
           <div
-            class="popup p-6 flex flex-col relative bg-surface-2 rounded-3xl overflow-y-auto max-h-[90vh] gap-4 w-full max-w-[300px]"
+            class="popup p-6 flex flex-col relative bg-surface-2 rounded-3xl overflow-y-auto max-h-[90vh] gap-4 w-full max-w-[18.75rem]"
           >
             <!-- popup related error poup -->
             <div
@@ -1122,7 +1325,7 @@
           class="add-category-popup-wrapper hidden transition-all duration-200 w-full h-full fixed z-50 flex justify-center items-center top-0 left-0 bg-[#00000060]"
         >
           <div
-            class="popup p-6 flex flex-col relative bg-surface-2 rounded-3xl gap-4 w-full max-w-[300px]"
+            class="popup p-6 flex flex-col relative bg-surface-2 rounded-3xl gap-4 w-full max-w-[18.75rem]"
           >
             <div class="wrapper w-full flex justify-between items-center">
               <p class="popup-title text-2xl font-semibold">Add Category</p>
@@ -1152,7 +1355,7 @@
           class="add-item-popup-wrapper hidden transition-all duration-200 w-full h-full fixed z-50 flex justify-center items-center top-0 left-0 bg-[#00000060]"
         >
           <div
-            class="popup overflow-y-auto max-h-[90vh] p-6 flex flex-col relative bg-surface-2 rounded-3xl gap-4 w-full max-w-[300px]"
+            class="popup overflow-y-auto max-h-[90vh] p-6 flex flex-col relative bg-surface-2 rounded-3xl gap-4 w-full max-w-[18.75rem]"
           >
             <!-- popup error-->
             <div
@@ -1263,7 +1466,7 @@
             </div>
           </div>
           <div
-            class="popup overflow-y-auto max-h-[90vh] p-6 flex flex-col relative bg-surface-2 rounded-3xl gap-4 w-full max-w-[300px]"
+            class="popup overflow-y-auto max-h-[90vh] p-6 flex flex-col relative bg-surface-2 rounded-3xl gap-4 w-full max-w-[18.75rem]"
           >
             <div class="wrapper w-full flex justify-between items-center">
               <p class="popup-title text-2xl font-semibold popup-title">
@@ -1401,7 +1604,7 @@
           </div>
 
           <div class="card-container grid-auto-fit">
-            <div class="card p-4 bg-surface-2 rounded-[20px]">
+            <div class="card p-4 bg-surface-2 rounded-[1.25rem]">
               <p class="description">Manual 4-5</p>
               <p class="submission-date">04-March</p>
             </div>
@@ -1417,7 +1620,7 @@
           class="edit-upcoming-test-popup-wrapper hidden transition-all duration-200 w-full h-full fixed z-50 flex justify-center items-center top-0 left-0 bg-[#00000060]"
         >
           <div
-            class="popup overflow-y-auto max-h-[90vh] p-6 flex flex-col relative bg-surface-2 rounded-3xl gap-4 w-full max-w-[300px]"
+            class="popup overflow-y-auto max-h-[90vh] p-6 flex flex-col relative bg-surface-2 rounded-3xl gap-4 w-full max-w-[18.75rem]"
           >
             <div class="wrapper w-full flex justify-between items-center">
               <p class="popup-title text-2xl font-semibold">Edit</p>
@@ -1524,7 +1727,7 @@
           class="previous-test-popup-wrapper hidden transition-all duration-200 w-full h-full fixed z-50 flex justify-center items-center top-0 left-0 bg-[#00000060]"
         >
           <div
-            class="popup p-6 flex overflow-y-auto max-h-[90vh] flex-col relative bg-surface-2 rounded-3xl gap-4 w-full max-w-[300px]"
+            class="popup p-6 flex overflow-y-auto max-h-[90vh] flex-col relative bg-surface-2 rounded-3xl gap-4 w-full max-w-[18.75rem]"
           >
             <div class="wrapper w-full flex justify-between items-center">
               <p class="popup-title text-2xl font-semibold">Add test</p>
@@ -1660,13 +1863,13 @@
             </button>
           </div>
           <div
-            class="card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full rounded-3xl lg:max-w-[500px] p-6"
+            class="card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full rounded-3xl lg:max-w-[31.25rem] p-6"
           >
             <div class="wrapper w-full flex items-center justify-between">
               <div class="flex items-center gap-2 lg:gap-3 icon-name-wrapper">
                 <img
                   src="https://ik.imagekit.io/yn9gz2n2g/others/test.png?updatedAt=1751607386764"
-                  class="h-[45px]"
+                  class="h-11"
                   alt=""
                 />
                 <p class="text-xl font-semibold title">Test-01</p>
@@ -1715,7 +1918,7 @@
             <div class="wrapper gap-3 flex items-center">
               <div class="wrapper flex items-center gap-1">
                 <img
-                  class="h-[20px]"
+                  class="h-5"
                   src="https://ik.imagekit.io/yn9gz2n2g/others/gold.png?updatedAt=1751607550552"
                   alt=""
                 />
@@ -1723,7 +1926,7 @@
               </div>
               <div class="wrapper flex items-center gap-1">
                 <img
-                  class="h-[20px]"
+                  class="h-5"
                   src="https://ik.imagekit.io/yn9gz2n2g/others/silver.png?updatedAt=1751607529476"
                   alt=""
                 />
@@ -1731,7 +1934,7 @@
               </div>
               <div class="wrapper flex items-center gap-1">
                 <img
-                  class="h-[20px]"
+                  class="h-5"
                   src="https://ik.imagekit.io/yn9gz2n2g/others/bronze.png?updatedAt=1751607503968"
                   alt=""
                 />
@@ -1764,7 +1967,7 @@
           class="confirmation-popup-wrapper hidden fixed top-0 left-0 z-60 w-full h-full flex justify-center items-center bg-[#00000060] transition-all duration-200"
         >
           <div
-            class="confirmation-popup overflow-y-auto max-h-[90vh] bg-surface-2 rounded-3xl p-6 flex flex-col gap-4 w-fit max-w-[300px]"
+            class="confirmation-popup overflow-y-auto max-h-[90vh] bg-surface-2 rounded-3xl p-6 flex flex-col gap-4 w-fit max-w-[18.75rem]"
           >
             <p class="text-xl font-semibold">Students Details</p>
             <div class="wrapper flex flex-col gap-2">
@@ -1784,7 +1987,7 @@
           class="upcoming-session-popup-wrapper hidden transition-all duration-200 w-full h-full fixed z-50 flex justify-center items-center top-0 left-0 bg-[#00000060] min-h-0"
         >
           <div
-            class="popup h-fit overflow-y-auto p-6 flex flex-col relative bg-surface-2 rounded-3xl gap-4 w-full max-w-[300px] min-h-0 max-h-[90vh]"
+            class="popup h-fit overflow-y-auto p-6 flex flex-col relative bg-surface-2 rounded-3xl gap-4 w-full max-w-[18.75rem] min-h-0 max-h-[90vh]"
           >
             <div class="wrapper w-full flex justify-between items-center">
               <p class="popup-title text-2xl font-semibold">Add session</p>
@@ -1927,7 +2130,7 @@
           class="previous-session-popup-wrapper hidden transition-all duration-200 w-full h-full fixed z-50 flex justify-center items-center top-0 left-0 bg-[#00000060]"
         >
           <div
-            class="popup p-6 flex flex-col relative overflow-y-auto max-h-[90vh] bg-surface-2 rounded-3xl gap-4 w-full max-w-[300px]"
+            class="popup p-6 flex flex-col relative overflow-y-auto max-h-[90vh] bg-surface-2 rounded-3xl gap-4 w-full max-w-[18.75rem]"
           >
             <div class="wrapper w-full flex justify-between items-center">
               <p class="popup-title text-2xl font-semibold">Add Session</p>
@@ -2142,12 +2345,12 @@
           </div>
           <div class="card-container flex flex-wrap gap-4 lg:gap-5">
             <div
-              class="card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full rounded-3xl lg:max-w-[500px] p-6"
+              class="card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full rounded-3xl lg:max-w-[31.25rem] p-6"
             >
               <div class="flex items-center gap-2 lg:gap-3 icon-name-wrapper">
                 <img
                   src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m30.png?updatedAt=1751608418404"
-                  class="h-[45px]"
+                  class="h-11"
                   alt=""
                 />
                 <div class="wrapper">
@@ -2175,12 +2378,12 @@
               <div class="button-hug">View Session</div>
             </div>
             <div
-              class="card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full rounded-3xl lg:max-w-[500px] p-6"
+              class="card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full rounded-3xl lg:max-w-[31.25rem] p-6"
             >
               <div class="flex items-center gap-2 lg:gap-3 icon-name-wrapper">
                 <img
                   src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m30.png?updatedAt=1751608418404"
-                  class="h-[45px]"
+                  class="h-11"
                   alt=""
                 />
                 <div class="wrapper">
@@ -2208,12 +2411,12 @@
               <div class="button-hug">View Session</div>
             </div>
             <div
-              class="card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full rounded-3xl lg:max-w-[500px] p-6"
+              class="card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full rounded-3xl lg:max-w-[31.25rem] p-6"
             >
               <div class="flex items-center gap-2 lg:gap-3 icon-name-wrapper">
                 <img
                   src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m30.png?updatedAt=1751608418404"
-                  class="h-[45px]"
+                  class="h-11"
                   alt=""
                 />
                 <div class="wrapper">
@@ -2241,12 +2444,12 @@
               <div class="button-hug">View Session</div>
             </div>
             <div
-              class="card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full rounded-3xl lg:max-w-[500px] p-6"
+              class="card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full rounded-3xl lg:max-w-[31.25rem] p-6"
             >
               <div class="flex items-center gap-2 lg:gap-3 icon-name-wrapper">
                 <img
                   src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m30.png?updatedAt=1751608418404"
-                  class="h-[45px]"
+                  class="h-11"
                   alt=""
                 />
                 <div class="wrapper">
@@ -2274,12 +2477,12 @@
               <div class="button-hug">View Session</div>
             </div>
             <div
-              class="card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full rounded-3xl lg:max-w-[500px] p-6"
+              class="card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full rounded-3xl lg:max-w-[31.25rem] p-6"
             >
               <div class="flex items-center gap-2 lg:gap-3 icon-name-wrapper">
                 <img
                   src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m30.png?updatedAt=1751608418404"
-                  class="h-[45px]"
+                  class="h-11"
                   alt=""
                 />
                 <div class="wrapper">
@@ -2311,13 +2514,13 @@
       </section>
       <!-- leaderboard section -->
       <section
-        class="leaderboard-section hidden transition-all duration-200 flex flex-col gap-4 lg:gap-5 w-full h-full max-w-[1500px] mr-auto ml-auto"
+        class="leaderboard-section hidden transition-all duration-200 flex flex-col gap-4 lg:gap-5 w-full h-full max-w-[93.75rem] mr-auto ml-auto"
       >
         <div
           class="pick-leaderboard-studet-popup-wrapper hidden transition-all duration-200 w-full h-full fixed z-50 flex justify-center items-center top-0 left-0 bg-[#00000060] p-5"
         >
           <div
-            class="popup h-full p-6 flex flex-col relative bg-surface-2 rounded-3xl gap-4 w-full max-w-[400px]"
+            class="popup h-full p-6 flex flex-col relative bg-surface-2 rounded-3xl gap-4 w-full max-w-[25.0rem]"
           >
             <div class="wrapper w-full flex justify-between items-center">
               <p class="popup-title text-2xl font-semibold">Pick student</p>
@@ -2329,7 +2532,7 @@
           </div>
         </div>
         <div
-          class="stats-card p-6 bg-surface-2 flex flex-col rounded-3xl gap-4 md:gap-0 md:justify-between lg:px-8 items-center h-fit md:flex-row max-w-[1000px] lg:justify-center lg:gap-12 mr-auto ml-auto w-full"
+          class="stats-card p-6 bg-surface-2 flex flex-col rounded-3xl gap-4 md:gap-0 md:justify-between lg:px-8 items-center h-fit md:flex-row max-w-[62.5rem] lg:justify-center lg:gap-12 mr-auto ml-auto w-full"
         >
           <div class="rank-wrapper hidden md:flex flex-col items-center">
             <p class="rank text-2xl font-semibold">01</p>
@@ -2344,12 +2547,12 @@
             <img
               src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m53.png?updatedAt=1750952781028"
               alt=""
-              class="h-[50px] w-[50px]"
+              class="h-12 w-h-12"
             />
             <p class="name text-2xl font-semibold">Sagar Kemble</p>
           </div>
           <div
-            class="wrapper flex w-full justify-between max-w-[300px] md:w-full"
+            class="wrapper flex w-full justify-between max-w-[18.75rem] md:w-full"
           >
             <div class="rank-wrapper md:hidden flex flex-col items-center">
               <p class="rank text-2xl font-semibold">01</p>
@@ -2372,7 +2575,7 @@
             <div class="medal-wrapper gap-2 md:gap-8 flex items-center">
               <div class="gold-medal-wrapper flex items-center gap-1">
                 <img
-                  class="h-[20px]"
+                  class="h-5"
                   src="https://ik.imagekit.io/yn9gz2n2g/others/gold.png?updatedAt=1751607550552"
                   alt=""
                 />
@@ -2380,7 +2583,7 @@
               </div>
               <div class="silver-medal-wrapper flex items-center gap-1">
                 <img
-                  class="h-[20px]"
+                  class="h-5"
                   src="https://ik.imagekit.io/yn9gz2n2g/others/silver.png?updatedAt=1751607529476"
                   alt=""
                 />
@@ -2388,7 +2591,7 @@
               </div>
               <div class="bronz-medal-wrapper flex items-center gap-1">
                 <img
-                  class="h-[20px]"
+                  class="h-5"
                   src="https://ik.imagekit.io/yn9gz2n2g/others/bronze.png?updatedAt=1751607503968"
                   alt=""
                 />
@@ -2415,16 +2618,16 @@
                   <img
                     src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m54.png?updatedAt=1751608964260"
                     alt=""
-                    class="pfp h-[50px] w-[50px]"
+                    class="pfp h-12 w-h-12"
                   />
                   <p
-                    class="winner-name font-semibold truncate w-[100px] lg:w-32 xl:w-40 text-center"
+                    class="winner-name font-semibold truncate w-24 lg:w-32 xl:w-40 text-center"
                   >
                     Unranked
                   </p>
                 </div>
                 <div
-                  class="winner-podium w-[100px] h-[130px] border-2 rounded-tr-lg rounded-tl-lg border-surface-3 border-b-0 bg-surface-2 flex items-center justify-center xl:w-40 lg:w-32"
+                  class="winner-podium w-[6.25rem] h-32 border-2 rounded-tr-lg rounded-tl-lg border-surface-3 border-b-0 bg-surface-2 flex items-center justify-center xl:w-40 lg:w-32"
                 >
                   <div class="podium-details gap-1 flex flex-col items-center">
                     <div class="medal-display flex items-center flex-col">
@@ -2455,17 +2658,17 @@
                   <img
                     src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Common/common83.png?updatedAt=1750991402045"
                     alt=""
-                    class="pfp w-[50px] h-[50px]"
+                    class="pfp w-12 h-w-12"
                   />
 
                   <p
-                    class="winner-name font-semibold truncate w-[100px] lg:w-32 xl:w-40 text-center"
+                    class="winner-name font-semibold truncate w-24 lg:w-32 xl:w-40 text-center"
                   >
                     Unranked
                   </p>
                 </div>
                 <div
-                  class="winner-podium w-[100px] h-[160px] border-2 rounded-tr-lg rounded-tl-lg border-surface-3 border-b-0 bg-surface-2 flex items-center justify-center lg:w-32 xl:w-40"
+                  class="winner-podium w-24 h-40 border-2 rounded-tr-lg rounded-tl-lg border-surface-3 border-b-0 bg-surface-2 flex items-center justify-center lg:w-32 xl:w-40"
                 >
                   <div class="podium-details gap-1 flex flex-col items-center">
                     <div class="medal-display flex items-center flex-col">
@@ -2496,16 +2699,16 @@
                   <img
                     src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Memes/me2.png?updatedAt=1750954163478"
                     alt=""
-                    class="w-[50px] pfp h-[50px]"
+                    class="w-12 pfp h-12"
                   />
                   <p
-                    class="winner-name font-semibold truncate w-[100px] lg:w-32 xl:w-40 text-center"
+                    class="winner-name font-semibold truncate w-24 lg:w-32 xl:w-40 text-center"
                   >
                     Unranked
                   </p>
                 </div>
                 <div
-                  class="winner-podium w-[100px] h-[130px] border-2 rounded-tr-lg rounded-tl-lg border-surface-3 border-b-0 bg-surface-2 flex items-center justify-center lg:w-32 xl:w-40"
+                  class="winner-podium w-24 h-32 border-2 rounded-tr-lg rounded-tl-lg border-surface-3 border-b-0 bg-surface-2 flex items-center justify-center lg:w-32 xl:w-40"
                 >
                   <div class="podium-details gap-1 flex flex-col items-center">
                     <div class="medal-display flex items-center flex-col">
@@ -2547,7 +2750,7 @@
                 class="winner-column second flex flex-col items-center gap-2 lg:gap-3"
               >
                 <div
-                  class="swiper w-[100px] lg:w-32 xl:w-40 h-fit"
+                  class="swiper w-24 lg:w-32 xl:w-40 h-fit"
                   id="second-place-swiper"
                 >
                   <!-- Additional required wrapper -->
@@ -2559,10 +2762,10 @@
                         <img
                           src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m54.png?updatedAt=1751608964260"
                           alt=""
-                          class="pfp h-[50px] w-[50px]"
+                          class="pfp h-12 w-12"
                         />
                         <p
-                          class="winner-name font-semibold truncate w-[100px] lg:w-32 xl:w-40 text-center"
+                          class="winner-name font-semibold truncate w-24 lg:w-32 xl:w-40 text-center"
                         >
                           Unranked
                         </p>
@@ -2572,7 +2775,7 @@
                 </div>
 
                 <div
-                  class="winner-podium w-[100px] h-[130px] border-2 rounded-tr-lg rounded-tl-lg border-surface-3 border-b-0 bg-surface-2 flex items-center justify-center xl:w-40 lg:w-32"
+                  class="winner-podium w-24 h-32 border-2 rounded-tr-lg rounded-tl-lg border-surface-3 border-b-0 bg-surface-2 flex items-center justify-center xl:w-40 lg:w-32"
                 >
                   <div class="podium-details gap-1 flex flex-col items-center">
                     <div class="medal-display flex items-center flex-col">
@@ -2600,7 +2803,7 @@
                 class="winner-column first flex flex-col items-center gap-2 lg:gap-3"
               >
                 <div
-                  class="swiper w-[100px] lg:w-32 xl:w-40 h-fit"
+                  class="swiper w-24 lg:w-32 xl:w-40 h-fit"
                   id="first-place-swiper"
                 >
                   <div class="swiper-wrapper">
@@ -2611,10 +2814,10 @@
                         <img
                           src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m54.png?updatedAt=1751608964260"
                           alt=""
-                          class="pfp h-[50px] w-[50px]"
+                          class="pfp h-12 w-12"
                         />
                         <p
-                          class="winner-name font-semibold truncate w-[100px] lg:w-32 xl:w-40 text-center"
+                          class="winner-name font-semibold truncate w-24 lg:w-32 xl:w-40 text-center"
                         >
                           Unranked
                         </p>
@@ -2627,10 +2830,10 @@
                         <img
                           src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m54.png?updatedAt=1751608964260"
                           alt=""
-                          class="pfp h-[50px] w-[50px]"
+                          class="pfp h-12 w-12"
                         />
                         <p
-                          class="winner-name font-semibold truncate w-[100px] lg:w-32 xl:w-40 text-center"
+                          class="winner-name font-semibold truncate w-24 lg:w-32 xl:w-40 text-center"
                         >
                           Unranked
                         </p>
@@ -2639,7 +2842,7 @@
                   </div>
                 </div>
                 <div
-                  class="winner-podium w-[100px] h-[160px] border-2 rounded-tr-lg rounded-tl-lg border-surface-3 border-b-0 bg-surface-2 flex items-center justify-center lg:w-32 xl:w-40"
+                  class="winner-podium w-24 h-40 border-2 rounded-tr-lg rounded-tl-lg border-surface-3 border-b-0 bg-surface-2 flex items-center justify-center lg:w-32 xl:w-40"
                 >
                   <div class="podium-details gap-1 flex flex-col items-center">
                     <div class="medal-display flex items-center flex-col">
@@ -2666,7 +2869,7 @@
                 class="winner-column third flex flex-col items-center gap-2 lg:gap-3"
               >
                 <div
-                  class="swiper w-[100px] lg:w-32 xl:w-40 h-fit"
+                  class="swiper w-24 lg:w-32 xl:w-40 h-fit"
                   id="third-place-swiper"
                 >
                   <!-- Additional required wrapper -->
@@ -2679,10 +2882,10 @@
                         <img
                           src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m54.png?updatedAt=1751608964260"
                           alt=""
-                          class="pfp h-[50px] w-[50px]"
+                          class="pfp h-12 w-12"
                         />
                         <p
-                          class="winner-name font-semibold truncate w-[100px] lg:w-32 xl:w-40 text-center"
+                          class="winner-name font-semibold truncate w-24 lg:w-32 xl:w-40 text-center"
                         >
                           Unranked
                         </p>
@@ -2691,7 +2894,7 @@
                   </div>
                 </div>
                 <div
-                  class="winner-podium w-[100px] h-[130px] border-2 rounded-tr-lg rounded-tl-lg border-surface-3 border-b-0 bg-surface-2 flex items-center justify-center lg:w-32 xl:w-40"
+                  class="winner-podium w-24 h-32 border-2 rounded-tr-lg rounded-tl-lg border-surface-3 border-b-0 bg-surface-2 flex items-center justify-center lg:w-32 xl:w-40"
                 >
                   <div class="podium-details gap-1 flex flex-col items-center">
                     <div class="medal-display flex items-center flex-col">
@@ -2724,7 +2927,7 @@
       <section
         class="error-section h-full w-full flex hidden justify-center items-center flex-col gap-4"
       >
-        <img src="/error-images/error.png" alt="" class="max-w-[360px]" />
+        <img src="/error-images/error.png" alt="" class="max-w-[22.5rem]" />
         <div
           class="text-text-primary flex flex-wrap items-center justify-center gap-2 text-center text-2xl font-semibold"
         >
@@ -2736,7 +2939,406 @@
           <button class="button-hug">Reload</button>
         </a>
       </section>
+
+      <!-- admin section  -->
+      <section
+        class="admin-section h-full w-full flex justify-center items-center flex-col gap-4"
+      >
+        <!-- edit name popup -->
+        <div
+          class="edit-name-popup-wrapper transition-all hidden duration-200 w-full h-full fixed z-50 flex justify-center items-center top-0 left-0 bg-[#00000060]"
+        >
+          <div
+            class="popup p-6 flex flex-col relative bg-surface-2 rounded-3xl gap-4 w-full max-w-[18.75rem]"
+          >
+            <div class="wrapper w-full flex justify-between items-center">
+              <p class="popup-title text-2xl font-semibold">Change name</p>
+              <i
+                class="fa-solid fa-xmark text-xl close-popup-btn cursor-pointer"
+              ></i>
+            </div>
+            <div class="first-name-input-wrapper flex flex-col gap-1">
+              <label
+                class="text-text-primary px-1"
+                for="student-first-name-input"
+                >First Name</label
+              >
+              <input
+                type="text"
+                autocomplete="off"
+                class="first-name-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+                id="student-first-name-input"
+              />
+              <p
+                class="first-name-related-error hidden text-text-error px-1 text-sm"
+              ></p>
+            </div>
+            <div class="last-name-input-wrapper flex flex-col gap-1">
+              <label
+                class="text-text-primary px-1"
+                for="student-last-name-input"
+                >Last Name</label
+              >
+              <input
+                type="text"
+                autocomplete="off"
+                class="last-name-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+                id="student-last-name-input"
+              />
+              <p
+                class="last-name-related-error hidden text-text-error px-1 text-sm"
+              ></p>
+            </div>
+            <button class="button-fill edit-btn" type="button">Edit</button>
+          </div>
+        </div>
+        <!-- edit roll no popup -->
+        <div
+          class="edit-roll-no-popup-wrapper transition-all hidden duration-200 w-full h-full fixed z-50 flex justify-center items-center top-0 left-0 bg-[#00000060]"
+        >
+          <div
+            class="popup p-6 flex flex-col relative bg-surface-2 rounded-3xl gap-4 w-full max-w-[18.75rem]"
+          >
+            <div class="wrapper w-full flex justify-between items-center">
+              <p class="popup-title text-2xl font-semibold">Change roll no</p>
+              <i
+                class="fa-solid fa-xmark text-xl close-popup-btn cursor-pointer"
+              ></i>
+            </div>
+            <div class="roll-no-input-wrapper flex flex-col gap-1">
+              <label class="text-text-primary px-1" for="student-roll-no-input"
+                >Roll No</label
+              >
+              <input
+                type="number"
+                autocomplete="off"
+                class="roll-no-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+                id="student-roll-no-input"
+              />
+              <p
+                class="roll-no-related-error hidden text-text-error px-1 text-sm"
+              ></p>
+            </div>
+            <button class="button-fill edit-btn" type="button">Edit</button>
+          </div>
+        </div>
+        <!-- edit email popup -->
+        <div
+          class="edit-email-popup-wrapper transition-all hidden duration-200 w-full h-full fixed z-50 flex justify-center items-center top-0 left-0 bg-[#00000060]"
+        >
+          <div
+            class="popup p-6 flex flex-col relative bg-surface-2 rounded-3xl gap-4 w-full max-w-[18.75rem]"
+          >
+            <div class="wrapper w-full flex justify-between items-center">
+              <p class="popup-title text-2xl font-semibold">Change email</p>
+              <i
+                class="fa-solid fa-xmark text-xl close-popup-btn cursor-pointer"
+              ></i>
+            </div>
+            <div class="email-input-wrapper flex flex-col gap-1">
+              <label class="text-text-primary px-1" for="student-email-input"
+                >Email</label
+              >
+              <input
+                type="email"
+                autocomplete="off"
+                class="email-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+                id="student-email-input"
+              />
+              <p
+                class="email-related-error hidden text-text-error px-1 text-sm"
+              ></p>
+            </div>
+            <button class="button-fill edit-btn" type="button">Edit</button>
+          </div>
+        </div>
+        <!-- edit role popup -->
+        <div
+          class="edit-role-popup-wrapper transition-all duration-200 hidden w-full h-full fixed z-50 flex justify-center items-center top-0 left-0 bg-[#00000060]"
+        >
+          <div
+            class="popup p-6 flex flex-col relative bg-surface-2 rounded-3xl gap-4 w-full max-w-[18.75rem]"
+          >
+            <div class="wrapper w-full flex justify-between items-center">
+              <p class="popup-title text-2xl font-semibold">Change role</p>
+              <i
+                class="fa-solid fa-xmark text-xl close-popup-btn cursor-pointer"
+              ></i>
+            </div>
+
+            <div class="role-input-wrapper flex flex-col gap-1">
+              <label class="text-text-primary px-1" for="student-role-input"
+                >Role</label
+              >
+              <select
+                name="role"
+                class="bg-surface-3 border-surface-4 resize-none focus:border-surface-3 focus:!ring-primary-400 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none role-input"
+                id="student-role-input"
+              >
+                <option value="student">Student</option>
+                <option value="editor">Editor</option>
+              </select>
+              <p
+                class="role-related-error hidden text-text-error px-1 text-sm"
+              ></p>
+            </div>
+            <button class="button-fill edit-btn" type="button">Edit</button>
+          </div>
+        </div>
+        <!-- sem div popup -->
+        <div
+          class="edit-sem-div-popup-wrapper transition-all hidden duration-200 w-full h-full fixed z-50 flex justify-center items-center top-0 left-0 bg-[#00000060]"
+        >
+          <div
+            class="popup p-6 flex flex-col relative bg-surface-2 rounded-3xl gap-4 w-full max-w-[18.75rem]"
+          >
+            <div class="wrapper w-full flex justify-between items-center">
+              <p class="popup-title text-lg font-semibold">Change Sem/Div</p>
+              <i
+                class="fa-solid fa-xmark text-xl close-popup-btn cursor-pointer"
+              ></i>
+            </div>
+
+            <div class="semester-input-wrapper flex flex-col gap-1">
+              <label class="text-text-primary px-1" for="student-semester-input"
+                >Semester</label
+              >
+              <select
+                name="semester"
+                class="bg-surface-3 border-surface-4 resize-none focus:border-surface-3 focus:!ring-primary-400 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none semester-input"
+                id="student-semester-input"
+              >
+                <option value="semester-1">Semester 1</option>
+                <option value="semester-2">Semester 2</option>
+                <option value="semester-3">Semester 3</option>
+                <option value="semester-4">Semester 4</option>
+                <option value="semester-5">Semester 5</option>
+                <option value="semester-6">Semester 6</option>
+              </select>
+              <p
+                class="semester-related-error hidden text-text-error px-1 text-sm"
+              ></p>
+            </div>
+            <div class="division-input-wrapper flex flex-col gap-1">
+              <label class="text-text-primary px-1" for="student-division-input"
+                >Division</label
+              >
+              <select
+                name="division"
+                class="bg-surface-3 border-surface-4 resize-none focus:border-surface-3 focus:!ring-primary-400 box-border w-full rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none division-input"
+                id="student-division-input"
+              >
+                <option value="div-a">Division A</option>
+                <option value="div-b">Division B</option>
+              </select>
+              <p
+                class="division-related-error hidden text-text-error px-1 text-sm"
+              ></p>
+            </div>
+            <button class="button-fill edit-btn" type="button">Edit</button>
+          </div>
+        </div>
+        <!-- edit medal popup -->
+        <div
+          class="edit-medal-popup-wrapper hidden transition-all duration-200 w-full h-full fixed z-50 flex justify-center items-center top-0 left-0 bg-[#00000060]"
+        >
+          <div
+            class="popup p-6 flex flex-col relative bg-surface-2 rounded-3xl gap-4 w-full max-w-[18.75rem]"
+          >
+            <div class="wrapper w-full flex justify-between items-center">
+              <p class="popup-title text-2xl font-semibold">Edit medals</p>
+              <i
+                class="fa-solid fa-xmark text-xl close-popup-btn cursor-pointer"
+              ></i>
+            </div>
+            <div class="wrapper flex items-center gap-3">
+              <div class="gold-medal-input-wrapper flex flex-col gap-1">
+                <div class="wrapper flex items-center gap-1">
+                  <img
+                    src="https://ik.imagekit.io/yn9gz2n2g/image(1).png?updatedAt=1751355609614"
+                    class="h-[25px] w-[20px]"
+                    alt=""
+                  />
+                  <p class="">=</p>
+                  <input
+                    type="text"
+                    autocomplete="off"
+                    class="gold-medal-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-10 rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+                    id="gold-medal-input"
+                  />
+                </div>
+              </div>
+              <div class="silver-medal-input-wrapper flex flex-col gap-1">
+                <div class="wrapper flex items-center gap-1">
+                  <img
+                    src="https://ik.imagekit.io/yn9gz2n2g/others/silver.png?updatedAt=1751607529476"
+                    class="h-[25px] w-[20px]"
+                    alt=""
+                  />
+                  <p class="">=</p>
+                  <input
+                    type="text"
+                    autocomplete="off"
+                    class="silver-medal-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-10 rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+                    id="silver-medal-input"
+                  />
+                </div>
+              </div>
+
+              <div class="bronze-medal-input-wrapper flex flex-col gap-1">
+                <div class="wrapper flex items-center gap-1">
+                  <img
+                    src="https://ik.imagekit.io/yn9gz2n2g/others/bronze.png?updatedAt=1751607503968"
+                    class="h-[25px] w-[20px]"
+                    alt=""
+                  />
+                  <p class="">=</p>
+                  <input
+                    type="text"
+                    autocomplete="off"
+                    class="bronze-medal-input bg-surface-3 border-surface-4 focus:border-surface-3 focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-10 rounded-lg border-2 px-3 py-1.5 focus:!ring-1 focus:outline-none"
+                    id="bronze-medal-input"
+                  />
+                </div>
+              </div>
+            </div>
+            <p
+              class="medal-related-error hidden text-text-error px-1 text-sm"
+            ></p>
+            <button class="button-fill edit-btn" type="button">Edit</button>
+          </div>
+        </div>
+
+        <div class="semester-list h-full w-full flex hidden flex-col gap-4">
+          <div
+            class="sem-card-container auto-grid-cards flex w-full flex-row flex-wrap justify-start gap-4 lg:gap-5"
+          ></div>
+        </div>
+        <div class="division-list h-full w-full flex hidden flex-col gap-4">
+          <div
+            class="div-card-container auto-grid-cards flex w-full flex-row flex-wrap justify-start gap-4 lg:gap-5"
+          ></div>
+        </div>
+        <div class="class-room h-full w-full flex hidden flex-col gap-4">
+          <div
+            class="student-card-container-wrapper flex flex-col items-center gap-2 lg:gap-3"
+          >
+            <div
+              class="add-student-link-popup-wrapper hidden absolute top-0 left-0 z-20 flex h-full w-full items-center justify-center bg-[#00000020] transition-all duration-200"
+            >
+              <div
+                class="add-student-link-popup bg-surface-2 flex flex-col gap-4 rounded-3xl p-6 lg:gap-5 w-80"
+              >
+                <p class="text-text-primary popup-title text-2xl font-semibold">
+                  Add student link
+                </p>
+                <p
+                  class="bg-surface-3 text-text-link flex items-center gap-4 rounded-xl p-4 w-full"
+                >
+                  <span
+                    id="add-student-link"
+                    class="truncate block w-full"
+                  ></span>
+                </p>
+
+                <div class="btn-wrapper flex justify-end gap-4">
+                  <button class="button-fill okay-btn">Ok</button>
+                </div>
+              </div>
+            </div>
+            <div class="wrapper flex w-full justify-between items-center">
+              <p class="text-2xl font-semibold main-title">Students</p>
+              <button class="button-hug add-student-btn">Add student</button>
+            </div>
+
+            <div
+              class="student-card-container auto-grid-student-cards flex w-full flex-row flex-wrap justify-start gap-4 lg:gap-5 w-full"
+            ></div>
+          </div>
+        </div>
+        <div
+          class="individual-student-popup hidden flex flex-col items-center gap-4 fixed top-0 left-0 z-20 h-full w-full justify-center bg-[#00000080] p-4"
+        >
+          <div
+            class="individual-student-popup relative bg-surface-2 flex flex-col gap-4 max-h-[90vh] lg:gap-5 max-w-96 px-6 py-5 rounded-3xl"
+          >
+            <div class="close-popup-btn absolute -top-8 right-4 cursor-pointer">
+              <i class="fa-solid fa-xmark"></i>
+            </div>
+            <div class="wrapper flex flex-col items-center gap-3 lg:gap-4">
+              <div
+                class="profile-pic-name-wrapper flex flex-col items-center gap-2 lg:gap-3"
+              >
+                <img
+                  src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Memes/me10.png?updatedAt=1750954390676"
+                  alt=""
+                  class="student-display-pfp h-[60px] w-[60px]"
+                />
+                <p
+                  class="student-display-name text-center text-2xl font-semibold"
+                >
+                  saagar kemble
+                </p>
+              </div>
+              <div class="medal-point-wrapper flex items-center gap-5">
+                <div class="points-wrapper flex items-center gap-1">
+                  <img
+                    src="https://ik.imagekit.io/yn9gz2n2g/others/coin.png?updatedAt=1751607575051"
+                    class="h-[20px] w-[20px]"
+                    alt=""
+                  />
+                  <p class="points text-xl">130</p>
+                </div>
+                <div class="medals flex items-center gap-3">
+                  <div class="gold-medal flex items-center gap-1">
+                    <img
+                      src="https://ik.imagekit.io/yn9gz2n2g/image(1).png?updatedAt=1751355609614"
+                      class="h-[20px] w-[15px]"
+                      alt=""
+                    />
+                    <span class="qty flex items-center"
+                      ><span class="text-xs">x</span>3</span
+                    >
+                  </div>
+                  <div class="silver-medal flex items-center gap-1">
+                    <img
+                      src="https://ik.imagekit.io/yn9gz2n2g/image3.png?updatedAt=1751355706789"
+                      class="h-[20px] w-[15px]"
+                      alt=""
+                    />
+                    <span class="qty flex items-center"
+                      ><span class="text-xs">x</span>3</span
+                    >
+                  </div>
+                  <div class="bronz-medal flex items-center gap-1">
+                    <img
+                      src="https://ik.imagekit.io/yn9gz2n2g/image4.png?updatedAt=1751355724252"
+                      class="h-[20px] w-[15px]"
+                      alt=""
+                    />
+                    <span class="qty flex items-center"
+                      ><span class="text-xs">x</span>3</span
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="student-info-wrapper flex h-fit overflow-y-auto flex-col items-start gap-4 lg:gap-5"
+            >
+              <p class="first-name">First Name: sagar</p>
+              <p class="last-name">Last Name: kemble</p>
+              <p class="roll-no">Roll No: 242213</p>
+              <p class="email break-all">Email: sagar.kemble@example.com</p>
+              <p class="role">Role: Student</p>
+              <p class="sem">Semester: 3</p>
+              <p class="div">Division: A</p>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
+    <script src="src/scripts/admin.js" type="module"></script>
     <script src="src/scripts/dashboard.js" type="module"></script>
     <script src="src/scripts/subject.js" type="module"></script>
     <script src="src/scripts/login.js" type="module"></script>

@@ -49,7 +49,7 @@ let activeStudentObj;
 //  semesters section variables and listners
 const semestersSection = document.querySelector("#semesters-section");
 const semParameters = {
-  divisions: "",
+  division: "",
   notice: "",
   popups: "",
 };
@@ -58,7 +58,7 @@ const semCardContainer = document.querySelector(".sem-card-container");
 async function loadSemestersPage() {
   await unloadIndividualDivisionPage();
   await unloadSemstersPage();
-  await unloadDivisionsOfSemesterPage();
+  await unloaddivisionOfSemesterPage();
   await unloadIndividualStudentPage();
   // renders individual sem cards
   for (let element in dbSemesterData) {
@@ -82,7 +82,7 @@ async function loadSemestersPage() {
         `admin.html?sem=${encodeURIComponent(activeSem)}`
       );
       await unloadSemstersPage();
-      loadDivisionsOfSemesterPage();
+      loaddivisionOfSemesterPage();
     });
     semCardContainer.appendChild(card);
   }
@@ -137,9 +137,9 @@ function writeNewSemToDb(inputSemName) {
     });
 }
 
-// divisions page variables and listners
-const divisionsOfSemesterSection = document.querySelector(
-  "#divisions-of-semester-section"
+// division page variables and listners
+const divisionOfSemesterSection = document.querySelector(
+  "#division-of-semester-section"
 );
 const addDivBtn = document.querySelector("#add-div-btn");
 const divCardContainer = document.querySelector(".div-card-container");
@@ -148,13 +148,13 @@ const divParameters = {
   popups: "",
   subjects: "",
 };
-async function loadDivisionsOfSemesterPage() {
+async function loaddivisionOfSemesterPage() {
   await unloadIndividualDivisionPage();
   await unloadSemstersPage();
-  await unloadDivisionsOfSemesterPage();
+  await unloaddivisionOfSemesterPage();
   await unloadIndividualStudentPage();
   // reednering division card
-  for (let element in dbSemesterData[activeSem].divisions) {
+  for (let element in dbSemesterData[activeSem].division) {
     const card = document.createElement("div");
     console.log(element);
     card.classList.add(
@@ -170,7 +170,7 @@ async function loadDivisionsOfSemesterPage() {
     );
     card.textContent = element;
     card.addEventListener("click", (e) => {
-      unloadDivisionsOfSemesterPage();
+      unloaddivisionOfSemesterPage();
       activeDiv = e.target.textContent;
       history.pushState(
         { div: activeDiv },
@@ -187,14 +187,14 @@ async function loadDivisionsOfSemesterPage() {
   addDivBtn.classList.remove("hidden");
   headerIcon.src =
     "https://ik.imagekit.io/yn9gz2n2g/image.png?updatedAt=1751378410144";
-  await fadeInEffect(divisionsOfSemesterSection);
+  await fadeInEffect(divisionOfSemesterSection);
 }
-async function unloadDivisionsOfSemesterPage() {
+async function unloaddivisionOfSemesterPage() {
   divCardContainer.innerHTML = "";
   headerTitle.textContent = "";
   addDivBtn.classList.add("hidden");
   headerIcon.src = "";
-  await fadeOutEffect(divisionsOfSemesterSection);
+  await fadeOutEffect(divisionOfSemesterSection);
 }
 addDivBtn.addEventListener("click", () => {
   let inputDivName;
@@ -214,7 +214,7 @@ addDivBtn.addEventListener("click", () => {
 });
 function divExists(inputName) {
   const divFormRelatedError = document.querySelector(".form-related-error");
-  for (let element in dbSemesterData[activeSem].divisions) {
+  for (let element in dbSemesterData[activeSem].division) {
     if (element === inputName) {
       divFormRelatedError.textContent = "div exists";
       divFormRelatedError.classList.remove("hidden");
@@ -224,7 +224,7 @@ function divExists(inputName) {
 }
 function writeNewDivToDb(inputDivName) {
   set(
-    ref(db, `semesters/${activeSem}/divisions/${inputDivName}`),
+    ref(db, `semesters/${activeSem}/division/${inputDivName}`),
     divParameters
   )
     .then(() => {
@@ -239,8 +239,8 @@ function writeNewDivToDb(inputDivName) {
 // class related var and listners
 
 // student related
-let studentsArr = [];
-const individualDivisionSection = document.querySelector(
+let studentArr = [];
+const individualdivisionection = document.querySelector(
   "#individual-division-section"
 );
 const individualSubjectCardContainer = document.querySelector(
@@ -249,8 +249,8 @@ const individualSubjectCardContainer = document.querySelector(
 const linkPopupContainer = document.querySelector(".link-popup-container");
 const addStudentLink = document.querySelector("#add-student-link");
 const linkPopupOkBtn = document.querySelector(".link-popup-container button");
-const studentsCardContainer = document.querySelector(
-  ".students-card-container"
+const studentCardContainer = document.querySelector(
+  ".student-card-container"
 );
 linkPopupOkBtn.addEventListener("click", async (e) => {
   e.preventDefault();
@@ -258,30 +258,30 @@ linkPopupOkBtn.addEventListener("click", async (e) => {
 });
 async function loadIndividualDivPage() {
   await unloadSemstersPage();
-  await unloadDivisionsOfSemesterPage();
+  await unloaddivisionOfSemesterPage();
   await unloadIndividualDivisionPage();
   await unloadIndividualStudentPage();
-  if (studentsArr.length === 0) await getStudentData();
+  if (studentArr.length === 0) await getStudentData();
   renderIndividualStudentCard();
   renderIndividualSubjectCard();
   headerTitle.textContent = activeDiv;
   headerIcon.src =
     "https://ik.imagekit.io/yn9gz2n2g/image.png?updatedAt=1751378410144";
   addStudentBtn.classList.remove("hidden");
-  fadeInEffect(individualDivisionSection);
+  fadeInEffect(individualdivisionection);
 }
 async function unloadIndividualDivisionPage() {
-  studentsCardContainer.innerHTML = "";
+  studentCardContainer.innerHTML = "";
   individualSubjectCardContainer.innerHTML = "";
   headerTitle.textContent = "";
   addDivBtn.classList.add("hidden");
   headerIcon.src = "";
   console.log("unload individual div page called");
 
-  await fadeOutEffect(individualDivisionSection);
+  await fadeOutEffect(individualdivisionection);
 }
 function renderIndividualStudentCard() {
-  studentsArr.forEach((element) => {
+  studentArr.forEach((element) => {
     const card = document.createElement("div");
     card.className =
       "individual-student-card bg-surface-2 flex w-full items-center justify-between rounded-3xl px-6 py-5";
@@ -319,11 +319,11 @@ function renderIndividualStudentCard() {
       );
       loadIndividualStudentPage();
     });
-    studentsCardContainer.appendChild(card);
+    studentCardContainer.appendChild(card);
   });
 }
 function getStudentData() {
-  const dbpath = ref(db, "students");
+  const dbpath = ref(db, "student");
   return get(dbpath)
     .then((snapshot) => {
       if (snapshot.exists()) {
@@ -333,7 +333,7 @@ function getStudentData() {
           const student = studentData[key];
           if (student.sem === activeSem && student.div === activeDiv) {
             console.log("Matched Student:", student);
-            studentsArr.push(student);
+            studentArr.push(student);
           }
         }
       } else {
@@ -403,7 +403,7 @@ addSubjectBtn.addEventListener("click", (e) => {
 });
 function subjectExists(inputSubject) {
   const divFormRelatedError = document.querySelector(".form-related-error");
-  for (const key in dbSemesterData[activeSem].divisions[activeDiv].subjects) {
+  for (const key in dbSemesterData[activeSem].division[activeDiv].subjects) {
     console.log(key);
     if (inputSubject == key) {
       console.log("subject key exists");
@@ -413,7 +413,7 @@ function subjectExists(inputSubject) {
     }
   }
 
-  console.log(dbSemesterData[activeSem].divisions[activeDiv].subjects);
+  console.log(dbSemesterData[activeSem].division[activeDiv].subjects);
 
   return false;
 }
@@ -476,7 +476,7 @@ function writeNewSubjectToDb(inputSubject) {
   set(
     ref(
       db,
-      `semesters/${activeSem}/divisions/${activeDiv}/subjects/${inputSubject}`
+      `semesters/${activeSem}/division/${activeDiv}/subjects/${inputSubject}`
     ),
     subjectParameters
   )
@@ -489,7 +489,7 @@ function writeNewSubjectToDb(inputSubject) {
     });
 }
 function renderIndividualSubjectCard() {
-  const subjects = dbSemesterData[activeSem].divisions[activeDiv].subjects;
+  const subjects = dbSemesterData[activeSem].division[activeDiv].subjects;
   for (let key in subjects) {
     const subjectObj = subjects[key]; // get the actual subject object
 
@@ -516,10 +516,9 @@ function renderIndividualSubjectCard() {
     individualSubjectCardContainer.appendChild(subjectCard);
   }
 }
-
 // student page related var and listner
 const studentDisplayName = document.querySelector(".student-display-name");
-const individualstudentSection = document.querySelector(
+const individualstudentection = document.querySelector(
   ".individual-student-section"
 );
 const studentDisplayPfp = document.querySelector(".student-display-pfp");
@@ -527,7 +526,7 @@ const studentInfoWrapper = document.querySelector(".studenet-info-wrapper");
 async function loadIndividualStudentPage() {
   await unloadIndividualDivisionPage();
   await unloadSemstersPage();
-  await unloadDivisionsOfSemesterPage();
+  await unloaddivisionOfSemesterPage();
   await unloadIndividualStudentPage();
   studentDisplayPfp.src = activeStudentObj.pfp;
   studentDisplayName.innerHTML = `${activeStudentObj.firstName}<br/>${activeStudentObj.lastName}`;
@@ -550,13 +549,13 @@ async function loadIndividualStudentPage() {
 
     studentInfoWrapper.appendChild(wrapper); // or replace with your target container
   }
-  await fadeInEffect(individualstudentSection);
+  await fadeInEffect(individualstudentection);
 }
 async function unloadIndividualStudentPage() {
   studentDisplayPfp.src = "";
   studentDisplayName.innerHTML = "";
   studentInfoWrapper.innerHTML = "";
-  await fadeOutEffect(individualstudentSection);
+  await fadeOutEffect(individualstudentection);
 }
 
 // other function
@@ -697,7 +696,7 @@ function createPopup({
 }
 async function initActiveStudentObj(inputName) {
   await getStudentData();
-  studentsArr.forEach((element) => {
+  studentArr.forEach((element) => {
     if (`${element.firstName}${element.lastName}` === inputName) {
       activeStudentObj = element;
       return;
@@ -721,7 +720,7 @@ async function initRouting() {
   } else if (div) {
     loadIndividualDivPage();
   } else if (sem) {
-    loadDivisionsOfSemesterPage();
+    loaddivisionOfSemesterPage();
   } else {
     loadSemestersPage();
   }

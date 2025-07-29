@@ -48,9 +48,7 @@ scheduleTestButton.addEventListener("click", async () => {
   fadeInEffect(upcomingTestPopup);
 });
 function renderUpcomingTests() {
-  console.log(appState.divisionData.testData);
   if (appState.divisionData.testData.upcomingTest.visible == false) {
-    console.log("no upcoming test");
     fadeOutEffect(upcomingTestCard);
     fadeInEffect(noTest);
     return;
