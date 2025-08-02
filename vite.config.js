@@ -5,7 +5,7 @@ import { resolve } from "path";
 export default defineConfig({
   plugins: [tailwindcss()],
   server: {
-    allowedHosts: ["d488c8678333.ngrok-free.app"],
+    allowedHosts: ["0dab1116c1b7.ngrok-free.app"],
   },
   build: {
     rollupOptions: {

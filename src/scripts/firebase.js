@@ -1,4 +1,4 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+import { initializeApp } from "firebase/app";
 import {
   getAuth,
   signInWithEmailAndPassword,
@@ -9,7 +9,7 @@ import {
   sendPasswordResetEmail,
   browserLocalPersistence,
   inMemoryPersistence,
-} from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+} from "firebase/auth";
 import {
   getDatabase,
   ref,
@@ -24,22 +24,22 @@ import {
   push,
   query,
   orderByChild,
-} from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
-import { connectAuthEmulator } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+} from "firebase/database";
 import { showErrorSection } from "./error";
-
+import { fadeOutEffect } from "./animation";
 const firebaseConfig = {
-  apiKey: "AIzaSyDxg1_YR4kZ2nnZ2hm32Oyjb4CUrnlXpvQ",
-  authDomain: "lesp-resources-fd879.firebaseapp.com",
-  projectId: "lesp-resources-fd879",
-  storageBucket: "lesp-resources-fd879.firebasestorage.app",
-  messagingSenderId: "422274455357",
-  appId: "1:422274455357:web:c04e0d829e7715e87ad754",
+  apiKey: "AIzaSyDM6R7E9NRG1FjBsu8v_T9QdKth0LUeLDU",
+  authDomain: "lesp-resources-350d1.firebaseapp.com",
+  databaseURL: "https://lesp-resources-350d1-default-rtdb.firebaseio.com",
+  projectId: "lesp-resources-350d1",
+  storageBucket: "lesp-resources-350d1.firebasestorage.app",
+  messagingSenderId: "763683500399",
+  appId: "1:763683500399:web:c3dc5d410d15416ac9b89a",
+  measurementId: "G-8RSZWPT0XK",
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
-
 // functions
 export function deleteData(path) {
   return remove(ref(db, path))
@@ -72,6 +72,16 @@ export function updateData(path, data) {
       console.error("Error pushing data:", error);
       showErrorSection();
       return;
+    });
+}
+export function signOutUser() {
+  return signOut(auth)
+    .then(() => {
+      console.log("Signed out successfully.");
+    })
+    .catch((error) => {
+      showErrorSection();
+      console.error("Sign-out error:", error);
     });
 }
 export {

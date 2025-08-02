@@ -27,11 +27,11 @@ export async function loadLeaderboardSection() {
   const medalPoints = { bronz: 10, silver: 20, gold: 30 };
   rankWiseSortedData = Object.entries(sortedRollNoWiseStudentData).reduce(
     (acc, [userId, user]) => {
-      const { firstName, lastName, medals, pfp } = user;
+      const { firstName, lastName, medalList, pfpLink } = user;
 
-      const bronze = medals.bronz || 0;
-      const silver = medals.silver || 0;
-      const gold = medals.gold || 0;
+      const bronze = medalList.bronze || 0;
+      const silver = medalList.silver || 0;
+      const gold = medalList.gold || 0;
 
       const totalPoints =
         bronze * medalPoints.bronz +
@@ -42,7 +42,7 @@ export async function loadLeaderboardSection() {
         firstName,
         lastName,
         name: `${firstName} ${lastName}`,
-        pfp,
+        pfpLink,
         bronze,
         silver,
         gold,
@@ -613,8 +613,12 @@ function initPreviousTestWinner() {
   }
 }
 function getStudentRawData() {
-  const usersRef = ref(db, "users");
-  const q = query(usersRef, orderByChild("div"), equalTo(appState.activeDiv));
+  const usersRef = ref(db, "userData");
+  const q = query(
+    usersRef,
+    orderByChild("division"),
+    equalTo(appState.activeDiv)
+  );
 
   return get(q).then((snapshot) => {
     if (snapshot.exists()) {

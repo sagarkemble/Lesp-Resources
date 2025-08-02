@@ -38,7 +38,7 @@ const swiper = new Swiper("#login-section-swiper", {
   },
 });
 const loadingScreen = document.querySelector(".loading-screen");
-// login form
+// login section
 const loginSection = document.querySelector(".login-section");
 const loginForm = document.querySelector("#login-form");
 const emailInput = document.querySelector("#email-input");
@@ -83,8 +83,7 @@ loginForm.addEventListener("submit", async (e) => {
       if (error.code === "auth/invalid-credential") {
         toggleFormState(false);
         loginFormRelatedError.textContent = "Invalid email or password.";
-      }
-      if (error.code === "auth/too-many-requests") {
+      } else if (error.code === "auth/too-many-requests") {
         toggleFormState(false);
         loginFormRelatedError.textContent = "Too many attempts.";
       } else {
@@ -119,8 +118,8 @@ const registeredEmailInputRelatedError = document.querySelector(
 );
 const backToLoginPageBtn = document.querySelector(".back-to-login-btn");
 const resetPasswordBtn = document.querySelector(".reset-password-btn");
-const resetPasswordLoader = resetPasswordBtn.querySelector(".btn-loader");
-const resetPasswordText = resetPasswordBtn.querySelector(".text");
+const resetPasswordBtnLoader = resetPasswordBtn.querySelector(".btn-loader");
+const resetPasswordBtnText = resetPasswordBtn.querySelector(".text");
 backToLoginPageBtn.addEventListener("click", async () => {
   showLoginSection();
 });
@@ -162,14 +161,14 @@ function toggleFormState(isDisabled) {
   resetPasswordBtn.disabled = isDisabled;
   registeredEmailInput.disabled = isDisabled;
   if (isDisabled) {
-    fadeOutEffectOpacity(resetPasswordText);
+    fadeOutEffectOpacity(resetPasswordBtnText);
     fadeOutEffectOpacity(loginBtnText);
     fadeInEffect(loginBtnLoader);
-    fadeInEffect(resetPasswordLoader);
+    fadeInEffect(resetPasswordBtnLoader);
   } else {
-    fadeOutEffect(resetPasswordLoader);
+    fadeOutEffect(resetPasswordBtnLoader);
     fadeOutEffect(loginBtnLoader);
-    fadeInEffectOpacity(resetPasswordText);
+    fadeInEffectOpacity(resetPasswordBtnText);
     fadeInEffectOpacity(loginBtnText);
   }
 }

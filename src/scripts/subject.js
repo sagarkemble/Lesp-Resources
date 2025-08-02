@@ -1,7 +1,13 @@
 import { deleteData, pushData, updateData } from "./firebase.js";
 import { deleteDriveFile, uploadDriveFile } from "./driveApi.js";
 import { appState, syncDbData } from "./appstate.js";
-import { fadeInEffect, fadeOutEffect } from "./animation.js";
+import {
+  fadeInEffect,
+  fadeInEffectOpacity,
+  fadeOutEffect,
+  hideElement,
+  showElement,
+} from "./animation.js";
 import {
   hideSections,
   showSectionLoader,
@@ -14,13 +20,12 @@ import { showErrorSection } from "./error.js";
 const subjectPageSection = document.querySelector(".subject-page-section");
 export async function loadSubjectSection() {
   await unloadSubjectSection();
-  await renderSwiper();
+  await renderNoticeSlider();
   await renderUpcomingSubmissions();
   await renderResources();
-  headerIcon.src =
-    appState.subjectData.individualSubjects[appState.activeSubject].icon;
+  headerIcon.src = appState.subjectMetaData[appState.activeSubject].iconLink;
   headerTitle.textContent =
-    appState.subjectData.individualSubjects[appState.activeSubject].name;
+    appState.subjectMetaData[appState.activeSubject].name;
   await hideSections();
   swiper.slideTo(0, 0);
   swiper.update();
@@ -62,9 +67,6 @@ const swiper = new Swiper("#subject-page-swiper", {
   observer: true,
   observeParents: true,
 });
-const Swiperwrapper = document.querySelector(
-  "#subject-page-swiper .swiper-wrapper"
-);
 // const swiperNxtBtn = document.querySelector(".custom-swiper-button-next");
 // const swiperPrevBtn = document.querySelector(".custom-swiper-button-prev");
 const addNoticeBtn = subjectPageSection.querySelector(".add-notice-btn");
@@ -107,13 +109,14 @@ const addNoticePopupErrorPopupOkayBtn =
   addNoticePopupErrorPopup.querySelector(".okay-btn");
 let selectedNotice;
 // functions
-async function renderSwiper() {
-  if (!appState.subjectData.notice) return;
-  if (!appState.subjectData.notice[appState.activeSubject]) return;
-  const noticeEntries = Object.entries(
-    appState.subjectData.notice[appState.activeSubject]
-  ).reverse();
-  for (const [key, noticeData] of noticeEntries) {
+async function renderNoticeSlider() {
+  const noticeList =
+    appState.divisionData?.noticeData?.subjectNoticeData?.[
+      appState.activeSubject
+    ] || {};
+  if (!noticeList || !Object.keys(noticeList).length) return; // if no notice data, return
+  const noticeReversedObj = Object.entries(noticeList).reverse();
+  for (const [key, noticeData] of noticeReversedObj) {
     const swiperSlide = document.createElement("div");
     swiperSlide.className =
       "swiper-slide w-full max-w-[600px] bg-surface-2 !flex !flex-col gap-3 rounded-2xl p-4 lg:p-5";
@@ -243,7 +246,7 @@ async function deleteNotice(key, attachmentId) {
     showSectionLoader("Deleting notice...");
   }
   await deleteData(
-    `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/notice/${appState.activeSubject}/${key}`
+    `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/noticeData/subjectNoticeData/${appState.activeSubject}/${key}`
   );
   await showSectionLoader("Syncing data...");
   await syncDbData();
@@ -269,6 +272,14 @@ addNoticeFileAttachment.addEventListener("click", () => {
 addNoticeBtn.addEventListener("click", () => {
   fadeInEffect(addNoticePopup);
 }); //
+addNoticeTitleInput.addEventListener("input", () => {
+  if (addNoticeTitleInput.value.length == 20) {
+    addNoticePopuptitleError.textContent = "Max 20 characters reached";
+    showElement(addNoticePopuptitleError);
+  } else {
+    hideElement(addNoticePopuptitleError);
+  }
+});
 addNoticePopupcloseBtn.addEventListener("click", async (e) => {
   await fadeOutEffect(addNoticePopup);
   resetAddNoticePopup();
@@ -310,7 +321,7 @@ addNoticePopupcreateBtn.addEventListener("click", async () => {
   if (file) {
     let uploaded = await uploadDriveFile(
       file,
-      `resources/${appState.activeSem}/${appState.activeDiv}/${appState.activeSubject}/notices`
+      `${appState.activeSem}/divisionData/division${appState.activeDiv}/noticeData/subjectNoticeData/${appState.activeSubject}`
     );
     if (!uploaded) return;
     attachmentURL = uploaded.webViewLink;
@@ -321,15 +332,14 @@ addNoticePopupcreateBtn.addEventListener("click", async () => {
   }
   showSectionLoader("Adding notice...");
   await pushData(
-    `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/notice/${appState.activeSubject}`,
+    `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/noticeData/subjectNoticeData/${appState.activeSubject}`,
     {
-      attachmentURL,
-      attachmentId,
       title,
       description,
+      attachmentURL,
+      attachmentId,
       createdAt: Date.now(),
       scope: appState.activeSubject,
-      subject: appState.activeSubject,
     }
   );
   fadeOutEffect(addNoticePopup);
@@ -397,14 +407,14 @@ addCategoryPopupCreateBtn.addEventListener("click", async () => {
   if (isCategoryEditing) {
     await showSectionLoader("Updating category...");
     updateData(
-      `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/individualSubjects/${appState.activeSubject}/content/${selectedCategoryId}`,
+      `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList/${selectedCategoryId}/metaData`,
       { name: title }
     );
   } else {
     showSectionLoader("Adding category...");
     await pushData(
-      `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/individualSubjects/${appState.activeSubject}/content`,
-      { name: title, visible: true }
+      `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList`,
+      { metaData: { name: title, isVisible: true } }
     );
   }
   await fadeOutEffect(addCategoryPopup);
@@ -414,6 +424,14 @@ addCategoryPopupCreateBtn.addEventListener("click", async () => {
   hideSectionLoader();
   loadSubjectSection();
 });
+addCategoryTitleInput.addEventListener("input", () => {
+  if (addCategoryTitleInput.value.length == 20) {
+    addCategoryTitleError.textContent = "Max 20 characters reached";
+    showElement(addCategoryTitleError);
+  } else {
+    hideElement(addCategoryTitleError);
+  }
+});
 async function deleteCategory() {
   const confirm = await showConfirmationPopup(
     "All the content in this category will be deleted forever"
@@ -421,17 +439,17 @@ async function deleteCategory() {
   if (!confirm) return;
   showSectionLoader("Deleting category...");
   const data =
-    appState.subjectData.individualSubjects[appState.activeSubject].content[
+    appState.subjectData[appState.activeSubject].containerList[
       selectedCategoryId
     ];
   showSectionLoader("Deleting individual content...");
-  for (const key in data.items) {
-    const element = data.items[key];
+  for (const key in data.itemList) {
+    const element = data.itemList[key];
     if (element.attachmentId === "custom-link") continue;
     await deleteDriveFile(element.attachmentId);
   }
   await deleteData(
-    `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/individualSubjects/${appState.activeSubject}/content/${selectedCategoryId}`
+    `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList/${selectedCategoryId}`
   );
   await showSectionLoader("Syncing data...");
   await syncDbData();
@@ -449,9 +467,9 @@ async function resetAddCategoryPopup() {
 }
 function editCategory() {
   addCategoryTitleInput.value =
-    appState.subjectData.individualSubjects[appState.activeSubject].content[
+    appState.subjectData[appState.activeSubject].containerList[
       selectedCategoryId
-    ].name;
+    ].metaData.name;
   isCategoryEditing = true;
   addCategoryPopupCreateBtn.textContent = "Edit";
   addCategoryPopupTitle.textContent = "Edit Category";
@@ -463,12 +481,13 @@ async function toggleCategoryVisibility() {
   );
   if (!confirm) return;
   await showSectionLoader("Changing visibility...");
-  await updateData(
-    `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/individualSubjects/${appState.activeSubject}/content/${selectedCategoryId}`,
+  updateData(
+    `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList/${selectedCategoryId}/metaData`,
     {
-      visible:
-        !appState.subjectData.individualSubjects[appState.activeSubject]
-          .content[selectedCategoryId].visible,
+      isVisible:
+        !appState.subjectData[appState.activeSubject].containerList[
+          selectedCategoryId
+        ].metaData.isVisible,
     }
   );
   await showSectionLoader("Syncing data...");
@@ -632,6 +651,7 @@ addItemPopupCreateBtn.addEventListener("click", async () => {
     fadeInEffect(addItemPopupTitleError);
     iserror = true;
   }
+
   if (!link && !file) {
     addItemPopupLinkError.textContent = "Link or file is required";
     fadeInEffect(addItemPopupLinkError);
@@ -652,13 +672,16 @@ addItemPopupCreateBtn.addEventListener("click", async () => {
   let attachmentId = "";
   if (file) {
     showSectionLoader("Uploading file...");
+
     let uploaded = await uploadDriveFile(
       file,
-      `resources/${appState.activeSem}/${appState.activeDiv}/${appState.activeSubject}/resources`
+      `${appState.activeSem}/divisionData/division${appState.activeDiv}/subjectData/${appState.activeSubject}/${selectedCategoryId}`
     );
     if (!uploaded) return;
     attachmentURL = uploaded.webViewLink;
     attachmentId = uploaded.fileId;
+    console.log("Uploaded file ID:", attachmentId);
+    console.log(attachmentId);
   } else {
     attachmentURL = link;
     if (link !== originalLink) {
@@ -674,24 +697,23 @@ addItemPopupCreateBtn.addEventListener("click", async () => {
     }
     showSectionLoader("Updating item...");
     await updateData(
-      `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/individualSubjects/${appState.activeSubject}/content/${selectedCategoryId}/items/${selectedItemId}`,
+      `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList/${selectedCategoryId}/itemList/${selectedItemId}`,
       {
-        title,
+        name: title,
         link: attachmentURL,
         attachmentId,
-        createdAt: Date.now(),
       }
     );
   } else {
     showSectionLoader("Adding item...");
     await pushData(
-      `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/individualSubjects/${appState.activeSubject}/content/${selectedCategoryId}/items`,
+      `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList/${selectedCategoryId}/itemList`,
       {
-        title,
+        name: title,
         link: attachmentURL,
         attachmentId,
         createdAt: Date.now(),
-        visible: true,
+        isVisible: true,
       }
     );
   }
@@ -709,8 +731,8 @@ addItemPopupUnhideIcon.addEventListener("click", async () => {
   if (!confirm) return;
   showSectionLoader("Unhiding item...");
   updateData(
-    `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/individualSubjects/${appState.activeSubject}/content/${selectedCategoryId}/items/${selectedItemId}`,
-    { visible: true }
+    `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList/${selectedCategoryId}/itemList/${selectedItemId}`,
+    { isVisible: true }
   );
   fadeOutEffect(addItemPopup);
   showSectionLoader("Syncing data...");
@@ -719,6 +741,15 @@ addItemPopupUnhideIcon.addEventListener("click", async () => {
   resetAddItemPopup();
   loadSubjectSection();
 });
+addItemPopupTitleInput.addEventListener("input", () => {
+  if (addItemPopupTitleInput.value.length == 12) {
+    addItemPopupTitleError.textContent =
+      "Max 12 characters reached (Use short words like Exp, Asign, etc)";
+    fadeInEffect(addItemPopupTitleError);
+  } else {
+    fadeOutEffect(addItemPopupTitleError);
+  }
+});
 addItemPopupHideIcon.addEventListener("click", async () => {
   let confirm = await showConfirmationPopup(
     "Are you sure you want to hide this item?"
@@ -726,8 +757,8 @@ addItemPopupHideIcon.addEventListener("click", async () => {
   if (!confirm) return;
   showSectionLoader("Hiding item...");
   updateData(
-    `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/individualSubjects/${appState.activeSubject}/content/${selectedCategoryId}/items/${selectedItemId}`,
-    { visible: false }
+    `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList/${selectedCategoryId}/itemList/${selectedItemId}`,
+    { isVisible: false }
   );
   fadeOutEffect(addItemPopup);
   showSectionLoader("Syncing data...");
@@ -742,16 +773,16 @@ addItemPopupDeleteIcon.addEventListener("click", async () => {
   );
   if (!confirm) return;
   if (
-    appState.subjectData.individualSubjects[appState.activeSubject].content[
+    appState.subjectData[appState.activeSubject].containerList[
       selectedCategoryId
-    ].items[selectedItemId].attachmentId !== "custom-link"
+    ].itemList[selectedItemId].attachmentId !== "custom-link"
   ) {
     showSectionLoader("Deleting uploaded attachment...");
     await deleteDriveFile(originalAttachmentId);
     showSectionLoader("Deleting item...");
   }
   deleteData(
-    `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/individualSubjects/${appState.activeSubject}/content/${selectedCategoryId}/items/${selectedItemId}`
+    `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList/${selectedCategoryId}/itemList/${selectedItemId}`
   );
   fadeOutEffect(addItemPopup);
   showSectionLoader("Syncing data...");
@@ -761,39 +792,30 @@ addItemPopupDeleteIcon.addEventListener("click", async () => {
   loadSubjectSection();
 });
 function renderResources() {
-  if (!appState.subjectData.individualSubjects[appState.activeSubject].content)
-    return;
   const categoryData =
-    appState.subjectData.individualSubjects[appState.activeSubject].content;
+    appState.subjectData?.[appState.activeSubject]?.containerList || {};
+  if (!categoryData || !Object.keys(categoryData).length) {
+    return;
+  }
   for (const categoryId in categoryData) {
     const category = categoryData[categoryId];
     const container = document.createElement("div");
     container.className =
       "category-item-container dynamic-container gap-2 lg:gap-3 flex flex-col w-full";
-    if (!category.visible) {
-      container.classList.add("hidden");
-      container.classList.add("editor-only-content");
-    }
     const headingWrapper = document.createElement("div");
     headingWrapper.className = "gap-2 lg:gap-3 flex items-center w-full";
     const heading = document.createElement("p");
-    if (!category.visible)
-      heading.className = "text-2xl font-semibold opacity-50";
-    else heading.className = "text-2xl font-semibold";
-    heading.textContent = category.name;
-
+    heading.textContent = category.metaData.name;
     const plusIcon = document.createElement("div");
     plusIcon.className = "plus-icon hidden editor-tool";
     const plusIconInner = document.createElement("i");
     plusIconInner.className = "fa-solid fa-plus text-2xl cursor-pointer";
     plusIcon.appendChild(plusIconInner);
-
     const editIcon = document.createElement("div");
     editIcon.className = "edit-icon hidden editor-tool ml-auto";
     const editIconInner = document.createElement("i");
     editIconInner.className = "fa-solid fa-pen text-xl cursor-pointer ml-auto";
     editIcon.appendChild(editIconInner);
-
     const deleteIcon = document.createElement("div");
     deleteIcon.className = "delete-icon hidden editor-tool";
     const deleteIconInner = document.createElement("i");
@@ -803,7 +825,7 @@ function renderResources() {
     const visibilityIcon = document.createElement("div");
     visibilityIcon.className = "visibility-icon hidden editor-tool";
     const visibilityIconInner = document.createElement("i");
-    visibilityIconInner.className = category.visible
+    visibilityIconInner.className = category.metaData.visible
       ? "fa-solid fa-eye-slash text-xl cursor-pointer"
       : "fa-solid fa-eye text-xl cursor-pointer";
     visibilityIcon.appendChild(visibilityIconInner);
@@ -813,7 +835,17 @@ function renderResources() {
     headingWrapper.appendChild(visibilityIcon);
     headingWrapper.appendChild(deleteIcon);
     container.appendChild(headingWrapper);
-
+    const cardContainer = document.createElement("div");
+    if (!category.metaData.isVisible) {
+      console.log("Category is not visible:", category.metaData.name);
+      container.classList.add("editor-only-content");
+      container.classList.add("hidden");
+      heading.className = "text-2xl font-semibold opacity-50";
+      cardContainer.className = "card-wrapper grid-auto-fit opacity-50";
+    } else {
+      cardContainer.className = "card-wrapper grid-auto-fit";
+      heading.className = "text-2xl font-semibold";
+    }
     plusIcon.addEventListener("click", () => {
       selectedCategoryId = categoryId;
       fadeInEffect(addItemPopup);
@@ -831,12 +863,7 @@ function renderResources() {
       toggleCategoryVisibility();
     });
 
-    const cardContainer = document.createElement("div");
-    if (!category.visible) {
-      cardContainer.className = "card-wrapper grid-auto-fit opacity-50";
-    } else cardContainer.className = "card-wrapper grid-auto-fit";
-
-    const items = category.items;
+    const items = category?.itemList || {};
     for (const itemId in items) {
       const item = items[itemId];
       const link = document.createElement("a");
@@ -844,16 +871,15 @@ function renderResources() {
       link.target = "_blank";
       link.className = "w-full";
       const card = document.createElement("div");
-
-      if (!item.visible) {
+      if (!item.isVisible) {
         card.className =
-          "card p-4 w-full text-center t bg-surface-2 rounded-[20px] hidden editor-only-content-card visiblity-hidden";
+          "card p-4 w-full text-center t bg-surface-2 rounded-[20px] editor-only-content-card opacity-50";
         link.classList.add("hidden");
       } else
         card.className =
           "card p-4 w-full text-center t bg-surface-2 rounded-[20px]";
 
-      card.textContent = item.title;
+      card.textContent = item.name;
       link.appendChild(card);
       cardContainer.appendChild(link);
 
@@ -866,13 +892,12 @@ function renderResources() {
             categoryId,
             item.link,
             item.attachmentId,
-            item.title,
-            item.visible
+            item.name,
+            item.isVisible
           );
         }
       });
     }
-
     container.appendChild(cardContainer);
     subjectPageSection.appendChild(container);
   }
@@ -1003,19 +1028,19 @@ addSubmissionPopupCreateBtn.addEventListener("click", async () => {
   if (isSubmissionEditing) {
     showSectionLoader("Updating submission...");
     updateData(
-      `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/upcomingSubmissions/${appState.activeSubject}/${selectedSubmissionId}`,
+      `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/upcomingSubmissionData/${appState.activeSubject}/${selectedSubmissionId}`,
       {
-        title: title,
-        date: date,
+        name: title,
+        dueDate: date,
       }
     );
   } else {
     showSectionLoader("Creating submission...");
     await pushData(
-      `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/upcomingSubmissions/${appState.activeSubject}`,
+      `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/upcomingSubmissionData/${appState.activeSubject}`,
       {
-        title: title,
-        date: date,
+        name: title,
+        dueDate: date,
       }
     );
   }
@@ -1033,7 +1058,7 @@ addSubmissionPopupDeleteIcon.addEventListener("click", async () => {
   if (!confirm) return;
   showSectionLoader("Deleting submission...");
   await deleteData(
-    `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/upcomingSubmissions/${appState.activeSubject}/${selectedSubmissionId}`
+    `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/upcomingSubmissionData/${appState.activeSubject}/${selectedSubmissionId}`
   );
   await fadeOutEffect(addSubmissionPopup);
   resetAddUpcomingSubmissionPopup();
@@ -1067,6 +1092,7 @@ function resetAddUpcomingSubmissionPopup() {
 }
 addSubmissionPopupChangeDateBtn.addEventListener("click", () => {
   fadeInEffect(addSubmissionPopupDateInputWrapper);
+  fadeInEffect(addSubmissionPopupDateOrLine);
   fadeInEffect(addSubmissionPopupDescriptionInputWrapper);
   addSubmissionPopupDescriptionInput.value = "";
   fadeOutEffect(addSubmissionPopupChangeDateBtn);
@@ -1085,13 +1111,13 @@ function editUpcomingSubmission(submissionId) {
   fadeOutEffect(addSubmissionPopupDateOrLine);
   addSubmissionPopupCreateBtn.textContent = "Edit";
   addSubmissionPopupTitleInput.value =
-    appState.subjectData.upcomingSubmissions[appState.activeSubject][
+    appState.divisionData.upcomingSubmissionData[appState.activeSubject][
       submissionId
-    ].title;
+    ].name;
   addSubmissionPopupDescriptionInput.value =
-    appState.subjectData.upcomingSubmissions[appState.activeSubject][
+    appState.divisionData.upcomingSubmissionData[appState.activeSubject][
       submissionId
-    ].date;
+    ].dueDate;
   isSubmissionEditing = true;
   selectedSubmissionId = submissionId;
   addSubmissionPopupTitle.textContent = "Edit Submission";
@@ -1099,26 +1125,27 @@ function editUpcomingSubmission(submissionId) {
   fadeInEffect(addSubmissionPopup);
 }
 async function renderUpcomingSubmissions() {
-  if (
-    !appState.subjectData.upcomingSubmissions ||
-    !appState.subjectData.upcomingSubmissions[appState.activeSubject]
-  ) {
-    fadeOutEffect(upcomingSubmission);
+  const submissionData =
+    (appState.divisionData?.upcomingSubmissionData || {})[
+      appState.activeSubject
+    ] || {};
+
+  if (!submissionData || !Object.keys(submissionData).length) {
+    hideElement(upcomingSubmission);
+    console.log("No upcoming found");
     return;
   }
-  const submissions =
-    appState.subjectData.upcomingSubmissions[appState.activeSubject];
   fadeInEffect(upcomingSubmission);
   const now = new Date();
   const deleteCutoffHour = 17;
   const deleteCutoffMinute = 30;
-  for (const key in submissions) {
-    let submission = submissions[key];
+  for (const key in submissionData) {
+    let submission = submissionData[key];
     if (
-      typeof submission.date === "string" &&
-      /^\d{4}-\d{2}-\d{2}$/.test(submission.date)
+      typeof submission.dueDate === "string" &&
+      /^\d{4}-\d{2}-\d{2}$/.test(submission.dueDate)
     ) {
-      const [year, month, day] = submission.date.split("-").map(Number);
+      const [year, month, day] = submission.dueDate.split("-").map(Number);
       const deleteTime = new Date(
         year,
         month - 1,
@@ -1127,9 +1154,11 @@ async function renderUpcomingSubmissions() {
         deleteCutoffMinute
       );
       if (now > deleteTime) {
+        console.log("this is old");
         await deleteData(
-          `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/upcomingSubmissions/${appState.activeSubject}/${key}`
+          `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/upcomingSubmissionData/${appState.activeSubject}/${key}`
         );
+        delete submissionData[key];
         continue;
       }
     }
@@ -1137,10 +1166,10 @@ async function renderUpcomingSubmissions() {
     card.className = "card p-4 bg-surface-2 rounded-[20px] text-center";
     const description = document.createElement("p");
     description.className = "description";
-    description.textContent = submission.title;
+    description.textContent = submission.name;
     const submissionDate = document.createElement("p");
     submissionDate.className = "submission-date";
-    submissionDate.textContent = formatDateBasedOnProximity(submission.date);
+    submissionDate.textContent = formatDateBasedOnProximity(submission.dueDate);
     card.appendChild(description);
     card.appendChild(submissionDate);
     upcomingSubmissionCardContainer.appendChild(card);

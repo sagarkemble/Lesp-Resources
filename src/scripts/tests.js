@@ -4,11 +4,16 @@ import {
   hideSectionLoader,
   showConfirmationPopup,
 } from "./index.js";
-import { fadeInEffect, fadeOutEffect } from "./animation.js";
+import {
+  fadeInEffect,
+  fadeOutEffect,
+  hideElement,
+  showElement,
+} from "./animation.js";
 import { hideSections } from "./index.js";
 import { headerIcon, headerTitle } from "./navigation.js";
 import { appState, syncDbData } from "./appstate.js";
-import { uploadDriveFile } from "./driveApi.js";
+import { deleteDriveFile, uploadDriveFile } from "./driveApi.js";
 const testsSection = document.querySelector(".tests-section");
 export async function loadTestSection() {
   await unloadTestsSection();
@@ -43,12 +48,13 @@ const noTest = document.querySelector(".upcoming-test .no-test");
 const scheduleTestButton = noTest.querySelector(".schedule-test-btn");
 scheduleTestButton.addEventListener("click", async () => {
   await resetUpcomingTestPopup();
+  hideElement(hideUpcomingTestBtn);
   upcomingTestDescriptionInput.value =
     appState.divisionData.testData.upcomingTest.description;
   fadeInEffect(upcomingTestPopup);
 });
 function renderUpcomingTests() {
-  if (appState.divisionData.testData.upcomingTest.visible == false) {
+  if (appState.divisionData.testData.upcomingTest.isVisible == false) {
     fadeOutEffect(upcomingTestCard);
     fadeInEffect(noTest);
     return;
@@ -149,14 +155,14 @@ upcomingTestPopupCreateBtn.addEventListener("click", async () => {
   if (isError) return;
   showSectionLoader("Updating data...");
   await updateData(
-    `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/testData/upcomingTest`,
+    `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/testData/upcomingTest`,
     {
       title: upcomingTestTitleInput.value.trim(),
       description: upcomingTestDescriptionInput.value.trim(),
       day: upcomingTestDayInput.value.trim(),
       duration: upcomingTestDurationInput.value.trim(),
       link: upcomingTestLinkInput.value.trim(),
-      visible: true,
+      isVisible: true,
     }
   );
   fadeOutEffect(upcomingTestPopup);
@@ -191,9 +197,9 @@ hideUpcomingTestBtn.addEventListener("click", async () => {
   if (!isConfirmed) return;
   showSectionLoader("Hiding test...");
   await updateData(
-    `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/testData/upcomingTest`,
+    `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/testData/upcomingTest`,
     {
-      visible: false,
+      isVisible: false,
     }
   );
   fadeOutEffect(upcomingTestPopup);
@@ -211,15 +217,22 @@ function resetUpcomingTestPopup() {
   upcomingTestDayInput.value = "";
   upcomingTestDurationInput.value = "";
   upcomingTestPopupTitle.textContent = "Edit";
+  showElement(hideUpcomingTestBtn);
   fadeOutEffect(upcomingTestTitleError);
   fadeOutEffect(upcomingTestDescriptionError);
   fadeOutEffect(upcomingTestLinkError);
   fadeOutEffect(upcomingTestDayError);
   fadeOutEffect(upcomingTestDurationError);
 }
+upcomingTestTitleInput.addEventListener("input", () => {
+  if (upcomingTestTitleInput.value.length == 12)
+    upcomingTestTitleError.textContent = "Max 12 characters reached";
+  showElement(upcomingTestTitleError);
+});
 //previous tests
 let isPreviousTestEditing = false;
 let previousTestEditingKey = null;
+const noPreviousTest = document.querySelector(".no-previous-test");
 const previousTest = document.querySelector(".previous-tests");
 const previousTestPopup = document.querySelector(
   ".previous-test-popup-wrapper"
@@ -236,6 +249,8 @@ const previousTestPopupCloseBtn =
 const previousTestCardWrapper = document.querySelector(
   ".previous-tests .card-container"
 );
+const previousTestPopupDeleteBtn =
+  previousTestPopup.querySelector(".delete-btn");
 // inputs
 const previousTestTitleInput = previousTestPopup.querySelector(
   "#previous-test-title-input"
@@ -290,6 +305,11 @@ const answerFileAttachmentText =
 previousTestPopupCloseBtn.addEventListener("click", async () => {
   await fadeOutEffect(previousTestPopup);
   resetPreviousTestPopup();
+});
+previousTestTitleInput.addEventListener("input", () => {
+  if (previousTestTitleInput.value.length == 12)
+    previousTestTitleError.textContent = "Max 12 characters reached";
+  showElement(previousTestTitleError);
 });
 resultFileInput.addEventListener("change", () => {
   const file = resultFileInput.files[0];
@@ -374,7 +394,7 @@ previousTestPopupCreateBtn.addEventListener("click", async () => {
   if (isPreviousTestEditing) {
     showSectionLoader("Updating data....");
     await updateData(
-      `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/testData/previousTests/${previousTestEditingKey}`,
+      `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/testData/previousTestList/${previousTestEditingKey}`,
       {
         title: title,
         date: date,
@@ -396,7 +416,7 @@ previousTestPopupCreateBtn.addEventListener("click", async () => {
     showSectionLoader("Uploading answer key...");
     let uploaded = await uploadDriveFile(
       answerFile,
-      `resources/${appState.activeSem}/${appState.activeDiv}/${appState.activeSubject}/testData`
+      `${appState.activeSem}/divisionData/division${appState.activeDiv}/previousTestData/answerKey`
     );
     if (!uploaded) {
       hideSectionLoader();
@@ -407,7 +427,7 @@ previousTestPopupCreateBtn.addEventListener("click", async () => {
     showSectionLoader("Uploading result...");
     let resultUploaded = await uploadDriveFile(
       resultFile,
-      `resources/${appState.activeSem}/${appState.activeDiv}/${appState.activeSubject}/testData`
+      `${appState.activeSem}/divisionData/division${appState.activeDiv}/previousTestData/result`
     );
     if (!resultUploaded) {
       hideSectionLoader();
@@ -417,7 +437,7 @@ previousTestPopupCreateBtn.addEventListener("click", async () => {
     resultAttachmentId = resultUploaded.fileId;
     showSectionLoader("Adding data....");
     await pushData(
-      `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/testData/previousTests`,
+      `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/testData/previousTestList`,
       {
         title: title,
         date: date,
@@ -437,12 +457,46 @@ previousTestPopupCreateBtn.addEventListener("click", async () => {
   await loadTestSection();
   showTestsSection();
 });
+previousTestPopupDeleteBtn.addEventListener("click", async () => {
+  if (!isPreviousTestEditing) return;
+  const isConfirmed = await showConfirmationPopup(
+    "Are you sure you want to delete this test? This action cannot be undone."
+  );
+  if (!isConfirmed) return;
+  const resultId =
+    appState.divisionData.testData.previousTestList[previousTestEditingKey]
+      .resultFileId;
+  const answerId =
+    appState.divisionData.testData.previousTestList[previousTestEditingKey]
+      .answerFileId;
+  showSectionLoader("Deleting result from Drive...");
+  await deleteDriveFile(resultId);
+  showSectionLoader("Deleting answer key from Drive...");
+  await deleteDriveFile(answerId);
+  showSectionLoader("Deleting test...");
+  await deleteData(
+    `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/testData/previousTestList/${previousTestEditingKey}`
+  );
+  await hideSectionLoader();
+  resetPreviousTestPopup();
+  fadeOutEffect(previousTestPopup);
+  showSectionLoader("Syncing data...");
+  await syncDbData();
+  await loadTestSection();
+  await hideSectionLoader();
+  showTestsSection();
+});
 function renderPreviousTestCard() {
-  if (!appState.divisionData.testData.previousTests) {
-    fadeOutEffect(previousTest);
+  const previousTestsdata =
+    appState.divisionData.testData?.previousTestList || {};
+  if (Object.keys(previousTestsdata).length === 0 || !previousTestsdata) {
+    console.log("this is called");
+    console.log(previousTestsdata);
+    fadeInEffect(noPreviousTest);
+
     return;
   }
-  const previousTestsdata = appState.divisionData.testData.previousTests;
+  hideElement(noPreviousTest);
   for (const key in previousTestsdata) {
     const data = previousTestsdata[key];
     const title = data.title;
@@ -529,7 +583,9 @@ function renderPreviousTestCard() {
 }
 
 function editPreviousTestCard(key) {
-  const data = appState.divisionData.testData.previousTests[key];
+  console.log("this is from the test page", appState.divisionData);
+  const data = appState.divisionData.testData.previousTestList[key];
+  showElement(previousTestPopupDeleteBtn);
   isPreviousTestEditing = true;
   previousTestEditingKey = key;
   previousTestTitleInput.value = data.title;
@@ -551,6 +607,7 @@ function resetPreviousTestPopup() {
   previousTestPopupCreateBtn.textContent = "Create";
   resultFileAttachmentText.textContent = "Upload Result Pdf";
   answerFileAttachmentText.textContent = "Upload Answer Pdf";
+  hideElement(previousTestPopupDeleteBtn);
   fadeOutEffect(previousTestDateError);
   fadeOutEffect(previousTestDurationError);
   fadeOutEffect(previousTestTitleError);

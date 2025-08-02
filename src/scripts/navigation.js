@@ -56,7 +56,6 @@ export const leaderboardIcon = document.querySelector(".leaderboard-icon");
 export const sessionsIcon = document.querySelector(".sessions-icon");
 export const timeTabelIcon = document.querySelector(".timetabel-icon");
 export const testsIcon = document.querySelector(".tests-icon");
-const smMdHeaderPfp = document.querySelector(".sm-md-header-pfp");
 const loginSection = document.querySelector(".login-section");
 dashboardIcon.addEventListener("click", (e) => {
   history.pushState({}, "", "/?dashboard=''");
@@ -92,14 +91,18 @@ testsIcon.addEventListener("click", () => {
   initRouting();
 });
 export function loadSubjectSelectionList() {
-  for (const key in appState.subjectData.individualSubjects) {
-    const subject = appState.subjectData.individualSubjects[key];
+  console.log(appState.subjectMetaData);
+
+  for (const key in appState.subjectMetaData) {
+    const subject = appState.subjectMetaData[key];
+    console.log(subject);
+
     const subjectCard = document.createElement("div");
     subjectCard.className =
-      "subject-card w-[108px] bg-surface-2 flex px-3 py-2 rounded-md justify-start items-center gap-4";
+      "subject-card w-28 bg-surface-2 flex px-3 py-2 rounded-md justify-start items-center gap-4";
 
     const img = document.createElement("img");
-    img.src = subject.icon;
+    img.src = subject.iconLink;
     img.className = "w-8 h-8";
     img.alt = "";
 
@@ -131,10 +134,3 @@ function handleScroll() {
   lastScrollY = window.scrollY;
 }
 window.addEventListener("scroll", handleScroll);
-window.addEventListener("resize", () => {
-  if (window.innerWidth >= 1024) {
-    fadeOutEffect(smMdHeaderPfp);
-  } else {
-    fadeInEffect(smMdHeaderPfp);
-  }
-});

@@ -1,3 +1,12 @@
+import {
+  fadeInEffect,
+  fadeOutEffect,
+  fadeOutEffectOpacity,
+  fadeInEffectOpacity,
+} from "./animation.js";
+import { accountPopup } from "./dashboard.js";
+import { appState } from "./appstate";
+import { updateData } from "./firebase.js";
 export const sem1Icons = [
   "https://ik.imagekit.io/yn9gz2n2g/Subject%20icons/Semester%201/sem1eng.png?updatedAt=1751047575422",
   "https://ik.imagekit.io/yn9gz2n2g/Subject%20icons/Semester%201/Sem1bms.png?updatedAt=1751047556203",
@@ -61,13 +70,12 @@ export const malePfpLinks = [
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m10.png?updatedAt=1750951251957",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m11.png?updatedAt=1750951276570",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m12.png?updatedAt=1750951301644",
-  "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m13.png?updatedAt=1750951325773",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m14.png?updatedAt=1750951353530",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m15.png?updatedAt=1750951380623",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m16.png?updatedAt=1750951403575",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m17.png?updatedAt=1750951428471",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m18.png?updatedAt=1750951454124",
-  "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m19.png?updatedAt=1750951478868",
+  // "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m19.png?updatedAt=1750951478868",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m20.png?updatedAt=1750951502472",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m21.png?updatedAt=1750951531803",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m22.png?updatedAt=1750951561691",
@@ -76,7 +84,7 @@ export const malePfpLinks = [
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m25.png?updatedAt=1750951653269",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m26.png?updatedAt=1750951680646",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m27.png?updatedAt=1750951703535",
-  "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m28.png?updatedAt=1750951731950",
+  // "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m28.png?updatedAt=1750951731950",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m29.png?updatedAt=1750951760509",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m30.png?updatedAt=1750952044454",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m31.png?updatedAt=1750952186802",
@@ -86,18 +94,15 @@ export const malePfpLinks = [
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m37.png?updatedAt=1750952367758",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m38.png?updatedAt=1750952394043",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m39.png?updatedAt=1750952424973",
-  "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m40.png?updatedAt=1750952451165",
+  // "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m40.png?updatedAt=1750952451165",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m41.png?updatedAt=1750952471413",
-  "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m44.png?updatedAt=1750952541793",
-  "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m46.png?updatedAt=1750952584914",
-  "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m47.png?updatedAt=1750952605773",
+  // "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m44.png?updatedAt=1750952541793",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m48.png?updatedAt=1750952631935",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m49.png?updatedAt=1750952655261",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m50.png?updatedAt=1750952677844",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m51.png?updatedAt=1750952706527",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m52.png?updatedAt=1750952729005",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m53.png?updatedAt=1750952781028",
-  "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m32.png?updatedAt=1750993854358",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m54.png?updatedAt=1751608964260",
 ];
 export const femalePfpLinks = [
@@ -227,7 +232,6 @@ export const femalePfpLinks = [
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Female/female124.png?updatedAt=1750988006501",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Female/female125.png?updatedAt=1750988067759",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Female/female126.png?updatedAt=1750988233174",
-  "https://ik.imagekit.io/yn9gz2n2g/Avatars/Female/female128.png?updatedAt=1750988000261",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Female/female129.png?updatedAt=1750988027543",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Female/female130.png?updatedAt=1750988374757",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Female/female131.png?updatedAt=1750988460112",
@@ -392,3 +396,140 @@ export const cartoonPfpLinks = [
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Cartoon/cartoon13.png?updatedAt=1750992200176",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Cartoon/cartoon14.png?updatedAt=1750992213327",
 ];
+
+//pfp selection section
+export const pfpSelectionPopup = document.querySelector(".pfp-selection-popup");
+const pfpSelectionForm = document.querySelector("#pfp-selection-form");
+const pfpSelectionPrevBtn = pfpSelectionForm.querySelector(".prev-btn");
+const pfpSelectionNextBtn = pfpSelectionForm.querySelector(".next-btn");
+const selectedPfpWrapper = pfpSelectionForm.querySelector(
+  ".selected-pfp-wrapper"
+);
+const selectedPfp = pfpSelectionForm.querySelector(".selected-pfp-wrapper img");
+const pfpContainer = pfpSelectionForm.querySelector(".pfp-container");
+
+const malePfpToggleBtn = pfpSelectionForm.querySelector(".male-pfp-toggle-btn");
+const femalePfpToggleBtn = pfpSelectionForm.querySelector(
+  ".female-pfp-toggle-btn"
+);
+femalePfpToggleBtn.addEventListener("click", async () => {
+  femalePfpToggleBtn.classList.add("bg-surface-3");
+  malePfpToggleBtn.classList.remove("bg-surface-3");
+  if (
+    femalePfpArr[0].classList.contains("hidden") &&
+    pfpContainer.scrollTop === 0
+  ) {
+    await fadeOutEffectOpacity(pfpContainer);
+    malePfpArr.forEach((pfp) => {
+      pfp.classList.add("hidden");
+    });
+    femalePfpArr.forEach((pfp) => {
+      pfp.classList.remove("hidden");
+    });
+    await fadeInEffectOpacity(pfpContainer);
+  } else if (
+    femalePfpArr[0].classList.contains("hidden") &&
+    pfpContainer.scrollTop > 0
+  ) {
+    malePfpArr.forEach((pfp) => {
+      pfp.classList.add("hidden");
+    });
+    femalePfpArr.forEach((pfp) => {
+      pfp.classList.remove("hidden");
+    });
+    pfpContainer.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }
+});
+malePfpToggleBtn.addEventListener("click", async () => {
+  malePfpToggleBtn.classList.add("bg-surface-3");
+  femalePfpToggleBtn.classList.remove("bg-surface-3");
+  if (
+    malePfpArr[0].classList.contains("hidden") &&
+    pfpContainer.scrollTop === 0
+  ) {
+    await fadeOutEffectOpacity(pfpContainer);
+    malePfpArr.forEach((pfp) => {
+      pfp.classList.remove("hidden");
+    });
+    femalePfpArr.forEach((pfp) => {
+      pfp.classList.add("hidden");
+    });
+    await fadeInEffectOpacity(pfpContainer);
+  } else if (
+    malePfpArr[0].classList.contains("hidden") &&
+    pfpContainer.scrollTop > 0
+  ) {
+    malePfpArr.forEach((pfp) => {
+      pfp.classList.remove("hidden");
+    });
+    femalePfpArr.forEach((pfp) => {
+      pfp.classList.add("hidden");
+    });
+    pfpContainer.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }
+});
+pfpContainer.addEventListener("click", async (e) => {
+  const target = e.target;
+  if (target.classList.contains("pfp")) {
+    await fadeOutEffectOpacity(selectedPfpWrapper);
+    selectedPfp.src = target.getAttribute("src");
+    await fadeInEffectOpacity(selectedPfpWrapper);
+    console.log("Selected PFP:", selectedPfp);
+  }
+});
+pfpSelectionPrevBtn.addEventListener("click", async () => {
+  await fadeOutEffect(pfpSelectionPopup);
+  await fadeInEffect(accountPopup);
+});
+pfpSelectionForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  appState.userData.pfpLink = selectedPfp.src;
+  const userPfps = document.querySelectorAll(".user-pfp");
+  console.log("Selected PFP:", appState.userData.pfpLink);
+
+  updateData(`userData/${appState.userData.userId}`, {
+    pfpLink: appState.userData.pfpLink,
+  });
+  userPfps.forEach((pfp) => {
+    pfp.src = appState.userData.pfpLink;
+  });
+  await fadeOutEffect(pfpSelectionPopup);
+  await fadeInEffect(accountPopup);
+});
+
+const malePfpArr = [];
+const femalePfpArr = [];
+const commonPfpArr = [];
+function renderPfpWrapper() {
+  renderImage("malePfp", malePfpLinks);
+  renderImage("femalePfp", femalePfpLinks);
+  renderImage("commonfp", commonPfpLinks);
+  renderImage("memePfp", memePfpLinks);
+}
+function renderImage(className, link) {
+  link.forEach((element) => {
+    const pfp = document.createElement("img");
+    pfp.src = element;
+    // pfp.loading = "lazy";
+    pfp.classList.add("h-full", "w-full", "pfp", `${className}`);
+    if (className === "malePfp") malePfpArr.push(pfp);
+    if (className === "femalePfp") {
+      pfp.classList.add("hidden");
+      femalePfpArr.push(pfp);
+    }
+    if (
+      className === "commonfp" ||
+      className === "memePfp" ||
+      className === "cartoonPfp"
+    )
+      commonPfpArr.push(pfp);
+    pfpContainer.appendChild(pfp);
+  });
+}
+renderPfpWrapper();

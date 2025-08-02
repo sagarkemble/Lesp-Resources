@@ -1,5 +1,10 @@
-import { app, auth, onAuthStateChanged, signOut } from "./firebase.js";
-import { fadeInEffect, fadeOutEffect } from "./animation.js";
+import { app, auth, onAuthStateChanged, signOutUser } from "./firebase.js";
+import {
+  fadeInEffect,
+  fadeOutEffect,
+  hideElement,
+  showElement,
+} from "./animation.js";
 import { showDashboard, loadDashboard } from "./dashboard.js";
 import { loadTestSection, showTestsSection } from "./tests.js";
 import {
@@ -30,11 +35,10 @@ import {
   initAppState,
   getUserData,
   adminAppState,
-  signOutUser,
 } from "./appstate.js";
 import { showErrorSection } from "./error.js";
-const loadingScreen = document.querySelector(".loading-screen");
-const lotteLoader = document.querySelector("#lotte-loader");
+const lottieLoadingScreen = document.querySelector(".loading-screen");
+const lottieLoader = document.querySelector("#lottie-loader");
 const sectionLoader = document.querySelector(".section-loader-wrapper");
 const sectionLoaderMessage = sectionLoader.querySelector(".loader-status");
 const editModeToggleButton = document.querySelector(".edit-mode-toggle-btn");
@@ -43,6 +47,7 @@ const confirmationDescription = confirmationPopup.querySelector(".description");
 const confirmationTitle = confirmationPopup.querySelector(".title");
 const confirmButton = confirmationPopup.querySelector(".confirm-btn");
 const cancelButton = confirmationPopup.querySelector(".cancel-btn");
+const lgUserPfp = document.querySelector(".navigation-pfp");
 export async function showSectionLoader(message = "Loading...") {
   sectionLoaderMessage.textContent = message;
   await fadeInEffect(sectionLoader);
@@ -51,9 +56,9 @@ export async function hideSectionLoader() {
   await fadeOutEffect(sectionLoader);
 }
 async function loadContent() {
-  await loadDashboard();
   await loadTestSection();
   await loadSubjectSelectionList();
+  await loadDashboard();
   await loadLeaderboardSection();
   await loadSessionsSection();
 }
@@ -80,24 +85,27 @@ document.addEventListener("DOMContentLoaded", async () => {
   //   await signOutUser();
   //   // return;
   // }
-  await fadeInEffect(loadingScreen);
+  await fadeInEffect(lottieLoadingScreen);
   onAuthStateChanged(auth, async (userCredential) => {
     if (userCredential) {
-      const user = await getUserData();
+      const user = await getUserData(userCredential.uid);
+      console.log("this is user data ", user);
       if (user.role === "admin") {
         console.log("Admin user detected");
-        await fadeOutEffect(loadingScreen);
+        await fadeOutEffect(lottieLoadingScreen);
         initAdminRouting(user);
         return;
       }
-      await initAppState();
-      await fadeInEffect(loadingScreen);
+      await initAppState(user, user.semester, user.division);
+      console.log("App state initialized", appState);
+      await fadeInEffect(lottieLoadingScreen);
       await hideSections();
       await loadContent();
       await applyEditModeUI();
+      lgUserPfp.src = user.pfpLink;
       initRouting();
     } else {
-      await fadeOutEffect(loadingScreen);
+      await fadeOutEffect(lottieLoadingScreen);
       await showLoginSection();
     }
   });
@@ -112,31 +120,31 @@ export async function initRouting() {
   const sessions = params.get("sessions");
   if (dashboard) {
     setActiveNavIcon(dashboardIcon);
-    await fadeOutEffect(loadingScreen);
+    await fadeOutEffect(lottieLoadingScreen);
     showDashboard();
   } else if (activeSubject) {
     appState.activeSubject = activeSubject;
     setActiveNavIcon(subjectIcon);
-    await fadeOutEffect(loadingScreen);
+    await fadeOutEffect(lottieLoadingScreen);
     loadSubjectSection();
   } else if (leaderboard) {
     setActiveNavIcon(leaderboardIcon);
-    await fadeOutEffect(loadingScreen);
+    await fadeOutEffect(lottieLoadingScreen);
     showLeaderboardSection();
   } else if (tests) {
     setActiveNavIcon(testsIcon);
-    await fadeOutEffect(loadingScreen);
+    await fadeOutEffect(lottieLoadingScreen);
     showTestsSection();
   } else if (sessions) {
     setActiveNavIcon(sessionsIcon);
-    await fadeOutEffect(loadingScreen);
+    await fadeOutEffect(lottieLoadingScreen);
     showSessionsSection();
   } else if (pyq) {
-    await fadeOutEffect(loadingScreen);
+    await fadeOutEffect(lottieLoadingScreen);
     showPyq();
   } else {
     setActiveNavIcon(dashboardIcon);
-    await fadeOutEffect(loadingScreen);
+    await fadeOutEffect(lottieLoadingScreen);
     showDashboard();
   }
 }
@@ -182,36 +190,36 @@ export async function applyEditModeUI() {
     ".subject-page-section .upcoming-submissions"
   );
   if (appState.isEditing) {
-    editorOnlyContent.forEach((content) => fadeInEffect(content));
+    editorOnlyContent.forEach((content) => showElement(content));
     editorOnlyContentCard.forEach((card) => {
       const wrapper = card.closest("a");
       if (wrapper?.classList.contains("hidden")) {
-        fadeInEffect(wrapper);
+        showElement(wrapper);
       }
-      fadeInEffect(card);
+      showElement(card);
       if (card.classList.contains("visiblity-hidden")) {
         card.style.opacity = "0.5";
       }
     });
-    editorTool.forEach((tool) => fadeInEffect(tool));
+    editorTool.forEach(async (tool) => showElement(tool));
     editModeToggleButton.textContent = "Exit editing";
-    fadeInEffect(subjectSectionUpcomingSubmissions);
+    showElement(subjectSectionUpcomingSubmissions);
   } else {
-    if (
-      !appState.subjectData.subjectSectionUpcomingSubmissions ||
-      !appState.subjectData.subjectSectionUpcomingSubmissions[
+    const submissions =
+      (appState.divisionData?.upcomingSubmissionData || {})[
         appState.activeSubject
-      ]
-    ) {
-      fadeOutEffect(subjectSectionUpcomingSubmissions);
+      ] || {};
+    if (!submissions || !Object.keys(submissions).length) {
+      console.log("No upcoming submissions found from index.");
+      hideElement(subjectSectionUpcomingSubmissions);
     }
-    editorOnlyContent.forEach((content) => fadeOutEffect(content));
+    editorOnlyContent.forEach((content) => hideElement(content));
     editorOnlyContentCard.forEach((card) => {
-      fadeOutEffect(card);
+      hideElement(card);
       const wrapper = card.closest("a");
-      if (wrapper) fadeOutEffect(wrapper);
+      if (wrapper) hideElement(wrapper);
     });
-    editorTool.forEach((tool) => fadeOutEffect(tool));
+    editorTool.forEach((tool) => hideElement(tool));
     editModeToggleButton.textContent = "Edit";
   }
 }

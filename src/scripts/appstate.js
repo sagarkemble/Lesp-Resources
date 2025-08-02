@@ -15,19 +15,19 @@ import {
   getDatabase,
 } from "./firebase.js";
 export let appState = {
-  userData: null,
-  userId: null,
-  semesterGlobalData: null,
-  globalData: null,
-  subjectData: null,
-  divisionData: null,
-  activeSem: null,
-  activeDiv: null,
-  isEditing: false,
-  studentData: null,
-  activeSubject: null,
-  activeNavIcon: null,
-  subjectMetaData: null,
+  // userData: null,
+  // userId: null,
+  // semesterGlobalData: null,
+  // globalData: null,
+  // subjectData: null,
+  // divisionData: null,
+  // activeSem: null,
+  // activeDiv: null,
+  // isEditing: false,
+  // studentData: null,
+  // activeSubject: null,
+  // activeNavIcon: null,
+  // subjectMetaData: null,
 };
 export let adminAppState = {
   userData: null,
@@ -38,28 +38,35 @@ export let adminAppState = {
   activeSem: null,
   activeDiv: null,
 };
-export async function initAppState() {
-  appState.userData = await getUserData();
-  // if (appState.userData.role === "admin") {
-  //   adminAppState.userData = appState.userData;
-  //   adminAppState.userId = appState.userId;
-  //   adminAppState.semesterData = await getWholeSemesterData();
-  //   console.log(adminAppState.semesterData);
-  //   return;
-  // }
-  //   window.location.href = "./html/admin.html";
-  appState.activeSem = appState.userData.sem;
-  appState.activeDiv = appState.userData.div;
-  appState.globalData = await getGlobalData();
-  appState.semesterGlobalData = await getSemesterGlobalData();
-  appState.divisionData = await getDivivsionData();
-  appState.subjectData = appState.divisionData.subjects;
-  appState.subjectMetaData = appState.subjectData.subjectMetaData;
+export async function initAppState(userData, semester, division) {
+  semester = `semester${semester}`;
+  console.log("this is sample ", semester, division, userData);
+
+  // division = `division${division}`;
+  const globalData = await getGlobalData();
+  const semesterGlobalData = await getSemesterGlobalData(semester);
+  const divisionData = await getDivisionData(semester, division);
+  console.log(divisionData);
+
+  appState.userData = userData;
+  appState.userId = userData.userId;
+  appState.semesterGlobalData = semesterGlobalData || {};
+  appState.globalData = globalData || {};
+  appState.subjectData = divisionData.subjectList;
+  appState.divisionData = divisionData;
+  appState.activeSem = semester;
+  appState.activeDiv = division;
+  appState.isEditing = false;
+  // appState.studentData = divisionData.students || {};
+  appState.activeSubject = null;
+  appState.activeNavIcon = null;
+  appState.subjectMetaData = appState.divisionData.subjectMetaDataList;
 }
-async function initAdmin() {}
-export function getUserData() {
-  appState.userId = auth.currentUser.uid;
-  return get(child(ref(db), `users/${appState.userId}`))
+async function initAdminAppState() {}
+
+// all data fetching functions based on userId
+export function getUserData(userId) {
+  return get(child(ref(db), `userData/${userId}`))
     .then((snapshot) => {
       if (snapshot.exists()) {
         return snapshot.val();
@@ -73,8 +80,8 @@ export function getUserData() {
       return null;
     });
 }
-function getSemesterGlobalData() {
-  return get(child(ref(db), `semesters/${appState.activeSem}/semesterGlobal`))
+function getSemesterGlobalData(semester) {
+  return get(child(ref(db), `semesterList/${semester}/semesterGlobalData`))
     .then((snapshot) => {
       if (snapshot.exists()) {
         return snapshot.val();
@@ -103,12 +110,9 @@ function getGlobalData() {
       return null;
     });
 }
-function getDivivsionData() {
+function getDivisionData(semester, division) {
   return get(
-    child(
-      ref(db),
-      `semesters/${appState.activeSem}/divisions/${appState.activeDiv}`
-    )
+    child(ref(db), `semesterList/${semester}/divisionList/${division}`)
   )
     .then((snapshot) => {
       if (snapshot.exists()) {
@@ -124,7 +128,7 @@ function getDivivsionData() {
     });
 }
 export function getWholeSemesterData() {
-  return get(child(ref(db), `semesters`))
+  return get(child(ref(db), `semesterList`))
     .then((snapshot) => {
       if (snapshot.exists()) {
         return snapshot.val();
@@ -139,20 +143,14 @@ export function getWholeSemesterData() {
     });
 }
 
-export function signOutUser() {
-  signOut(auth)
-    .then(() => {
-      console.log("Signed out successfully.");
-    })
-    .catch((error) => {
-      console.error("Sign-out error:", error);
-    });
-}
 export async function syncDbData() {
-  appState.semesterGlobalData = await getSemesterGlobalData();
-  appState.divisionData = await getDivivsionData();
+  appState.semesterGlobalData = await getSemesterGlobalData(appState.activeSem);
+  appState.divisionData = await getDivisionData(
+    appState.activeSem,
+    appState.activeDiv
+  );
   appState.globalData = await getGlobalData();
-  appState.subjectData = appState.divisionData.subjects;
+  appState.subjectData = appState.divisionData.subjectList;
 }
 export async function syncAdminData() {
   adminAppState.semesterData = await getWholeSemesterData();

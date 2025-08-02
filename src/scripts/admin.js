@@ -33,7 +33,7 @@ async function showSemesterList() {
     "https://ik.imagekit.io/yn9gz2n2g/others/semester.png?updatedAt=1751607364675";
   headerTitle.textContent = "Admin Section";
   for (const key in adminAppState.semesterData) {
-    const semesterName = adminAppState.semesterData[key].semesterMetaData.name;
+    const semesterName = key;
     const card = document.createElement("div");
     card.classList.add(
       "card",
@@ -77,9 +77,7 @@ async function showDivisionList() {
 
   for (const key in adminAppState.semesterData[adminAppState.activeSem]
     .divisionList) {
-    const divisionName =
-      adminAppState.semesterData[adminAppState.activeSem].divisionList[key]
-        .divisionMetadata.name;
+    const divisionName = `Div - ${key}`;
 
     const card = document.createElement("div");
     card.classList.add(
@@ -95,7 +93,7 @@ async function showDivisionList() {
     card.textContent = divisionName;
 
     card.addEventListener("click", async (e) => {
-      let activeDiv = e.target.textContent;
+      let activeDiv = e.target.textContent.replace("Div - ", "");
       adminAppState.activeDiv = activeDiv;
       history.pushState(
         { div: activeDiv },
@@ -125,12 +123,20 @@ async function showClassRoom() {
     "https://ik.imagekit.io/yn9gz2n2g/others/semester.png?updatedAt=1751607364675";
   headerTitle.textContent = adminAppState.activeDiv;
   const studentRawData = await getStudentRawData();
-  const sortedRollNoWiseStudentData = Object.entries(studentRawData)
-    .sort(([, a], [, b]) => a.rollNo - b.rollNo)
-    .reduce((acc, [key, val]) => {
-      acc[key] = val;
-      return acc;
-    }, {});
+  console.log(studentRawData);
+  let sortedRollNoWiseStudentData = {};
+  if (studentRawData) {
+    sortedRollNoWiseStudentData = Object.entries(studentRawData)
+      .sort(([, a], [, b]) => a.rollNumber - b.rollNumber)
+      .reduce((acc, [key, val]) => {
+        acc[key] = val;
+        return acc;
+      }, {});
+  } else {
+    sortedRollNoWiseStudentData = {};
+  }
+  console.log();
+
   adminAppState.semesterData[adminAppState.activeSem].divisionList[
     adminAppState.activeDiv
   ].studentList = sortedRollNoWiseStudentData;
@@ -161,10 +167,8 @@ export async function initAdminRouting(userData) {
   const sem = urlParams.get("sem");
   const div = urlParams.get("div");
   console.log(div);
-
   if (div) {
     console.log("Div found");
-
     adminAppState.activeSem = sem;
     adminAppState.activeDiv = div;
     await showClassRoom();
@@ -186,10 +190,10 @@ async function hideAdminDivisions() {
 
 // other function
 function getStudentRawData() {
-  const usersRef = ref(db, "users");
+  const usersRef = ref(db, "userData");
   const q = query(
     usersRef,
-    orderByChild("div"),
+    orderByChild("division"),
     equalTo(adminAppState.activeDiv)
   );
 
@@ -197,7 +201,7 @@ function getStudentRawData() {
     if (snapshot.exists()) {
       return snapshot.val();
     } else {
-      console.log("No users found for div:", appState.activeDiv);
+      console.log("No users found for div:", adminAppState.activeDiv);
     }
   });
 }
@@ -214,7 +218,7 @@ function renderIndividualStudentCard() {
     const wrapper = document.createElement("div");
     wrapper.className = "image-name-wrapper flex items-center gap-2";
     const img = document.createElement("img");
-    img.src = student.pfp;
+    img.src = student.pfpLink;
     img.alt = "";
     img.className = "pfp h-[45px] w-[45px] lg:h-[50px] lg:w-[50px]";
     const nameP = document.createElement("p");
@@ -224,7 +228,7 @@ function renderIndividualStudentCard() {
     wrapper.appendChild(nameP);
     const rollP = document.createElement("p");
     rollP.className = "roll-no text-text-secondary";
-    rollP.textContent = student.rollNo;
+    rollP.textContent = student.rollNumber;
     card.appendChild(wrapper);
     card.appendChild(rollP);
     card.addEventListener("click", () => {
@@ -326,20 +330,19 @@ function initIndividualStudentPopup() {
   firstNameP.textContent = `First Name: ${student.firstName}`;
   lastNameP.textContent = `Last Name: ${student.lastName}`;
   displayName.textContent = `${student.firstName} ${student.lastName}`;
-  rollNoP.textContent = `Roll No: ${student.rollNo}`;
+  rollNoP.textContent = `Roll No: ${student.rollNumber}`;
   emailP.textContent = `Email: ${student.email}`;
   roleP.textContent = `Role: ${student.role
     .charAt(0)
     .toUpperCase()}${student.role.slice(1)}`;
-  const sem = student.sem.replace("semester-", "");
-  const div = student.div.replace("div-", "");
+  const sem = student.semester;
+  const div = student.division;
   semP.textContent = `Semester: ${sem}`;
   divP.textContent = `Division: ${div.toUpperCase()}`;
-  pfpImg.src = student.pfp;
-  pfpImg.alt = `${student.firstName} ${student.lastName}`;
-  const gold = student.medals.gold || 0;
-  const silver = student.medals.silver || 0;
-  const bronze = student.medals.bronze || 0;
+  pfpImg.src = student.pfpLink;
+  const gold = student.medalList.gold || 0;
+  const silver = student.medalList.silver || 0;
+  const bronze = student.medalList.bronze || 0;
   goldMedal.textContent = gold;
   silverMedals.textContent = silver;
   bronzMedals.textContent = bronze;
@@ -391,7 +394,7 @@ editNameEditBtn.addEventListener("click", async () => {
   );
   if (!isConfirmed) return;
   showSectionLoader("Updating name...");
-  await updateData(`users/${activeStudentId}`, {
+  await updateData(`userData/${activeStudentId}`, {
     firstName: firstName,
     lastName: lastName,
   });
@@ -437,7 +440,11 @@ editRollNoEditBtn.addEventListener("click", async () => {
   }
   if (rollNo) {
     showSectionLoader("Checking rollno...");
-    const q = query(ref(db, "users"), orderByChild("rollNo"), equalTo(rollNo));
+    const q = query(
+      ref(db, "users"),
+      orderByChild("rollNumber"),
+      equalTo(rollNo)
+    );
     await get(q).then(async (snapshot) => {
       if (snapshot.exists()) {
         rollNoError.textContent = "Roll No already exists";
@@ -452,9 +459,9 @@ editRollNoEditBtn.addEventListener("click", async () => {
         );
         if (!isConfirmed) return;
         else {
-          showSectionLoader("Updating roll no...");
+          showSectionLoader("Updating roll number...");
           await updateData(`users/${activeStudentId}`, {
-            rollNo: rollNo,
+            rollNumber: rollNumber,
           });
           fadeOutEffect(editRollNoPopup);
         }
@@ -498,7 +505,7 @@ editEmailEditBtn.addEventListener("click", async () => {
     return;
   }
   showSectionLoader("Checking email...");
-  const q = query(ref(db, "users"), orderByChild("email"), equalTo(email));
+  const q = query(ref(db, "userData"), orderByChild("email"), equalTo(email));
   await get(q).then(async (snapshot) => {
     if (snapshot.exists()) {
       emailError.textContent = "Email already exists";
@@ -514,7 +521,7 @@ editEmailEditBtn.addEventListener("click", async () => {
       if (!isConfirmed) return;
       else {
         showSectionLoader("Updating email...");
-        await updateData(`users/${activeStudentId}`, {
+        await updateData(`userData/${activeStudentId}`, {
           email: email,
         });
         fadeOutEffect(editEmailPopup);
@@ -549,7 +556,6 @@ editRoleEditBtn.addEventListener("click", async () => {
   fadeOutEffect(roleError);
   const role = editRoleInput.value.trim();
   console.log(role);
-
   if (!role) {
     roleError.textContent = "Role is required";
     fadeInEffect(roleError);
@@ -561,7 +567,7 @@ editRoleEditBtn.addEventListener("click", async () => {
   if (!isConfirmed) return;
   else {
     showSectionLoader("Updating role...");
-    await updateData(`users/${activeStudentId}`, {
+    await updateData(`userData/${activeStudentId}`, {
       role: role,
     });
     fadeOutEffect(editRolePopup);
@@ -621,9 +627,9 @@ editSemDivEditBtn.addEventListener("click", async () => {
   if (!isConfirmed) return;
   else {
     showSectionLoader("Updating sem and div...");
-    await updateData(`users/${activeStudentId}`, {
-      sem: sem,
-      div: div,
+    await updateData(`userData/${activeStudentId}`, {
+      semester: sem,
+      division: div,
     });
     fadeOutEffect(editSemDivPopup);
   }
@@ -690,7 +696,7 @@ editMedalsEditBtn.addEventListener("click", async () => {
   if (!isConfirmed) return;
   else {
     showSectionLoader("Updating medals...");
-    await updateData(`users/${activeStudentId}/medals`, {
+    await updateData(`userData/${activeStudentId}/medalList`, {
       gold: gold,
       silver: silver,
       bronze: bronze,

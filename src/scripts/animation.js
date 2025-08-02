@@ -1,15 +1,10 @@
 export async function fadeInEffect(element) {
-  // if (getComputedStyle(element).transitionDuration !== "0s") {
-  //   console.log("Yes has transition ");
-  // } else {
-  //   console.log("No doesnt have transition");
-  // }
   if (!element.classList.contains("hidden")) {
     // console.log("containes hidden");
     return;
   }
-  element.classList.remove("hidden");
   element.style.opacity = "0";
+  element.classList.remove("hidden");
   const durationStr = getComputedStyle(element).transitionDuration;
   let ms = 0;
   if (durationStr.endsWith("ms")) {
@@ -70,21 +65,9 @@ export async function fadeOutEffectOpacity(element) {
   }
   await new Promise((resolve) => setTimeout(resolve, ms));
 }
-function fadeOut(element, duration = 0.3) {
-  gsap.to(element, {
-    opacity: 0,
-    duration: duration,
-    onComplete: () => {
-      element.classList.add("hidden"); // hide after fade out
-    },
-  });
+export function hideElement(element) {
+  element.classList.add("hidden");
 }
-function fadeIn(element, duration = 0.3) {
-  // First, make sure it's visible
+export function showElement(element) {
   element.classList.remove("hidden");
-  gsap.set(element, { opacity: 0 }); // start from 0
-  gsap.to(element, {
-    opacity: 1,
-    duration: duration,
-  });
 }

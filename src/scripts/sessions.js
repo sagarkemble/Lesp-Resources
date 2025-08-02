@@ -29,7 +29,7 @@ export async function loadSessionsSection() {
 }
 export async function showSessionsSection() {
   headerIcon.src =
-    "https://ik.imagekit.io/yn9gz2n2g/others/image.png?updatedAt=1751906213435";
+    "https://ik.imagekit.io/yn9gz2n2g/others/session.png?updatedAt=1753970178886";
   headerTitle.textContent = "Sessions";
   await hideSections();
   fadeInEffect(sessionsSection);
@@ -185,7 +185,11 @@ upcomingSessionsAddBtn.addEventListener("click", async () => {
   isError = false;
   if (rollno !== "") {
     showSectionLoader("Checking rollno...");
-    const q = query(ref(db, "users"), orderByChild("rollNo"), equalTo(rollno));
+    const q = query(
+      ref(db, "userData"),
+      orderByChild("rollNumber"),
+      equalTo(rollno)
+    );
     await get(q).then(async (snapshot) => {
       if (snapshot.exists()) {
         hideSectionLoader();
@@ -210,7 +214,7 @@ upcomingSessionsAddBtn.addEventListener("click", async () => {
   if (isUpcomingSessionEditing) {
     showSectionLoader("Updating session...");
     await updateData(
-      `globalData/sessions/upcomingSessions/${selectedUpcomingSessionId}`,
+      `globalData/sessionData/upcomingSessionList/${selectedUpcomingSessionId}`,
       {
         title: title,
         description: description,
@@ -218,21 +222,21 @@ upcomingSessionsAddBtn.addEventListener("click", async () => {
         date: date,
         time: time,
         duration: duration,
-        rollno: rollno,
-        userId: userId,
+        hostRollNumber: rollno,
+        hostUserId: userId,
       }
     );
   } else {
     showSectionLoader("Adding session...");
-    await pushData(`globalData/sessions/upcomingSessions`, {
+    await pushData(`globalData/sessionData/upcomingSessionList`, {
       title: title,
       description: description,
       link: link,
       date: date,
       time: time,
       duration: duration,
-      rollno: rollno,
-      userId: userId,
+      hostRollNumber: rollno,
+      hostUserId: userId,
     });
   }
   showSectionLoader("Syncing data...");
@@ -250,7 +254,7 @@ upcomingSessionDeleteBtn.addEventListener("click", async () => {
   if (isConfirmed) {
     showSectionLoader("Deleting session...");
     await deleteData(
-      `globalData/sessions/upcomingSessions/${selectedUpcomingSessionId}`
+      `globalData/sessionData/upcomingSessionList/${selectedUpcomingSessionId}`
     );
     showSectionLoader("Syncing data...");
     await fadeOutEffect(upcomingSessionsPopup);
@@ -281,10 +285,10 @@ async function studentConfirmationPopup(data) {
       ".confirmation-popup .cancel-btn"
     );
 
-    confirmationRollno.textContent = data.rollno;
+    confirmationRollno.textContent = `Roll no : ${data.rollNumber}`;
     confirmationName.textContent = `${data.firstName} ${data.lastName}`;
-    confirmationSem.textContent = data.sem;
-    confirmationDiv.textContent = data.div;
+    confirmationSem.textContent = `Semester : ${data.semester}`;
+    confirmationDiv.textContent = `Division : ${data.division}`;
     fadeInEffect(confirmationPopup);
     confirmButton.addEventListener("click", async () => {
       fadeOutEffect(confirmationPopup);
@@ -317,21 +321,20 @@ function resetUpcomingSessionsPopup() {
 }
 async function renderUpcomingSession() {
   let isLink = false;
-  if (
-    !appState.globalData.sessions ||
-    !appState.globalData.sessions.upcomingSessions ||
-    Object.keys(appState.globalData.sessions.upcomingSessions).length === 0
-  ) {
+  const data = appState?.globalData?.sessionData?.upcomingSessionList || {};
+  console.log("Upcoming sessions data:", data);
+
+  if (!data || Object.keys(data).length === 0) {
     fadeInEffect(noUpcomingSessions);
     return;
   } else fadeOutEffect(noUpcomingSessions);
-  const data = appState.globalData.sessions.upcomingSessions;
   for (const key in data) {
     const session = data[key];
-    const { title, description, link, date, time, duration, userId } = session;
+    const { title, description, link, date, time, duration, hostUserId } =
+      session;
     if (link) isLink = true;
 
-    const mentorData = await get(ref(db, `users/${userId}`))
+    const mentorData = await get(ref(db, `userData/${hostUserId}`))
       .then((snapshot) => {
         if (snapshot.exists()) {
           return snapshot.val();
@@ -346,8 +349,11 @@ async function renderUpcomingSession() {
 
     if (!mentorData) continue;
     const name = `${mentorData.firstName} ${mentorData.lastName}`;
-    const mentorClass = getFormattedClass(mentorData.sem, mentorData.div);
-    const pfp = mentorData.pfp;
+    const mentorClass = getFormattedClass(
+      mentorData.semester,
+      mentorData.division
+    );
+    const pfp = mentorData.pfpLink;
     const card = document.createElement("div");
     card.className =
       "card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full rounded-3xl lg:max-w-[500px] p-6";
@@ -395,27 +401,24 @@ async function renderUpcomingSession() {
 }
 function getFormattedClass(sem, div) {
   const semMap = {
-    "semester-1": "FYCO",
-    "semester-2": "FYCO",
-    "semester-3": "SYCO",
-    "semester-4": "SYCO",
-    "semester-5": "TYCO",
-    "semester-6": "TYCO",
+    1: "FYCO",
+    2: "FYCO",
+    3: "SYCO",
+    4: "SYCO",
+    5: "TYCO",
+    6: "TYCO",
   };
-
   const formattedSem = semMap[sem] || sem;
-  const formattedDiv = div.replace("div-", "").toUpperCase();
-
-  return `${formattedSem}-${formattedDiv}`;
+  return `${formattedSem}-${div}`;
 }
 function editUpcomingSessionCard(id) {
   isUpcomingSessionEditing = true;
   selectedUpcomingSessionId = id;
   upcomingSessionsPopupTitle.textContent = "Edit Session";
-  const session = appState.globalData.sessions.upcomingSessions[id];
+  const session = appState.globalData.sessionData.upcomingSessionList[id];
   upcomingSessionsTitleInput.value = session.title;
   upcomingSessionDescriptionInput.value = session.description;
-  upcomingSessionsRollnoInput.value = session.rollno;
+  upcomingSessionsRollnoInput.value = session.hostRollNumber;
   upcomingSessionsLinkInput.value = session.link;
   upcomingSessionsDateInput.value = session.date;
   upcomingSessionsTimeInput.value = session.time;
@@ -570,7 +573,11 @@ previousSessionsAddBtn.addEventListener("click", async () => {
 
   if (rollno !== "") {
     showSectionLoader("Checking rollno...");
-    const q = query(ref(db, "users"), orderByChild("rollNo"), equalTo(rollno));
+    const q = query(
+      ref(db, "userData"),
+      orderByChild("rollNumber"),
+      equalTo(rollno)
+    );
     await get(q).then(async (snapshot) => {
       if (snapshot.exists()) {
         hideSectionLoader();
@@ -596,27 +603,27 @@ previousSessionsAddBtn.addEventListener("click", async () => {
   if (isPreviousSessionEditing) {
     showSectionLoader("Updating session...");
     await updateData(
-      `globalData/sessions/previousSessions/${selectedPreviousSessionId}`,
+      `globalData/sessionData/previousSessionList/${selectedPreviousSessionId}`,
       {
         title,
         description,
         date,
         time,
         duration,
-        rollno,
-        userId,
+        rollNumber: rollno,
+        hostUserId: userId,
       }
     );
   } else {
     showSectionLoader("Adding session...");
-    await pushData("globalData/sessions/previousSessions", {
+    await pushData("globalData/sessionData/previousSessionList", {
       title,
       description,
       date,
       time,
       duration,
-      rollno,
-      userId,
+      rollNumber: rollno,
+      hostUserId: userId,
       link,
     });
   }
@@ -647,20 +654,17 @@ function resetPreviousSessionsPopup() {
   fadeOutEffect(previousSessionDurationError);
 }
 async function renderPreviousSession() {
-  if (
-    !appState.globalData.sessions ||
-    !appState.globalData.sessions.previousSessions ||
-    Object.keys(appState.globalData.sessions.previousSessions).length === 0
-  ) {
+  const data = appState?.globalData?.sessionData?.previousSessionList || {};
+  if (!data || Object.keys(data).length === 0) {
     fadeInEffect(noPreviousSessions);
     return;
   } else fadeOutEffect(noPreviousSessions);
-  const data = appState.globalData.sessions.previousSessions;
   for (const key in data) {
     const session = data[key];
 
-    const { title, description, link, date, time, duration, userId } = session;
-    const mentorData = await get(ref(db, `users/${userId}`))
+    const { title, description, link, date, time, duration, hostUserId } =
+      session;
+    const mentorData = await get(ref(db, `userData/${hostUserId}`))
       .then((snapshot) => {
         if (snapshot.exists()) {
           return snapshot.val();
@@ -675,9 +679,11 @@ async function renderPreviousSession() {
     if (!mentorData) continue;
 
     const name = `${mentorData.firstName} ${mentorData.lastName}`;
-    const mentorClass = getFormattedClass(mentorData.sem, mentorData.div);
-    const pfp = mentorData.pfp;
-
+    const mentorClass = getFormattedClass(
+      mentorData.semester,
+      mentorData.division
+    );
+    const pfp = mentorData.pfpLink;
     const card = document.createElement("div");
     card.className =
       "card bg-surface-2 flex flex-col gap-4 lg:gap-5 w-full rounded-3xl lg:max-w-[500px] p-6";
@@ -710,7 +716,6 @@ async function renderPreviousSession() {
       <div><a href="${link}" target="_blank"><button class="button-hug mt-2">View session</button></a></div>
    
     `;
-
     previousSessionsCardContainer.appendChild(card);
     card.addEventListener("click", () => {
       if (!appState.isEditing) return;
@@ -724,10 +729,10 @@ function editPreviousSessionCard(id) {
   isPreviousSessionEditing = true;
   selectedPreviousSessionId = id;
   previousSessionsPopupTitle.textContent = "Edit Session";
-  const session = appState.globalData.sessions.previousSessions[id];
+  const session = appState.globalData.sessionData.previousSessionList[id];
   previousSessionsTitleInput.value = session.title;
   previousSessionsDescriptionInput.value = session.description;
-  previousSessionsRollnoInput.value = session.rollno;
+  previousSessionsRollnoInput.value = session.rollNumber;
   previousSessionsLinkInput.value = session.link;
   previousSessionsDateInput.value = session.date;
   previousSessionsTimeInput.value = session.time;
@@ -742,7 +747,7 @@ previousSessionDeleteBtn.addEventListener("click", async () => {
   if (isConfirmed) {
     showSectionLoader("Deleting session...");
     await deleteData(
-      `globalData/sessions/previousSessions/${selectedPreviousSessionId}`
+      `globalData/sessionData/previousSessionList/${selectedPreviousSessionId}`
     );
     showSectionLoader("Syncing data...");
     await fadeOutEffect(previousSessionsPopup);

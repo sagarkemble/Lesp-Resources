@@ -1,5 +1,10 @@
 import { appState, syncDbData } from "./appstate.js";
-import { fadeInEffect, fadeOutEffect } from "./animation.js";
+import {
+  fadeInEffect,
+  fadeOutEffect,
+  hideElement,
+  showElement,
+} from "./animation.js";
 import {
   hideSections,
   showSectionLoader,
@@ -9,7 +14,18 @@ import {
 } from "./index.js";
 import { deleteDriveFile, uploadDriveFile } from "./driveApi.js";
 import { headerIcon, headerTitle } from "./navigation.js";
-import { app, pushData, updateData, deleteData } from "./firebase.js";
+import { pfpSelectionPopup } from "./iconLibrary.js";
+import {
+  app,
+  pushData,
+  get,
+  ref,
+  db,
+  updateData,
+  deleteData,
+  signOutUser,
+  set,
+} from "./firebase.js";
 const timetableSwiper = new Swiper("#time-table-swiper", {
   direction: "horizontal",
   loop: true,
@@ -33,16 +49,16 @@ const upcomingSubmissionCardContainer = upcomingSubmission.querySelector(
   ".upcoming-submissions .card-container"
 );
 function renderUpcomingSubmissions() {
-  if (!appState.subjectData || !appState.subjectData.upcomingSubmissions) {
-    console.error("No subject data available");
+  const upcomingSubmissions = appState?.divisionData?.upcomingSubmissionData;
+  if (!upcomingSubmissions || Object.keys(upcomingSubmissions).length === 0) {
+    console.log("No upcoming submissions found from dashboard.");
     return;
   }
-  const upcomingSubmissions = appState.subjectData.upcomingSubmissions;
-  const subjectMetaData = appState.subjectData.subjectMetaData;
+  const subjectMetaData = appState.subjectMetaData;
   for (const key in upcomingSubmissions) {
     const subject = upcomingSubmissions[key];
     const subjectName = subjectMetaData[key].name;
-    const subjectIcon = subjectMetaData[key].icon;
+    const subjectIcon = subjectMetaData[key].iconLink;
     for (const key2 in subject) {
       const submission = subject[key2];
       const card = document.createElement("div");
@@ -66,8 +82,8 @@ function renderUpcomingSubmissions() {
                 <p class="subject-name font-semibold text-text-primary">${subjectName}</p>
               </div>
               <div class="wrapper flex flex-col lg:gap-1 text-text-secondary">
-                <p class="description">${submission.title}</p>
-                <p class="submission-date">${submission.date}</p>
+                <p class="description">${submission.name}</p>
+                <p class="submission-date">${submission.dueDate}</p>
               </div>
       `;
       upcomingSubmissionCardContainer.appendChild(card);
@@ -228,7 +244,9 @@ addNoticePopupcreateBtn.addEventListener("click", async () => {
   showSectionLoader("Uploading attachment...");
   if (file) {
     let uploaded;
+
     if (type === "department") {
+      console.log("Uploading file to Drive...");
       uploaded = await uploadDriveFile(file, `resources/globalData/notices`);
     } else if (type === "division") {
       uploaded = await uploadDriveFile(
@@ -263,21 +281,21 @@ addNoticePopupcreateBtn.addEventListener("click", async () => {
     scope: type,
   };
   if (type === "department") {
-    await pushData(`globalData/notices`, obj);
+    await pushData(`globalData/noticeList`, obj);
   } else if (type === "division") {
     await pushData(
-      `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/notice`,
+      `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/noticeData/divisionNoticeList`,
       obj
     );
   } else if (type === "semester") {
     await pushData(
-      `semesters/${appState.activeSem}/semesterGlobal/notice`,
+      `semesterList/${appState.activeSem}/semesterGlobalData/noticeList`,
       obj
     );
   } else {
-    obj.scope = "subject";
+    obj.scope = type;
     await pushData(
-      `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/notice/${type}`,
+      `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/noticeData/subjectNoticeData/${type}`,
       obj
     );
     console.log("nothing added");
@@ -290,6 +308,15 @@ addNoticePopupcreateBtn.addEventListener("click", async () => {
   await loadDashboard();
   showDashboard();
 });
+function loadTypeSelectorSubjects() {
+  for (const key in appState.subjectMetaData) {
+    const element = appState.subjectMetaData[key];
+    const option = document.createElement("option");
+    option.value = key;
+    option.textContent = `${element.name} notice`;
+    addNoticeScopeInput.appendChild(option);
+  }
+}
 async function resetAddNoticePopup() {
   addNoticeTitleInput.value = "";
   addNoticeDescriptionInput.value = "";
@@ -304,7 +331,7 @@ async function resetAddNoticePopup() {
   await fadeOutEffect(addNoticePopuptitleError);
 }
 async function renderSwiper() {
-  const noticeEntries = getFlatNoticeObjectFastest();
+  const noticeEntries = getFlatNoticeOrdered();
   for (const key in noticeEntries) {
     const noticeData = noticeEntries[key];
     const swiperSlide = document.createElement("div");
@@ -417,7 +444,7 @@ async function renderSwiper() {
     });
   }
 }
-function getFlatNoticeObjectFastest() {
+function getFlatNoticeOrdered() {
   const now = Date.now();
   const oneDayMs = 24 * 60 * 60 * 1000;
   const merged = {};
@@ -442,12 +469,14 @@ function getFlatNoticeObjectFastest() {
   };
 
   // Collect all major groups
-  const global = splitAndReverse(appState.globalData?.notices);
-  const semester = splitAndReverse(appState.semesterGlobalData?.notice);
-  const division = splitAndReverse(appState.divisionData?.notice);
+  const global = splitAndReverse(appState.globalData?.noticeList);
+  const semester = splitAndReverse(appState.semesterGlobalData?.noticeList);
+  const division = splitAndReverse(
+    appState.divisionData?.noticeData?.divisionNoticeList
+  );
 
   // Flatten and split subject notices
-  const subjectRaw = appState.subjectData?.notice || {};
+  const subjectRaw = appState.divisionData?.noticeData?.subjectNoticeData || {};
   const subjectFlat = {};
   for (const subjectGroup of Object.values(subjectRaw)) {
     if (!subjectGroup) continue;
@@ -492,18 +521,18 @@ async function deleteNotice(key, attachmentId, scope) {
     showSectionLoader("Deleting notice...");
   }
   if (scope === "department") {
-    await deleteData(`globalData/notices/${key}`);
+    await deleteData(`globalData/noticeList/${key}`);
   } else if (scope === "semester") {
     await deleteData(
-      `semesters/${appState.activeSem}/semesterGlobal/notice/${key}`
+      `semesterList/${appState.activeSem}/semesterGlobalData/noticeList/${key}`
     );
   } else if (scope === "division") {
     await deleteData(
-      `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/notice/${key}`
+      `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/noticeData/divisionNoticeList/${key}`
     );
   } else {
     await deleteData(
-      `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/notice/${scope}/${key}`
+      `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/noticeData/subjectNoticeData/${scope}/${key}`
     );
   }
   await deleteData(
@@ -515,7 +544,7 @@ async function deleteNotice(key, attachmentId, scope) {
   await loadDashboard();
   showDashboard();
 }
-// dashborad timetable
+// upcoming sessions
 const UpcomingSessionsSwiper = new Swiper(
   "#dashboard-upcoming-sessions-swiper",
   {
@@ -534,6 +563,124 @@ const UpcomingSessionsSwiper = new Swiper(
     },
   }
 );
+async function renderUpcomingSessions() {
+  const upcomingSessions =
+    appState?.globalData?.sessionData?.upcomingSessionList;
+
+  if (!upcomingSessions || Object.keys(upcomingSessions).length === 0) {
+    console.log("No upcoming sessions found from dashboard.");
+    return;
+  }
+
+  for (const key in upcomingSessions) {
+    const session = upcomingSessions[key];
+    const { title, description, link, date, time, duration, hostUserId } =
+      session;
+
+    const mentorData = await get(ref(db, `userData/${hostUserId}`))
+      .then((snapshot) => (snapshot.exists() ? snapshot.val() : null))
+      .catch((error) => {
+        console.error("Error fetching mentor data:", error);
+        showErrorSection();
+        return null;
+      });
+
+    if (!mentorData) continue;
+
+    const name = `${mentorData.firstName} ${mentorData.lastName}`;
+    const mentorClass = getFormattedClass(
+      mentorData.semester,
+      mentorData.division
+    );
+    const pfp = mentorData.pfpLink;
+
+    // Create Swiper Slide container
+    const swiperSlide = document.createElement("div");
+    swiperSlide.className = "swiper-slide";
+
+    // Create card inside swiper slide
+    const card = document.createElement("div");
+    card.className = "card flex flex-col gap-4 lg:gap-5 w-full rounded-3xl";
+
+    card.innerHTML = `
+      <div class="wrapper w-full flex items-center justify-between">
+        <div class="flex items-center gap-2 lg:gap-3 icon-name-wrapper">
+          <img
+            src="${pfp}"
+            class="h-11 w-11 object-cover rounded-full"
+            alt="Mentor"
+          />
+          <div class="wrapper">
+            <p class="text-xl">${name}</p>
+            <p class="text-xs text-text-tertiary">${mentorClass}</p>
+          </div>
+        </div>
+        ${
+          link
+            ? `<div><a href="${link}" target="_blank"><button class="button-hug mt-2">Join</button></a></div>`
+            : `<p class="status text-xs text-text-link">Coming soon</p>`
+        }
+      </div>
+
+      <div class="wrapper flex flex-col gap-2">
+        <p class="title text-xl font-semibold">${title}</p>
+        <div class="description text-text-secondary">
+          ${description}
+        </div>
+      </div>
+
+      <div class="duration-date-wrapper text-xs font-light flex flex-col gap-1">
+        <p class="day">${formatDate(date)} at ${time}</p>
+        <p class="duration">Duration : ${duration}</p>
+      </div>
+    `;
+
+    swiperSlide.appendChild(card);
+    UpcomingSessionsSwiper.appendSlide(swiperSlide);
+  }
+}
+
+function getFormattedClass(sem, div) {
+  const semMap = {
+    1: "FYCO",
+    2: "FYCO",
+    3: "SYCO",
+    4: "SYCO",
+    5: "TYCO",
+    6: "TYCO",
+  };
+  const formattedSem = semMap[sem] || sem;
+  return `${formattedSem}-${div}`;
+}
+function formatDate(dateString) {
+  const dateObj = new Date(dateString);
+  const now = new Date();
+
+  // Calculate difference in days
+  const diffTime = dateObj.getTime() - now.getTime();
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+  // If date is within next 7 days (0–6)
+  if (diffDays >= 0 && diffDays < 7) {
+    const dayNames = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+    return dayNames[dateObj.getDay()];
+  }
+
+  // Else return D-M-YY
+  const day = dateObj.getDate();
+  const month = dateObj.getMonth() + 1;
+  const year = dateObj.getFullYear().toString().slice(-2);
+  return `${day}-${month}-${year}`;
+}
+
 // time table - time table popup
 // time table popup
 export const timetablePopupSwiper = new Swiper("#time-table-popup-swiper", {
@@ -642,20 +789,20 @@ timeTableAddBtn.addEventListener("click", async () => {
   const newSlot = {
     subject: subject,
     type: type,
-    from: timeFrom,
-    to: timeTo,
+    fromTime: timeFrom,
+    toTime: timeTo,
   };
   if (isTimeTableEditing) {
     showSectionLoader("Updating slot...");
     await updateData(
-      `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/timetableData/${seletectedDay}/${seletedEntry}`,
+      `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/timetableDayList/${seletectedDay}/slotList/${seletedEntry}`,
       newSlot
     );
   } else {
     showSectionLoader("Adding slot...");
 
     await pushData(
-      `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/timetableData/${seletectedDay}`,
+      `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/timetableDayList/${seletectedDay}/slotList`,
       newSlot
     );
   }
@@ -715,141 +862,12 @@ async function resetTimeTablePopup() {
   await fadeOutEffect(TimeTableTimeFromError);
   await fadeOutEffect(TimeTableTimeToError);
 }
-async function renderTimeTable() {
-  const timetableData = appState.divisionData.timetableData;
-  const dayOrder = [
-    "sunday",
-    "monday",
-    "tuesday",
-    "wednesday",
-    "thursday",
-    "friday",
-    "saturday",
-  ];
-  const sortedTimetable = {};
-  dayOrder.forEach((day) => {
-    if (timetableData.hasOwnProperty(day)) {
-      sortedTimetable[day] = timetableData[day];
-    }
-  });
-  console.log("Sorted Timetable:", sortedTimetable);
-
-  for (const key in sortedTimetable) {
-    const day = sortedTimetable[key];
-    const daySlide = document.createElement("div");
-    daySlide.className = "swiper-slide !flex !flex-col gap-3";
-    const dayDiv = document.createElement("div");
-    dayDiv.className =
-      "day font-semibold text-center text-xl w-full translate flex gap-2 justify-center items-center leading-tight -translatey-1";
-    dayDiv.textContent = key.charAt(0).toUpperCase() + key.slice(1);
-    const plusIcon = document.createElement("div");
-    plusIcon.className = "plus-icon hidden editor-tool";
-    const plusIconInner = document.createElement("i");
-    plusIconInner.className = "fa-solid fa-plus text-xl cursor-pointer";
-    plusIcon.appendChild(plusIconInner);
-    dayDiv.appendChild(plusIcon);
-    daySlide.appendChild(dayDiv);
-    plusIcon.addEventListener("click", () => {
-      seletectedDay = key;
-      seletedEntry = null;
-      fadeInEffect(addTimeTablePopup);
-    });
-    if (Object.keys(day).length === 1) {
-      const wrapper = document.createElement("div");
-      wrapper.className =
-        "wrapper w-fit h-fit flex flex-col gap-2 mx-auto my-auto items-center";
-      const img = document.createElement("img");
-      img.src =
-        "https://ik.imagekit.io/yn9gz2n2g/others/holiday.png?updatedAt=1753439319775";
-      img.alt = "";
-      img.className = "h-20 w-20";
-      const p = document.createElement("p");
-      p.className = "font-semibold text-center";
-      p.textContent = "Holiday";
-      wrapper.appendChild(img);
-      wrapper.appendChild(p);
-      daySlide.appendChild(wrapper);
-      timetableSwiper.appendSlide(daySlide);
-      // timetablePopupSwiper.appendSlide(daySlide);
-      continue;
-    }
-    const cardDiv = document.createElement("div");
-    cardDiv.className =
-      "card flex flex-col gap-4 border border-neutral-500 rounded-xl p-4 overflow-y-auto scrollbar-hide h-full";
-    for (const key2 in day) {
-      if (key2 === "day") continue;
-      const singleEntry = day[key2];
-      const subjectName = singleEntry.subject;
-      const icon = appState.subjectMetaData[subjectName].icon;
-      const type = singleEntry.type;
-      const timeFrom = new Date(`1970-01-01T${singleEntry.from}:00`)
-        .toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: true,
-        })
-        .replace(/\s?[AP]M/i, ""); // remove AM/PM and space
-
-      const timeTo = new Date(`1970-01-01T${singleEntry.to}:00`)
-        .toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: true,
-        })
-        .replace(/\s?[AP]M/i, "");
-
-      const time = `${timeFrom}-${timeTo}`; // no space between times
-
-      const wrapper = document.createElement("div");
-      wrapper.className = "wrapper flex items-center justify-between w-full ";
-      const nameIconWrapper = document.createElement("div");
-      nameIconWrapper.className =
-        "name-icon-wrapper flex items-center gap-2 w-20";
-      const img = document.createElement("img");
-      img.src = icon;
-      img.alt = "";
-      img.className = "h-[2.0rem] w-[2.0rem]";
-      const subjectNameP = document.createElement("p");
-      subjectNameP.className = "subject-name";
-      subjectNameP.textContent = subjectName;
-      nameIconWrapper.appendChild(img);
-      nameIconWrapper.appendChild(subjectNameP);
-      const typeMap = {
-        Practical: "Prac",
-        Lecture: "Lec",
-        Tutorial: "Tut",
-      };
-      const typeP = document.createElement("p");
-      typeP.className = "type w-10";
-      typeP.textContent = typeMap[type] || type;
-
-      const timeP = document.createElement("p");
-      timeP.className = "time text-text-tertiary w-25";
-      timeP.textContent = time;
-      wrapper.appendChild(nameIconWrapper);
-      wrapper.appendChild(typeP);
-      wrapper.appendChild(timeP);
-      cardDiv.appendChild(wrapper);
-      daySlide.appendChild(dayDiv);
-      wrapper.addEventListener("click", () => {
-        if (!appState.isEditing) return;
-        seletectedDay = key;
-        seletedEntry = key2;
-        editSlot(subjectName, type, timeFrom, timeTo, key2);
-      });
-    }
-    daySlide.appendChild(cardDiv);
-    await timetableSwiper.appendSlide(daySlide);
-    // timetablePopupSwiper.appendSlide(daySlide);
-  }
-}
 
 function renderSubjects() {
   const subjectSelectionDropDown = document.querySelector(
     "#timetable-subject-selection-drop-down"
   );
-  const subjectData = appState.subjectData.subjectMetaData;
-
+  const subjectData = appState.subjectMetaData;
   for (const key in subjectData) {
     const subject = subjectData[key];
     const option = document.createElement("option");
@@ -858,15 +876,6 @@ function renderSubjects() {
     option.className = "text-text-primary";
     subjectSelectionDropDown.appendChild(option);
   }
-  for (const key in subjectData) {
-    const subject = subjectData[key];
-    const option = document.createElement("option");
-    option.value = key;
-    option.textContent = subject.name;
-    option.className = "text-text-primary";
-    addNoticeScopeInput.appendChild(option);
-  }
-  addNoticeScopeInput.value = "";
   subjectSelectionDropDown.value = "";
 }
 async function editSlot(subjectName, type, timeFrom, timeTo, key) {
@@ -879,10 +888,10 @@ async function editSlot(subjectName, type, timeFrom, timeTo, key) {
   timeTableTimeFrom.value = timeFrom;
   timeTableTimeTo.value = timeTo;
   timeTableAddBtn.textContent = "Update Slot";
-  await fadeOutEffect(timeTableSubjectPlaceholder);
-  await fadeOutEffect(timeTableTypePlaceholder);
-  await fadeOutEffect(timeTableTimeFromPlaceholder);
-  await fadeOutEffect(timeTableTimeToPlaceholder);
+  hideElement(timeTableSubjectPlaceholder);
+  hideElement(timeTableTypePlaceholder);
+  hideElement(timeTableTimeFromPlaceholder);
+  hideElement(timeTableTimeToPlaceholder);
   fadeInEffect(addTimeTablePopup);
 }
 timeTableDeleteBtn.addEventListener("click", async () => {
@@ -892,7 +901,7 @@ timeTableDeleteBtn.addEventListener("click", async () => {
   if (!isConfirmed) return;
   showSectionLoader("Deleting slot...");
   await deleteData(
-    `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/timetableData/${seletectedDay}/${seletedEntry}`
+    `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/timetableDayList/${seletectedDay}/slotList/${seletedEntry}`
   );
   await fadeOutEffect(addTimeTablePopup);
   showSectionLoader("Syncing data...");
@@ -914,35 +923,22 @@ async function renderTimeTableSlides(swiperInstance) {
     "friday",
     "saturday",
   ];
-
   const today = new Date();
   const todayIndex = today.getDay();
-
   const dayOrder = Array.from({ length: 7 }, (_, i) => {
     return daysOfWeek[(todayIndex + i) % 7];
   });
-
-  const timetableData = appState.divisionData.timetableData;
-  // const dayOrder = [
-  //   "sunday",
-  //   "monday",
-  //   "tuesday",
-  //   "wednesday",
-  //   "thursday",
-  //   "friday",
-  //   "saturday",
-  // ];
+  const timetableData = appState.divisionData.timetableDayList;
+  console.log("Timetable Data:", timetableData);
   const sortedTimetable = {};
   dayOrder.forEach((day) => {
-    if (timetableData.hasOwnProperty(day)) {
-      sortedTimetable[day] = timetableData[day];
-    }
+    sortedTimetable[day] = timetableData[day.toLowerCase()];
   });
   console.log("Sorted Timetable:", sortedTimetable);
   for (const key in sortedTimetable) {
     const day = sortedTimetable[key];
     const daySlide = document.createElement("div");
-    daySlide.className = "swiper-slide !flex !flex-col gap-3";
+    daySlide.className = "swiper-slide !flex !flex-col gap-3 ";
     const dayDiv = document.createElement("div");
     dayDiv.className =
       "day font-semibold text-center text-xl w-full translate flex gap-2 justify-center items-center leading-tight -translatey-1";
@@ -959,7 +955,7 @@ async function renderTimeTableSlides(swiperInstance) {
       seletedEntry = null;
       fadeInEffect(addTimeTablePopup);
     });
-    if (Object.keys(day).length === 1) {
+    if (!day.slotList) {
       const wrapper = document.createElement("div");
       wrapper.className =
         "wrapper w-fit h-fit flex flex-col gap-2 mx-auto my-auto items-center";
@@ -981,13 +977,13 @@ async function renderTimeTableSlides(swiperInstance) {
     const cardDiv = document.createElement("div");
     cardDiv.className =
       "card flex flex-col gap-4 border border-neutral-500 rounded-xl p-4 overflow-y-auto scrollbar-hide h-full";
-    for (const key2 in day) {
-      if (key2 === "day") continue;
-      const singleEntry = day[key2];
+    for (const key2 in day.slotList) {
+      const singleEntry = day.slotList[key2];
+      console.log("this is singleEntry:", singleEntry);
       const subjectName = singleEntry.subject;
-      const icon = appState.subjectMetaData[subjectName].icon;
+      const icon = appState.subjectMetaData[subjectName].iconLink;
       const type = singleEntry.type;
-      const timeFrom = new Date(`1970-01-01T${singleEntry.from}:00`)
+      const timeFrom = new Date(`1970-01-01T${singleEntry.fromTime}:00`)
         .toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
@@ -995,7 +991,7 @@ async function renderTimeTableSlides(swiperInstance) {
         })
         .replace(/\s?[AP]M/i, "");
 
-      const timeTo = new Date(`1970-01-01T${singleEntry.to}:00`)
+      const timeTo = new Date(`1970-01-01T${singleEntry.toTime}:00`)
         .toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
@@ -1004,7 +1000,6 @@ async function renderTimeTableSlides(swiperInstance) {
         .replace(/\s?[AP]M/i, "");
 
       const time = `${timeFrom}-${timeTo}`;
-
       const wrapper = document.createElement("div");
       wrapper.className = "wrapper flex items-center justify-between w-full ";
       const nameIconWrapper = document.createElement("div");
@@ -1027,7 +1022,6 @@ async function renderTimeTableSlides(swiperInstance) {
       const typeP = document.createElement("p");
       typeP.className = "type w-10";
       typeP.textContent = typeMap[type] || type;
-
       const timeP = document.createElement("p");
       timeP.className = "time text-text-tertiary w-25";
       timeP.textContent = time;
@@ -1040,11 +1034,136 @@ async function renderTimeTableSlides(swiperInstance) {
         if (!appState.isEditing) return;
         seletectedDay = key;
         seletedEntry = key2;
+        console.log("clicked");
+
         editSlot(subjectName, type, timeFrom, timeTo, key2);
       });
     }
     daySlide.appendChild(cardDiv);
     swiperInstance.appendSlide(daySlide);
+    swiperInstance.update(); // Update swiper
+    swiperInstance.slideTo(0, 0);
+  }
+}
+//rest data
+// upcoming card elements
+const upcomingTestCard = document.querySelector(
+  ".dashboard-upcoming-test .card"
+);
+const upcomingTestCardTitle = upcomingTestCard.querySelector(".title");
+const upcomingTestCardDescription =
+  upcomingTestCard.querySelector(".description");
+const upcomingTestCardDay = upcomingTestCard.querySelector(".day");
+const upcomingTestCardDuration = upcomingTestCard.querySelector(".duration");
+const upcomingTestCardLink = upcomingTestCard.querySelector(".link");
+const upcomingTestJoinBtn = upcomingTestCard.querySelector(".join-btn");
+const upcomingTestTitle = document.querySelector(".upcoming-test .main-title");
+const comingSoonLabel = upcomingTestCard.querySelector(".coming-soon-label");
+//no test elements
+const noTest = upcomingTestCard.querySelector(".no-test");
+
+//account popup
+export const accountPopupWrapper = document.querySelector(
+  ".account-popup-wrapper"
+);
+export const accountPopup = document.querySelector(".account-popup");
+const accountPopupUserName = accountPopup.querySelector(".user-name");
+const editPfpBtn = accountPopup.querySelector(".edit-pfp-btn");
+const points = accountPopup.querySelector(".points");
+const goldMedal = accountPopup.querySelector(".gold-medal .qty");
+const silverMedal = accountPopup.querySelector(".silver-medal .qty");
+const bronzeMedal = accountPopup.querySelector(".bronze-medal .qty");
+const accountPopupCloseBtn = accountPopup.querySelector(".close-popup-btn");
+const lgUserPfp = document.querySelector(".navigation-pfp");
+const accountPopupProfile = accountPopup.querySelector(".account-popup-pfp");
+const accountLogoutBtn = accountPopup.querySelector(".account-logout");
+const accountDetailsBtn = accountPopup.querySelector(".account-details-btn");
+
+editPfpBtn.addEventListener("click", async () => {
+  await fadeOutEffect(accountPopup);
+  await fadeInEffect(pfpSelectionPopup);
+});
+accountLogoutBtn.addEventListener("click", async () => {
+  showSectionLoader("Logging out...");
+  await signOutUser().then(async () => {
+    await fadeOutEffect(document.body);
+    setTimeout(() => {
+      location.reload();
+    }, 500);
+  });
+});
+accountPopupProfile.addEventListener("click", async () => {
+  await fadeOutEffect(accountPopup);
+  await fadeInEffect(pfpSelectionPopup);
+});
+lgUserPfp.addEventListener("click", () => {
+  fadeInEffect(accountPopupWrapper);
+});
+accountPopupCloseBtn.addEventListener("click", async () => {
+  fadeOutEffect(accountPopupWrapper);
+});
+headerIcon.addEventListener("click", () => {
+  console.log("header icon clicked");
+  if (dashboardSection.classList.contains("hidden")) return;
+  fadeInEffect(accountPopupWrapper);
+});
+
+const accountDetailsPopup = document.querySelector(".account-details-popup");
+const accountDetailsCloseBtn =
+  accountDetailsPopup.querySelector(".close-popup-btn");
+const accountDetailsFirstName =
+  accountDetailsPopup.querySelector(".first-name");
+const accountDetailsLastName = accountDetailsPopup.querySelector(".last-name");
+const accountDetailsEmail = accountDetailsPopup.querySelector(".email");
+const accountDetailsSemester = accountDetailsPopup.querySelector(".semester");
+const accountDetailsDivision = accountDetailsPopup.querySelector(".division");
+const accountDetailsRollno = accountDetailsPopup.querySelector(".roll-no");
+const accountDetailsDisplayName =
+  accountDetailsPopup.querySelector(".user-name");
+const accountDetailsPfp = accountDetailsPopup.querySelector(
+  ".account-details-popup-pfp"
+);
+const accountDetailsEditPfpBtn =
+  accountDetailsPopup.querySelector(".edit-pfp-btn");
+const accountDetailsPoints = accountDetailsPopup.querySelector(".points");
+const accountDetailsGoldMedal =
+  accountDetailsPopup.querySelector(".gold-medal .qty");
+const accountDetailsSilverMedal =
+  accountDetailsPopup.querySelector(".silver-medal .qty");
+const accountDetailsBronzeMedal =
+  accountDetailsPopup.querySelector(".bronze-medal .qty");
+accountPopupCloseBtn.addEventListener("click", async () => {
+  await fadeOutEffect(accountPopupWrapper);
+});
+accountDetailsBtn.addEventListener("click", async () => {
+  await fadeOutEffect(accountPopup);
+  await fadeInEffect(accountDetailsPopup);
+});
+accountDetailsCloseBtn.addEventListener("click", async () => {
+  await fadeOutEffect(accountDetailsPopup);
+  await fadeInEffect(accountPopup);
+});
+accountDetailsPfp.addEventListener("click", async () => {
+  await fadeOutEffect(accountDetailsPopup);
+  await fadeInEffect(pfpSelectionPopup);
+});
+accountDetailsEditPfpBtn.addEventListener("click", async () => {
+  await fadeOutEffect(accountDetailsPopup);
+  await fadeInEffect(pfpSelectionPopup);
+});
+function initUpcomingTestCard() {
+  const testData = appState.divisionData.testData.upcomingTest;
+  upcomingTestCardDay.textContent = `Day : ${testData.day}`;
+  upcomingTestCardDuration.textContent = `Duration : ${testData.duration}`;
+  upcomingTestCardTitle.textContent = testData.title;
+  upcomingTestCardDescription.textContent = testData.description;
+  if (testData.link) {
+    upcomingTestJoinBtn.href = testData.link;
+    fadeOutEffect(comingSoonLabel);
+    fadeInEffect(upcomingTestJoinBtn);
+  } else {
+    fadeOutEffect(upcomingTestJoinBtn);
+    fadeInEffect(comingSoonLabel);
   }
 }
 export async function loadDashboard() {
@@ -1053,15 +1172,26 @@ export async function loadDashboard() {
   await renderUpcomingSubmissions();
   await renderTimeTableSlides(timetableSwiper);
   await renderTimeTableSlides(timetablePopupSwiper);
+  await renderUpcomingSessions();
+  initUserInfo();
+  UpcomingSessionsSwiper.update();
+  await initUpcomingTestCard();
+  await loadTypeSelectorSubjects();
   renderSubjects();
 }
 export async function showDashboard() {
   headerTitle.textContent = `Hello ${appState.userData.firstName}`;
-  await hideSections(false, true, true);
+  await hideSections();
   await applyEditModeUI();
+  headerIcon.src = appState.userData.pfpLink;
+  if (window.innerWidth > 1024) hideElement(headerIcon);
+  else showElement(headerIcon);
 
   await fadeInEffect(dashboardSection);
+  UpcomingSessionsSwiper.update();
+  UpcomingSessionsSwiper.autoplay.start();
   timetablePopupSwiper.update();
+  timetableSwiper.update();
 }
 export async function unloadDashboard() {
   const subjectSelectionDropDown = document.querySelector(
@@ -1070,9 +1200,44 @@ export async function unloadDashboard() {
   noticeSwiper.removeAllSlides();
   await fadeOutEffect(dashboardSection);
   subjectSelectionDropDown.innerHTML = "";
-  timeTableTypeInput.innerHTML = "";
   upcomingSubmissionCardContainer.innerHTML = "";
   timetableSwiper.removeAllSlides();
   timetablePopupSwiper.removeAllSlides();
   noticeSwiper.removeAllSlides();
+}
+window.addEventListener("resize", () => {
+  if (
+    window.innerWidth > 1024 &&
+    !dashboardSection.classList.contains("hidden")
+  ) {
+    hideElement(headerIcon);
+  } else {
+    showElement(headerIcon);
+  }
+});
+function initUserInfo() {
+  const gold = Number(appState.userData.medalList.gold || 0);
+  const silver = Number(appState.userData.medalList.silver || 0);
+  const bronze = Number(appState.userData.medalList.bronze || 0);
+  const totalPoints = gold * 30 + silver * 20 + bronze * 10;
+  accountPopupProfile.src = appState.userData.pfpLink;
+  accountPopupUserName.textContent = `${appState.userData.firstName} ${appState.userData.lastName}`;
+  editPfpBtn.src = appState.userData.pfpLink;
+  goldMedal.textContent = gold;
+  silverMedal.textContent = silver;
+  bronzeMedal.textContent = bronze;
+  points.textContent = totalPoints;
+  accountDetailsPfp.src = appState.userData.pfpLink;
+  accountDetailsDisplayName.textContent = `${appState.userData.firstName} ${appState.userData.lastName}`;
+  accountDetailsRollno.textContent = `Roll No : ${appState.userData.rollNo}`;
+  accountDetailsFirstName.textContent = `First name : ${appState.userData.firstName}`;
+  accountDetailsLastName.textContent = `Last name : ${appState.userData.lastName}`;
+  accountDetailsEmail.textContent = `Email : ${appState.userData.email}`;
+  accountDetailsSemester.textContent = `Semester : ${appState.userData.semester}`;
+  accountDetailsDivision.textContent = `Division : ${appState.userData.division}`;
+  accountDetailsGoldMedal.textContent = gold;
+  accountDetailsSilverMedal.textContent = silver;
+  accountDetailsBronzeMedal.textContent = bronze;
+  accountDetailsPoints.textContent = totalPoints;
+  accountDetailsEditPfpBtn.src = appState.userData.pfpLink;
 }

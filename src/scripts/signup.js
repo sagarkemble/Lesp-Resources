@@ -1,9 +1,10 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+import { initializeApp } from "firebase/app";
 import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-} from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+  signOut,
+} from "firebase/auth";
 import {
   getDatabase,
   ref,
@@ -13,20 +14,22 @@ import {
   query,
   orderByChild,
   equalTo,
-} from "https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js";
-
+} from "firebase/database";
 const firebaseConfig = {
-  apiKey: "AIzaSyDxg1_YR4kZ2nnZ2hm32Oyjb4CUrnlXpvQ",
-  authDomain: "lesp-resources-fd879.firebaseapp.com",
-  projectId: "lesp-resources-fd879",
-  storageBucket: "lesp-resources-fd879.firebasestorage.app",
-  messagingSenderId: "422274455357",
-  appId: "1:422274455357:web:c04e0d829e7715e87ad754",
+  apiKey: "AIzaSyDM6R7E9NRG1FjBsu8v_T9QdKth0LUeLDU",
+  authDomain: "lesp-resources-350d1.firebaseapp.com",
+  databaseURL: "https://lesp-resources-350d1-default-rtdb.firebaseio.com",
+  projectId: "lesp-resources-350d1",
+  storageBucket: "lesp-resources-350d1.firebasestorage.app",
+  messagingSenderId: "763683500399",
+  appId: "1:763683500399:web:c3dc5d410d15416ac9b89a",
+  measurementId: "G-8RSZWPT0XK",
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
-const spinnerLoadingScreen = document.querySelector(".spinner-loading-wrapper");
+
+const loadingScreen = document.querySelector(".loading-screen");
 const errorScreen = document.querySelector(".error-screen");
 const notFoundMessage = errorScreen.querySelector(".page-not-found-content");
 const wentWrongMessage = errorScreen.querySelector(".went-wrong-content");
@@ -41,40 +44,33 @@ window.addEventListener("load", async () => {
       console.log("Decrypted semester:", result.semester);
       console.log("Decrypted role:", result.role);
       userObj.division = result.division;
-      userObj.semester = result.semester;
+      userObj.semester = result.semester.replace("semester", ""); ///change the semester eto the
       userObj.role = result.role;
       if (result.role === "teacher") {
-        fadeOutEffect(rollNoInputWrapper);
-        fadeOutEffect(finalRollNoWrapper);
+        hideElement(rollNoInputWrapper);
+        hideElement(finalRollNoWrapper);
       }
       isValid = true;
-      await preloadImages();
-      await fadeOutEffect(spinnerLoadingScreen);
+      await preloadIntroImages();
+      await fadeOutEffect(loadingScreen);
       await fadeInEffect(introSection);
     } else {
-      await fadeOutEffect(wentWrongMessage);
-      await fadeInEffect(notFoundMessage);
-      await fadeOutEffect(spinnerLoadingScreen);
+      hideElement(wentWrongMessage);
+      showElement(notFoundMessage);
+      await fadeOutEffect(loadingScreen);
       await fadeInEffect(errorScreen);
       console.error("Decryption failed or data is invalid.");
       return;
     }
   } else {
-    await fadeOutEffect(wentWrongMessage);
-    await fadeInEffect(notFoundMessage);
-    await fadeOutEffect(spinnerLoadingScreen);
+    hideElement(wentWrongMessage);
+    showElement(notFoundMessage);
+    await fadeOutEffect(loadingScreen);
     await fadeInEffect(errorScreen);
     console.error("No data parameter found in the URL.");
     return;
   }
 });
-
-const images = [
-  document.querySelector(".intro-img-1"),
-  document.querySelector(".intro-img-2"),
-  document.querySelector(".intro-img-3"),
-  document.querySelector(".intro-img-4"),
-];
 function decryptLink(dataStr) {
   try {
     const decoded = atob(dataStr);
@@ -85,23 +81,22 @@ function decryptLink(dataStr) {
     return null;
   }
 }
-async function preloadImages() {
+async function preloadIntroImages() {
   const images = [
     document.querySelector(".intro-img-1"),
     document.querySelector(".intro-img-2"),
     document.querySelector(".intro-img-3"),
     document.querySelector(".intro-img-4"),
   ];
-
   await Promise.all(
     images.map((img) => {
-      if (!img) return Promise.resolve(); // skip if null
+      if (!img) return Promise.resolve();
       if (img.complete) return Promise.resolve();
       return new Promise((resolve) => {
         img.addEventListener("load", resolve);
-        img.addEventListener("error", resolve); // also resolve if it errors
+        img.addEventListener("error", resolve);
       });
-    })
+    }),
   );
 }
 const introSection = document.querySelector(".intro-section");
@@ -130,7 +125,7 @@ intro3NextBtn.addEventListener("click", async () => {
 });
 intro4NextBtn.addEventListener("click", async () => {
   await fadeOutEffect(intro4);
-  fadeInEffect(studentDetailsSection);
+  await fadeInEffect(studentDetailsSection);
 });
 intro2PrevBtn.addEventListener("click", async () => {
   await fadeOutEffect(intro2);
@@ -144,7 +139,6 @@ intro4PrevBtn.addEventListener("click", async () => {
   await fadeOutEffect(intro4);
   await fadeInEffect(intro3);
 });
-
 let userObj = {
   firstName: "",
   lastName: "",
@@ -161,10 +155,9 @@ let userObj = {
     bronze: "",
   },
 };
-
 // student details form
 const studentDetailsSection = document.querySelector(
-  ".student-details-section"
+  ".student-details-section",
 );
 const studentDetailsForm = document.querySelector("#student-details-form");
 const studentDetailNextBtn = studentDetailsForm.querySelector(".next-btn");
@@ -174,24 +167,32 @@ const studentDetailNextBtnText = studentDetailNextBtn.querySelector(".text");
 const firstNameInput = studentDetailsForm.querySelector("#first-name-input");
 const lastNameInput = studentDetailsForm.querySelector("#last-name-input");
 const rollNoInputWrapper = studentDetailsForm.querySelector(
-  ".roll-no-input-wrapper"
+  ".roll-no-input-wrapper",
 );
 const rollNoInput = studentDetailsForm.querySelector("#roll-no-input");
 const firstNameError = studentDetailsForm.querySelector(
-  ".first-name-related-error"
+  ".first-name-related-error",
 );
 const lastNameError = studentDetailsForm.querySelector(
-  ".last-name-related-error"
+  ".last-name-related-error",
 );
 const rollNoError = studentDetailsForm.querySelector(".roll-no-related-error");
-
+rollNoInput.addEventListener("input", (e) => {
+  if (e.target.value.length > 6) {
+    rollNoError.textContent = "Roll no must be 6 characters";
+    e.target.value = e.target.value.slice(0, 6);
+    showElement(rollNoError);
+  } else if (e.target.value.length < 6) {
+    rollNoError.textContent = "";
+    hideElement(rollNoError);
+  }
+});
 studentDetailsForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  fadeOutEffect(firstNameError);
-  fadeOutEffect(lastNameError);
-  fadeOutEffect(rollNoError);
+  hideElement(firstNameError);
+  hideElement(lastNameError);
+  hideElement(rollNoError);
   console.log(userObj);
-
   const firstName = firstNameInput.value.trim();
   const lastName = lastNameInput.value.trim();
   const rollNoStr = rollNoInput.value.trim();
@@ -199,36 +200,42 @@ studentDetailsForm.addEventListener("submit", async (e) => {
   let isError = false;
   if (!firstName) {
     console.log("error");
-    fadeInEffect(firstNameError);
+    firstNameError.textContent = "First Name is required";
+    showElement(firstNameError);
     isError = true;
   }
   if (!lastName) {
-    fadeInEffect(lastNameError);
+    lastNameError.textContent = "Last Name is required";
+    showElement(lastNameError);
     isError = true;
   }
   if (!rollNoStr && userObj.role !== "teacher") {
     rollNoError.textContent = "Roll No is required";
-    fadeInEffect(rollNoError);
+    showElement(rollNoError);
     isError = true;
   }
   if (isError) return;
   if (rollNoStr.length < 6 && userObj.role !== "teacher") {
     rollNoError.textContent = "Roll No must be at least 6 characters";
-    fadeInEffect(rollNoError);
+    showElement(rollNoError);
     isError = true;
   }
   if (isError) return;
   if (rollNoStr && userObj.role !== "teacher") {
-    const q = query(ref(db, "users"), orderByChild("rollNo"), equalTo(rollNo));
+    studentDetailNextBtn.disabled = true;
     await fadeOutEffectOpacity(studentDetailNextBtnText);
     fadeInEffect(studentDetailNextBtnLoader);
+    const q = query(
+      ref(db, "userData"),
+      orderByChild("rollNumber"),
+      equalTo(rollNo),
+    );
     await get(q)
       .then(async (snapshot) => {
         if (snapshot.exists()) {
           rollNoError.textContent = "Roll No already exists";
-          fadeInEffect(rollNoError);
+          showElement(rollNoError);
           isError = true;
-          return;
         }
       })
       .catch((error) => {
@@ -240,6 +247,7 @@ studentDetailsForm.addEventListener("submit", async (e) => {
   if (isError) {
     await fadeOutEffect(studentDetailNextBtnLoader);
     await fadeInEffectOpacity(studentDetailNextBtnText);
+    studentDetailNextBtn.disabled = false;
     return;
   } else {
     await fadeOutEffect(studentDetailNextBtnLoader);
@@ -253,15 +261,15 @@ studentDetailsForm.addEventListener("submit", async (e) => {
     }
     await fadeOutEffect(studentDetailsSection);
     fadeInEffect(studentCredentialsSection);
+    studentDetailNextBtn.disabled = false;
   }
 });
-
 // students credentials
 const studentCredentialsSection = document.querySelector(
-  ".student-credentials-section"
+  ".student-credentials-section",
 );
 const studentCredentialsForm = document.querySelector(
-  "#student-credentials-form"
+  "#student-credentials-form",
 );
 const studentCredentialsPrevBtn =
   studentCredentialsForm.querySelector(".prev-btn");
@@ -274,70 +282,74 @@ const studentCredentialNextBtnText =
 const emailInput = studentCredentialsForm.querySelector("#email-input");
 const passwordInput = studentCredentialsForm.querySelector("#password-input");
 const confirmPasswordInput = studentCredentialsForm.querySelector(
-  "#confirm-password-input"
+  "#confirm-password-input",
 );
 const emailError = studentCredentialsForm.querySelector(".email-related-error");
 const passwordError = studentCredentialsForm.querySelector(
-  ".password-related-error"
+  ".password-related-error",
 );
 const confirmPasswordError = studentCredentialsForm.querySelector(
-  ".confirm-password-related-error"
+  ".confirm-password-related-error",
 );
 studentCredentialsPrevBtn.addEventListener("click", async () => {
   await fadeOutEffect(studentCredentialsSection);
   fadeInEffect(studentDetailsSection);
+  hideElement(emailError);
+  hideElement(passwordError);
+  hideElement(confirmPasswordError);
 });
 studentCredentialsForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  fadeOutEffect(emailError);
-  fadeOutEffect(passwordError);
-  fadeOutEffect(confirmPasswordError);
+  hideElement(emailError);
+  hideElement(passwordError);
+  hideElement(confirmPasswordError);
   const email = emailInput.value.trim();
   const password = passwordInput.value.trim();
   const confirmPassword = confirmPasswordInput.value.trim();
   let isError = false;
   if (!email) {
     emailError.textContent = "Email is required";
-    fadeInEffect(emailError);
+    showElement(emailError);
     isError = true;
   }
   if (!password) {
     passwordError.textContent = "Password is required";
-    fadeInEffect(passwordError);
+    showElement(passwordError);
     isError = true;
   }
   if (!confirmPassword) {
     confirmPasswordError.textContent = "Confirm Password is required";
-    fadeInEffect(confirmPasswordError);
+    showElement(confirmPasswordError);
     isError = true;
   }
   if (isError) return;
   if (password.length < 6) {
     passwordError.textContent = "Password must be at least 6 characters";
-    fadeInEffect(passwordError);
+    showElement(passwordError);
     isError = true;
   }
   if (email && !email.includes("@gmail.com")) {
     emailError.textContent = "Enter a valid email";
-    fadeInEffect(emailError);
+    showElement(emailError);
     isError = true;
   }
   if (password !== confirmPassword) {
     confirmPasswordError.textContent = "Passwords do not match";
-    fadeInEffect(confirmPasswordError);
+    showElement(confirmPasswordError);
     isError = true;
   }
   if (isError) return;
+  studentCredentialNextBtn.disabled = true;
+  studentCredentialsPrevBtn.disabled = true;
   await fadeOutEffectOpacity(studentCredentialNextBtnText);
   fadeInEffect(studentCredentialNextBtnLoader);
-  const q = query(ref(db, "users"), orderByChild("email"), equalTo(email));
+  const q = query(ref(db, "userData"), orderByChild("email"), equalTo(email));
   await get(q)
     .then(async (snapshot) => {
       if (snapshot.exists()) {
         emailError.textContent = "Email already exists";
-        fadeInEffect(emailError);
+        showElement(emailError);
         isError = true;
-        return;
       }
     })
     .catch((error) => {
@@ -347,6 +359,8 @@ studentCredentialsForm.addEventListener("submit", async (e) => {
   if (isError) {
     await fadeOutEffect(studentCredentialNextBtnLoader);
     await fadeInEffectOpacity(studentCredentialNextBtnText);
+    studentCredentialNextBtn.disabled = false;
+    studentCredentialsPrevBtn.disabled = false;
     return;
   } else {
     await fadeOutEffect(studentCredentialNextBtnLoader);
@@ -356,6 +370,8 @@ studentCredentialsForm.addEventListener("submit", async (e) => {
     await fadeOutEffect(studentCredentialsSection);
     fadeInEffect(pfpSelectionSection);
   }
+  studentCredentialNextBtn.disabled = false;
+  studentCredentialsPrevBtn.disabled = false;
 });
 
 //pfp selection section
@@ -364,7 +380,7 @@ const pfpSelectionForm = document.querySelector("#pfp-selection-form");
 const pfpSelectionPrevBtn = pfpSelectionForm.querySelector(".prev-btn");
 const pfpSelectionNextBtn = pfpSelectionForm.querySelector(".next-btn");
 const selectedPfpWrapper = pfpSelectionForm.querySelector(
-  ".selected-pfp-wrapper"
+  ".selected-pfp-wrapper",
 );
 const selectedPfp = pfpSelectionForm.querySelector(".selected-pfp-wrapper img");
 const pfpContainer = pfpSelectionForm.querySelector(".pfp-container");
@@ -373,7 +389,7 @@ const femalePfpArr = [];
 const commonPfpArr = [];
 const malePfpToggleBtn = pfpSelectionForm.querySelector(".male-pfp-toggle-btn");
 const femalePfpToggleBtn = pfpSelectionForm.querySelector(
-  ".female-pfp-toggle-btn"
+  ".female-pfp-toggle-btn",
 );
 femalePfpToggleBtn.addEventListener("click", async () => {
   femalePfpToggleBtn.classList.add("bg-surface-3");
@@ -489,31 +505,47 @@ summaryPrevBtn.addEventListener("click", async () => {
 });
 summaryForm.addEventListener("submit", async (e) => {
   e.preventDefault();
+  summaryNextBtn.disabled = true;
+  summaryPrevBtn.disabled = true;
   await fadeOutEffectOpacity(summaryNextBtnText);
   fadeInEffect(summaryNextBtnLoader);
-  await createUserWithEmailAndPassword(auth, userObj.email, passwordInput.value)
-    .then(async (userCredential) => {
-      const user = userCredential.user;
-      console.log(user);
-      userObj.userId = user.uid;
-      await writeUserData();
-      fadeOutEffect(summaryNextBtnLoader);
-      fadeInEffectOpacity(summaryNextBtnText);
+  try {
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      userObj.email,
+      passwordInput.value,
+    );
+    const user = userCredential.user;
+    userObj.userId = user.uid;
+    await writeUserData();
+    await fadeOutEffect(summaryNextBtnLoader);
+    await fadeInEffectOpacity(summaryNextBtnText);
+    await fadeOutEffect(summarySection);
+    await fadeInEffect(successScreen);
+    try {
+      await signOut(auth);
+      console.log("Signed out successfully.");
+      successLottiePlayer.play();
+    } catch (signOutError) {
+      console.error("Sign-out error:", signOutError);
+      hideElement(notFoundMessage);
+      showElement(wentWrongMessage);
       await fadeOutEffect(summarySection);
-      await fadeInEffect(successLoadingScreen);
-      lottiePlayer.play();
-    })
-    .catch((error) => {
-      console.log(error.message);
-    });
-  await fadeOutEffect(summaryNextBtnLoader);
-  await fadeInEffectOpacity(summaryNextBtnText);
-  await fadeOutEffect(summarySection);
-  await fadeInEffect(successLoadingScreen);
-  lottiePlayer.play();
+      fadeInEffect(errorScreen);
+    }
+  } catch (creationError) {
+    console.error("Account creation error:", creationError.message);
+    hideElement(notFoundMessage);
+    showElement(wentWrongMessage);
+    await fadeOutEffect(summarySection);
+    fadeInEffect(errorScreen);
+  }
+  summaryNextBtn.disabled = false;
+  summaryPrevBtn.disabled = false;
 });
+
 async function writeUserData() {
-  const path = ref(db, `users/${userObj.userId}`);
+  const path = ref(db, `userData/${userObj.userId}`);
   return await set(path, userObj)
     .then(() => {
       console.log("User data written successfully");
@@ -526,8 +558,8 @@ async function fadeInEffect(element) {
   if (!element.classList.contains("hidden")) {
     return;
   }
-  element.classList.remove("hidden");
   element.style.opacity = "0";
+  element.classList.remove("hidden");
   const durationStr = getComputedStyle(element).transitionDuration;
   let ms = 0;
   if (durationStr.endsWith("ms")) {
@@ -598,13 +630,12 @@ export const malePfpLinks = [
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m10.png?updatedAt=1750951251957",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m11.png?updatedAt=1750951276570",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m12.png?updatedAt=1750951301644",
-  "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m13.png?updatedAt=1750951325773",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m14.png?updatedAt=1750951353530",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m15.png?updatedAt=1750951380623",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m16.png?updatedAt=1750951403575",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m17.png?updatedAt=1750951428471",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m18.png?updatedAt=1750951454124",
-  "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m19.png?updatedAt=1750951478868",
+  // "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m19.png?updatedAt=1750951478868",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m20.png?updatedAt=1750951502472",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m21.png?updatedAt=1750951531803",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m22.png?updatedAt=1750951561691",
@@ -613,7 +644,7 @@ export const malePfpLinks = [
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m25.png?updatedAt=1750951653269",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m26.png?updatedAt=1750951680646",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m27.png?updatedAt=1750951703535",
-  "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m28.png?updatedAt=1750951731950",
+  // "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m28.png?updatedAt=1750951731950",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m29.png?updatedAt=1750951760509",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m30.png?updatedAt=1750952044454",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m31.png?updatedAt=1750952186802",
@@ -623,18 +654,15 @@ export const malePfpLinks = [
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m37.png?updatedAt=1750952367758",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m38.png?updatedAt=1750952394043",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m39.png?updatedAt=1750952424973",
-  "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m40.png?updatedAt=1750952451165",
+  // "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m40.png?updatedAt=1750952451165",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m41.png?updatedAt=1750952471413",
-  "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m44.png?updatedAt=1750952541793",
-  "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m46.png?updatedAt=1750952584914",
-  "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m47.png?updatedAt=1750952605773",
+  // "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m44.png?updatedAt=1750952541793",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m48.png?updatedAt=1750952631935",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m49.png?updatedAt=1750952655261",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m50.png?updatedAt=1750952677844",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m51.png?updatedAt=1750952706527",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m52.png?updatedAt=1750952729005",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m53.png?updatedAt=1750952781028",
-  "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m32.png?updatedAt=1750993854358",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m54.png?updatedAt=1751608964260",
 ];
 export const femalePfpLinks = [
@@ -764,7 +792,6 @@ export const femalePfpLinks = [
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Female/female124.png?updatedAt=1750988006501",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Female/female125.png?updatedAt=1750988067759",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Female/female126.png?updatedAt=1750988233174",
-  "https://ik.imagekit.io/yn9gz2n2g/Avatars/Female/female128.png?updatedAt=1750988000261",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Female/female129.png?updatedAt=1750988027543",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Female/female130.png?updatedAt=1750988374757",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Female/female131.png?updatedAt=1750988460112",
@@ -929,6 +956,7 @@ export const cartoonPfpLinks = [
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Cartoon/cartoon13.png?updatedAt=1750992200176",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Cartoon/cartoon14.png?updatedAt=1750992213327",
 ];
+
 function renderPfpWrapper() {
   // renderImage(malePfpContainer, malePfpLinks);
   // renderImage(femalePfpContainer, femalePfpLinks);
@@ -945,7 +973,13 @@ function renderImage(className, link) {
     const pfp = document.createElement("img");
     pfp.src = element;
     // pfp.loading = "lazy";
-    pfp.classList.add("h-full", "w-full", "pfp", `${className}`);
+    pfp.classList.add(
+      "h-full",
+      "w-full",
+      "pfp",
+      "cursor-pointer",
+      `${className}`,
+    );
     if (className === "malePfp") malePfpArr.push(pfp);
     if (className === "femalePfp") {
       pfp.classList.add("hidden");
@@ -961,31 +995,26 @@ function renderImage(className, link) {
   });
 }
 renderPfpWrapper();
-async function showErrorScreen(message) {
-  const errorScreen = document.querySelector(".error-screen");
-  const errorMessage = errorScreen.querySelector(".message");
-  const reloadBtn = errorScreen.querySelector(".reload-btn");
-  // if()
-  errorMessage.textContent = message;
-  await fadeInEffect(errorScreen);
-}
-
-const successLoadingScreen = document.querySelector(
-  ".success-lottie-loading-screen"
-);
-const lottiePlayer = document.getElementById("success-lottie-loader");
-const loadingText = document.querySelector(".success-loading-text");
-const loadingWrapper = document.querySelector(".success-loading-wrapper");
-lottiePlayer.addEventListener("complete", async () => {
+const successScreen = document.querySelector(".success-screen");
+const successLottiePlayer = document.getElementById("success-lottie-animation");
+const successText = document.querySelector(".success-text");
+const successWrapper = successScreen.querySelector(".success-wrapper");
+successLottiePlayer.addEventListener("complete", async () => {
   console.log("Lottie animation completed");
-  loadingWrapper.style.gap = "8px";
+  successWrapper.style.gap = "8px";
   await setTimeout(() => {
-    loadingText.classList.add("show");
+    successText.classList.add("show");
   }, 100);
   await setTimeout(() => {
-    fadeOutEffect(successLoadingScreen);
+    fadeOutEffect(successScreen);
   }, 1000);
   setTimeout(() => {
-    window.location.href = "http://localhost:5173/";
+    window.location.href = "  https://0dab1116c1b7.ngrok-free.app/";
   }, 1000);
 });
+export function hideElement(element) {
+  element.classList.add("hidden");
+}
+export function showElement(element) {
+  element.classList.remove("hidden");
+}
