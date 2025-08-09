@@ -35,7 +35,7 @@ const DOM = {
         ".previous-test-rank-container .first-winner-container .name",
       ),
       pfp: document.querySelector(
-        ".previous-test-rank-container .first-winner-container .user-pfp",
+        ".previous-test-rank-container .first-winner-container .pfp",
       ),
     },
     second: {
@@ -46,7 +46,7 @@ const DOM = {
         ".previous-test-rank-container .second-winner-container .name",
       ),
       pfp: document.querySelector(
-        ".previous-test-rank-container .second-winner-container .user-pfp",
+        ".previous-test-rank-container .second-winner-container .pfp",
       ),
     },
     third: {
@@ -57,7 +57,7 @@ const DOM = {
         ".previous-test-rank-container .third-winner-container .name",
       ),
       pfp: document.querySelector(
-        ".previous-test-rank-container .third-winner-container .user-pfp",
+        ".previous-test-rank-container .third-winner-container .pfp",
       ),
     },
   },

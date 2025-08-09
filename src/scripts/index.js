@@ -258,7 +258,7 @@ window.addEventListener("popstate", () => {
   // initRouting();
 });
 function trackPageView(pageName, sem, div, subject) {
-  logEvent(analytics, "page_view", {
+  logEvent(analytics, "page_view_custom", {
     page_name: pageName,
     semester: appState.activeSem,
     division: appState.activeDiv,
@@ -276,22 +276,4 @@ const updateSW = registerSW({
   onOfflineReady() {
     console.log("App ready to work offline");
   },
-});
-
-let deferredPrompt;
-
-window.addEventListener("beforeinstallprompt", (e) => {
-  e.preventDefault(); // Stop the browser from showing it automatically
-  deferredPrompt = e;
-
-  // Show the prompt as soon as window loads
-  window.addEventListener("load", () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then((choiceResult) => {
-        console.log(`User response: ${choiceResult.outcome}`);
-        deferredPrompt = null;
-      });
-    }
-  });
 });

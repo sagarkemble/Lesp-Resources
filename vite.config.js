@@ -12,7 +12,7 @@ export default defineConfig({
         name: "Lesp resources",
         short_name: "Lesp",
         description: "Lesp resources PWA",
-        theme_color: "#ffffff",
+        theme_color: "#000000",
         icons: [
           {
             src: "logo.png",
@@ -32,7 +32,7 @@ export default defineConfig({
     allowedHosts: "5fdc182a0d2f.ngrok-free.app",
   },
   preview: {
-    allowedHosts: "5fdc182a0d2f.ngrok-free.app", // your ngrok host here
+    allowedHosts: "5fdc182a0d2f.ngrok-free.app",
   },
   build: {
     rollupOptions: {
