@@ -258,7 +258,7 @@ window.addEventListener("popstate", () => {
   // initRouting();
 });
 function trackPageView(pageName, sem, div, subject) {
-  logEvent(analytics, "page_view_custom", {
+  logEvent(analytics, "page_view", {
     page_name: pageName,
     semester: appState.activeSem,
     division: appState.activeDiv,
