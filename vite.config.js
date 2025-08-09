@@ -13,6 +13,7 @@ export default defineConfig({
         short_name: "Lesp",
         description: "Lesp resources PWA",
         theme_color: "#000000",
+        background_color: "#000000",
         icons: [
           {
             src: "logo.png",
