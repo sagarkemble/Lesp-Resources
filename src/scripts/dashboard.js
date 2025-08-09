@@ -11,6 +11,7 @@ import {
   hideSectionLoader,
   showConfirmationPopup,
   applyEditModeUI,
+  initRouting,
 } from "./index.js";
 import { deleteDriveFile, uploadDriveFile } from "./driveApi.js";
 import { headerIcon, headerTitle } from "./navigation.js";
@@ -26,7 +27,8 @@ import {
   signOutUser,
   set,
 } from "./firebase.js";
-const timetableSwiper = new Swiper("#time-table-swiper", {
+const dashboardSection = document.querySelector(".dashboard-section");
+export const timeTablePopupSwiper = new Swiper("#time-table-popup-swiper", {
   direction: "horizontal",
   loop: true,
   slidesPerView: 1,
@@ -40,14 +42,382 @@ const timetableSwiper = new Swiper("#time-table-swiper", {
     prevEl: ".swiper-button-prev",
   },
 });
-const dashboardSection = document.querySelector(".dashboard-section");
-// upcoming submission
-const upcomingSubmission = dashboardSection.querySelector(
-  ".upcoming-submissions"
-);
-const upcomingSubmissionCardContainer = upcomingSubmission.querySelector(
-  ".upcoming-submissions .card-container"
-);
+const DOM = {
+  addNoticeBtn: document.querySelector(".dashboard-section .add-notice-btn"),
+  navPfp: document.querySelector(".navigation-user-pfp"),
+  themeBtn: document.querySelector(".theme-btn"),
+  smThemeBtn: document.querySelector(".sm-theme-btn"),
+  upcomingSubmissions: {
+    container: document.querySelector(
+      ".dashboard-section .upcoming-submissions",
+    ),
+    cardContainer: document.querySelector(
+      ".dashboard-section .upcoming-submissions .card-container",
+    ),
+  },
+  themePopup: {
+    popup: document.querySelector(".theme-popup-wrapper"),
+    closeBtn: document.querySelector(".theme-popup-wrapper .close-popup-btn"),
+  },
+  warningPopup: {
+    popup: document.querySelector(".dashboard-section .warning-popup-wrapper"),
+    successBtn: document.querySelector(
+      ".dashboard-section .warning-popup-wrapper .success-btn",
+    ),
+    message: document.querySelector(
+      ".dashboard-section .warning-popup-wrapper .message",
+    ),
+  },
+  timeTableSwiper: {
+    swiper: new Swiper("#time-table-swiper", {
+      direction: "horizontal",
+      loop: true,
+      slidesPerView: 1,
+      spaceBetween: 30,
+      effect: "fade",
+      fadeEffect: {
+        crossFade: true,
+      },
+      navigation: {
+        nextEl: ".swiper-button-next",
+        prevEl: ".swiper-button-prev",
+      },
+    }),
+    popupSwiper: new Swiper("#time-table-popup-swiper", {
+      direction: "horizontal",
+      loop: true,
+      slidesPerView: 1,
+      spaceBetween: 30,
+      effect: "fade",
+      fadeEffect: {
+        crossFade: true,
+      },
+      navigation: {
+        nextEl: ".swiper-button-next",
+        prevEl: ".swiper-button-prev",
+      },
+    }),
+  },
+  upcomingSessions: {
+    swiper: new Swiper("#dashboard-upcoming-sessions-swiper", {
+      direction: "horizontal",
+      loop: true,
+      // speed: 0,
+      // effect: "fade",
+      slidesPerView: 1,
+      spaceBetween: 30,
+      autoplay: {
+        delay: 2000,
+      },
+
+      fadeEffect: {
+        crossFade: true,
+      },
+    }),
+    noUpcomingSession: document.querySelector(
+      ".dashboard-section .no-upcoming-session",
+    ),
+    viewPreviousSessionsBtn: document.querySelector(
+      ".dashboard-section .view-previous-sessions-btn",
+    ),
+    containerTitle: document.querySelector(
+      ".dashboard-section .upcoming-sessions .container-title",
+    ),
+  },
+  timeTablePopupSwiper: {
+    popup: document.querySelector(".time-table-popup-wrapper"),
+    closeBtn: document.querySelector(
+      ".time-table-popup-wrapper .close-popup-btn",
+    ),
+  },
+  timeTablePopup: {
+    popup: document.querySelector(".add-time-table-popup-wrapper"),
+    successBtn: document.querySelector(
+      ".add-time-table-popup-wrapper .success-btn",
+    ),
+    closeBtn: document.querySelector(
+      ".add-time-table-popup-wrapper .close-popup-btn",
+    ),
+    deleteBtn: document.querySelector(
+      ".add-time-table-popup-wrapper .delete-btn",
+    ),
+    popupTitle: document.querySelector(
+      ".add-time-table-popup-wrapper .popup-title",
+    ),
+    fakeSubjectPlaceholder: document.querySelector(
+      ".add-time-table-popup-wrapper .subject-placeholder",
+    ),
+    fakeTypePlaceholder: document.querySelector(
+      ".add-time-table-popup-wrapper .type-placeholder",
+    ),
+    fakeToTimePlaceholder: document.querySelector(
+      ".add-time-table-popup-wrapper .to-time-placeholder",
+    ),
+    fakeFromTimePlaceholder: document.querySelector(
+      ".add-time-table-popup-wrapper .from-time-placeholder",
+    ),
+    inputs: {
+      subject: document.querySelector("#timetable-subject-selection-drop-down"),
+      type: document.querySelector("#timetable-type-selection-drop-down"),
+      fromTime: document.querySelector("#timetable-from-time-input"),
+      toTime: document.querySelector("#timetable-to-time-input"),
+      date: document.querySelector("#timetable-date-input"),
+    },
+    errors: {
+      subject: document.querySelector(
+        ".add-time-table-popup-wrapper .subject-error",
+      ),
+      type: document.querySelector(".add-time-table-popup-wrapper .type-error"),
+      fromTime: document.querySelector(
+        ".add-time-table-popup-wrapper .from-time-error",
+      ),
+      toTime: document.querySelector(
+        ".add-time-table-popup-wrapper .to-time-error",
+      ),
+      date: document.querySelector(".add-time-table-popup-wrapper .date-error"),
+    },
+  },
+  noticeSwiper: {
+    swiper: new Swiper("#dashboard-notice-swiper", {
+      direction: "horizontal",
+      slidesPerView: "auto",
+      spaceBetween: 30,
+      loop: false,
+      centeredSlides: true,
+      watchOverflow: true,
+      breakpoints: {
+        768: {
+          centeredSlides: false,
+        },
+      },
+      pagination: {
+        el: ".swiper-pagination",
+        clickable: true,
+      },
+      navigation: {
+        nextEl: ".swiper-button-next",
+        prevEl: ".swiper-button-prev",
+      },
+
+      observer: true,
+      observeParents: true,
+    }),
+    wrapper: document.querySelector("#subject-page-swiper .swiper-wrapper"),
+    pagination: document.querySelector(".swiper-pagination"),
+    prevBtn: document.querySelector(".swiper-button-prev"),
+    nextBtn: document.querySelector(".swiper-button-next"),
+  },
+  noticePopup: {
+    popup: document.querySelector(
+      ".dashboard-section .add-notice-popup-wrapper",
+    ),
+    popupTitle: document.querySelector(
+      ".dashboard-section .add-notice-popup-wrapper .popup-title",
+    ),
+    closeBtn: document.querySelector(
+      ".dashboard-section .add-notice-popup-wrapper .close-popup-btn",
+    ),
+    successBtn: document.querySelector(
+      ".dashboard-section .add-notice-popup-wrapper .success-btn",
+    ),
+    fakeScopePlaceholder: document.querySelector(
+      ".dashboard-section .add-notice-popup-wrapper .scope-placeholder",
+    ),
+    inputs: {
+      title: document.querySelector("#dashboard-section-notice-title"),
+      description: document.querySelector(
+        "#dashboard-section-notice-description",
+      ),
+      link: document.querySelector("#dashboard-section-notice-link"),
+      file: document.querySelector("#dashboard-section-notice-file-input"),
+      scope: document.querySelector("#dashboard-section-notice-scope-input"),
+    },
+    errors: {
+      title: document.querySelector(
+        ".dashboard-section .add-notice-popup-wrapper .title-error",
+      ),
+      description: document.querySelector(
+        ".dashboard-section .add-notice-popup-wrapper .description-error",
+      ),
+      link: document.querySelector(
+        ".dashboard-section .add-notice-popup-wrapper .link-error",
+      ),
+      file: document.querySelector(
+        ".dashboard-section .add-notice-popup-wrapper .file-error",
+      ),
+      scope: document.querySelector(
+        ".dashboard-section .add-notice-popup-wrapper .scope-error",
+      ),
+    },
+
+    fileAttachment: {
+      icon: document.querySelector(
+        ".dashboard-section .add-notice-popup-wrapper .upload-icon",
+      ),
+      text: document.querySelector(
+        ".dashboard-section .add-notice-popup-wrapper .upload-text",
+      ),
+      inputWrapper: document.querySelector(
+        ".dashboard-section .add-notice-popup-wrapper .file-input-wrapper",
+      ),
+    },
+  },
+  upcomingTest: {
+    container: document.querySelector(".dashboard-upcoming-test"),
+    card: document.querySelector(".dashboard-upcoming-test .card"),
+    containerTitle: document.querySelector(
+      ".dashboard-upcoming-test .container-title",
+    ),
+    cardTitle: document.querySelector(".dashboard-upcoming-test .card .title"),
+    cardDescription: document.querySelector(
+      ".dashboard-upcoming-test .description",
+    ),
+    cardDay: document.querySelector(".dashboard-upcoming-test .day"),
+    cardDuration: document.querySelector(".dashboard-upcoming-test .duration"),
+    cardJoinBtn: document.querySelector(".dashboard-upcoming-test .join-btn"),
+    cardComingSoonLabel: document.querySelector(
+      ".dashboard-upcoming-test .coming-soon-label",
+    ),
+    noUpcomingTest: document.querySelector(".dashboard-upcoming-test .no-test"),
+    viewBtn: document.querySelector(
+      ".dashboard-upcoming-test .view-previous-sessions-btn",
+    ),
+    viewPreviousTestsBtn: document.querySelector(
+      ".dashboard-upcoming-test .view-previous-tests-btn",
+    ),
+  },
+  menuPopup: {
+    popup: document.querySelector(".menu-popup-wrapper"),
+    points: document.querySelector(".menu-popup-wrapper .points"),
+    medals: {
+      gold: document.querySelector(".menu-popup-wrapper .gold-medal .qty"),
+      silver: document.querySelector(".menu-popup-wrapper .silver-medal .qty"),
+      bronze: document.querySelector(".menu-popup-wrapper .bronze-medal .qty"),
+    },
+    userName: document.querySelector(".menu-popup-wrapper .user-name"),
+    userPfp: document.querySelector(".menu-popup-wrapper .user-pfp"),
+    changeThemeBtn: document.querySelector(
+      ".menu-popup-wrapper .change-theme-btn",
+    ),
+    accountDetailsBtn: document.querySelector(
+      ".menu-popup-wrapper .account-details-btn",
+    ),
+    logoutBtn: document.querySelector(".menu-popup-wrapper .logout-btn"),
+    closePopupBtn: document.querySelector(
+      ".menu-popup-wrapper .close-popup-btn",
+    ),
+    pfpOverlay: document.querySelector(".menu-popup-wrapper .pfp-overlay"),
+    editPfpBtn: document.querySelector(".menu-popup-wrapper .edit-pfp-btn"),
+  },
+  accountDetailsPopup: {
+    popup: document.querySelector(".account-details-popup-wrapper"),
+    closePopupBtn: document.querySelector(
+      ".account-details-popup-wrapper .close-popup-btn",
+    ),
+    userPfp: document.querySelector(".account-details-popup-wrapper .user-pfp"),
+    userName: document.querySelector(
+      ".account-details-popup-wrapper .user-name",
+    ),
+    editPfpBtn: document.querySelector(
+      ".account-details-popup-wrapper .edit-pfp-btn",
+    ),
+    points: document.querySelector(".account-details-popup-wrapper .points"),
+    medals: {
+      gold: document.querySelector(
+        ".account-details-popup-wrapper .gold-medal .qty",
+      ),
+      silver: document.querySelector(
+        ".account-details-popup-wrapper .silver-medal .qty",
+      ),
+      bronze: document.querySelector(
+        ".account-details-popup-wrapper .bronze-medal .qty",
+      ),
+    },
+    details: {
+      firstName: document.querySelector(
+        ".account-details-popup-wrapper .first-name",
+      ),
+      lastName: document.querySelector(
+        ".account-details-popup-wrapper .last-name",
+      ),
+      email: document.querySelector(".account-details-popup-wrapper .email"),
+      rollNo: document.querySelector(".account-details-popup-wrapper .roll-no"),
+      division: document.querySelector(
+        ".account-details-popup-wrapper .division",
+      ),
+      semester: document.querySelector(
+        ".account-details-popup-wrapper .semester",
+      ),
+    },
+    pfpOverlay: document.querySelector(
+      ".account-details-popup-wrapper .pfp-overlay",
+    ),
+  },
+  statsCard: {
+    card: document.querySelector(
+      ".dashboard-section .stats-card-wrapper .card",
+    ),
+    points: document.querySelector(
+      ".dashboard-section .stats-card-wrapper .points",
+    ),
+    totalStudents: document.querySelector(
+      ".dashboard-section .stats-card-wrapper .total-students ",
+    ),
+    rank: document.querySelector(
+      ".dashboard-section .stats-card-wrapper .rank",
+    ),
+    medals: {
+      gold: document.querySelector(
+        ".dashboard-section .stats-card-wrapper .gold-medal-wrapper .qty",
+      ),
+      silver: document.querySelector(
+        ".dashboard-section .stats-card-wrapper .silver-medal-wrapper .qty",
+      ),
+      bronze: document.querySelector(
+        ".dashboard-section .stats-card-wrapper .bronze-medal-wrapper .qty",
+      ),
+    },
+  },
+};
+export async function loadDashboard() {
+  await unloadDashboard();
+  await renderNoticeSlider();
+  await renderUpcomingSubmissions();
+  await renderTimeTableSlides(DOM.timeTableSwiper.swiper);
+  await renderTimeTableSlides(timeTablePopupSwiper);
+  await renderUpcomingSessions();
+  initStatsCard();
+  initUserInfo();
+  DOM.noticeSwiper.swiper.update();
+  await initUpcomingTestCard();
+  await loadTypeSelectorSubjects();
+  renderTimeTablePopupSubjects();
+}
+export async function showDashboard() {
+  headerTitle.textContent = `Hello ${appState.userData.firstName}`;
+  await hideSections();
+  await applyEditModeUI();
+  headerIcon.src = appState.userData.pfpLink;
+  if (window.innerWidth > 1024) hideElement(headerIcon);
+  else showElement(headerIcon);
+  await fadeInEffect(dashboardSection);
+  DOM.upcomingSessions.swiper.update();
+  DOM.upcomingSessions.swiper.autoplay.start();
+  timeTablePopupSwiper.update();
+  DOM.timeTableSwiper.swiper.update();
+}
+export async function unloadDashboard() {
+  const subjectSelectionDropDown = document.querySelector(
+    "#timetable-subject-selection-drop-down",
+  );
+  DOM.noticeSwiper.swiper.removeAllSlides();
+  await fadeOutEffect(dashboardSection);
+  subjectSelectionDropDown.innerHTML = "";
+  DOM.upcomingSubmissions.cardContainer.innerHTML = "";
+  DOM.timeTableSwiper.swiper.removeAllSlides();
+  timeTablePopupSwiper.removeAllSlides();
+  DOM.noticeSwiper.swiper.removeAllSlides();
+}
 function renderUpcomingSubmissions() {
   const upcomingSubmissions = appState?.divisionData?.upcomingSubmissionData;
   if (!upcomingSubmissions || Object.keys(upcomingSubmissions).length === 0) {
@@ -70,172 +440,103 @@ function renderUpcomingSubmissions() {
         "flex",
         "flex-col",
         "lg:gap-3",
-        "py-5"
+        "py-5",
       );
       card.innerHTML = `
        <div class="wrapper flex items-center gap-1 lg:gap-3 pt-1 ">
                 <img
                   src="${subjectIcon}"
                   alt=""
-                  class="w-[25px] h-[25px] lg:w-[40px] lg:h-[40px]"
+                  class="w-[1.5rem] h-[1.5rem] lg:w-[2.5rem] lg:h-[2.5rem]"
                 />
-                <p class="subject-name font-semibold text-text-primary">${subjectName}</p>
+                <p class="subject-name font-semibold text-text-primary">${subjectName.charAt(0).toUpperCase() + subjectName.slice(1)}</p>
               </div>
               <div class="wrapper flex flex-col lg:gap-1 text-text-secondary">
-                <p class="description">${submission.name}</p>
-                <p class="submission-date">${submission.dueDate}</p>
+                <p class="description">${submission.name.charAt(0).toUpperCase() + submission.name.slice(1)}</p>
+                <p class="submission-date">${submission.dueDate.charAt(0).toUpperCase() + submission.dueDate.slice(1)}</p>
               </div>
       `;
-      upcomingSubmissionCardContainer.appendChild(card);
+      DOM.upcomingSubmissions.cardContainer.appendChild(card);
     }
   }
 }
-
+function showWarningPopup(message) {
+  return new Promise((resolve) => {
+    DOM.warningPopup.message.textContent = message;
+    fadeInEffect(DOM.warningPopup.popup);
+    DOM.warningPopup.successBtn.addEventListener("click", async () => {
+      await fadeOutEffect(DOM.warningPopup.popup);
+      resolve(true);
+    });
+  });
+}
 // notice section
-const noticeSwiper = new Swiper("#dashboard-notice-swiper", {
-  direction: "horizontal",
-  slidesPerView: "auto",
-  spaceBetween: 30,
-  loop: false,
-  centeredSlides: true,
-  watchOverflow: true,
-  breakpoints: {
-    768: {
-      centeredSlides: false,
-    },
-  },
-  pagination: {
-    el: ".swiper-pagination",
-    clickable: true,
-  },
-  navigation: {
-    nextEl: ".swiper-button-next",
-    prevEl: ".swiper-button-prev",
-  },
-
-  observer: true,
-  observeParents: true,
+DOM.addNoticeBtn.addEventListener("click", () => {
+  fadeInEffect(DOM.noticePopup.popup);
 });
-const noticeSwiperWrapper = document.querySelector(
-  "#dashboard-notice-swiper .swiper-wrapper"
-);
-const addNoticeBtn = dashboardSection.querySelector(".add-notice-btn");
-const addNoticePopup = dashboardSection.querySelector(
-  ".add-notice-popup-wrapper"
-);
-const addNoticePopupcloseBtn = addNoticePopup.querySelector(".close-popup-btn");
-const addNoticePopupcreateBtn = addNoticePopup.querySelector(".create-btn");
-//inputs
-const addNoticeTitleInput = addNoticePopup.querySelector(".title-input");
-const addNoticefileInput = addNoticePopup.querySelector(".file-input");
-const addNoticeDescriptionInput =
-  addNoticePopup.querySelector(".description-input");
-const addNoticeLinkInput = addNoticePopup.querySelector(".link-input");
-const addNoticeScopeInput = addNoticePopup.querySelector(".scope-input");
-// error msgs
-const addNoticePopupLinkError = addNoticePopup.querySelector(
-  ".link-related-error"
-);
-const addNoticePopuptitleError = addNoticePopup.querySelector(
-  ".title-related-error"
-);
-const addNoticePopupdescriptionError = addNoticePopup.querySelector(
-  ".description-related-error"
-);
-const addNoticePopupScopeError = addNoticePopup.querySelector(
-  ".scope-related-error"
-);
-// file attachment ui
-const addNoticeFileAttachment =
-  addNoticePopup.querySelector(".file-attachment");
-const addNotivePopupFileAttachmentText =
-  addNoticePopup.querySelector(".upload-text");
-const addNoticePopupFileAttachmentIcon = addNoticePopup.querySelector(
-  ".file-attachment-icon"
-);
-// error popup
-const addNoticePopupErrorPopup = addNoticePopup.querySelector(
-  ".error-popup-wrapper"
-);
-const addNoticePopupErrorPopupOkayBtn =
-  addNoticePopupErrorPopup.querySelector(".okay-btn");
-let selectedNotice;
-// others
-const addNoticeTypePlaceholder =
-  addNoticePopup.querySelector(".scope-placeholder");
-
-addNoticeBtn.addEventListener("click", () => {
-  fadeInEffect(addNoticePopup);
+DOM.noticePopup.closeBtn.addEventListener("click", async () => {
+  await fadeOutEffect(DOM.noticePopup.popup);
+  resetNoticePopup();
 });
-addNoticePopupcloseBtn.addEventListener("click", async () => {
-  await fadeOutEffect(addNoticePopup);
-  resetAddNoticePopup();
+DOM.noticePopup.inputs.scope.addEventListener("change", () => {
+  hideElement(DOM.noticePopup.fakeScopePlaceholder);
 });
-addNoticeScopeInput.addEventListener("change", () => {
-  fadeOutEffect(addNoticeTypePlaceholder);
-});
-addNoticefileInput.addEventListener("change", () => {
-  const file = addNoticefileInput.files[0];
+DOM.noticePopup.inputs.file.addEventListener("change", () => {
+  const file = DOM.noticePopup.inputs.file.files[0];
   if (file) {
     if (file.size > 20 * 1024 * 1024) {
-      addNoticefileInput.value = "";
-      addNoticePopupLinkError.textContent = "File too large (max 20MB)";
-      fadeInEffect(addNoticePopupLinkError);
-      fadeInEffect(addNoticePopupFileAttachmentIcon);
+      DOM.noticePopup.inputs.file.value = "";
+      DOM.noticePopup.errors.file.textContent = "File too large (max 20MB)";
+      fadeInEffect(DOM.noticePopup.errors.file);
+      fadeInEffect(DOM.noticePopup.fileAttachment.icon);
       return;
     }
-    fadeOutEffect(addNoticePopupFileAttachmentIcon);
-    addNotivePopupFileAttachmentText.textContent = "1 file attached";
+    hideElement(DOM.noticePopup.fileAttachment.icon);
+    DOM.noticePopup.fileAttachment.text.textContent = "1 file attached";
   } else {
-    fadeInEffect(addNoticePopupFileAttachmentIcon);
-    addNotivePopupFileAttachmentText.textContent = "Upload (Optional)";
+    showElement(DOM.noticePopup.fileAttachment.icon);
+    DOM.noticePopup.fileAttachment.text.textContent = "Upload";
   }
 });
-addNoticeFileAttachment.addEventListener("click", () => {
-  addNoticefileInput.click();
+DOM.noticePopup.fileAttachment.inputWrapper.addEventListener("click", () => {
+  DOM.noticePopup.inputs.file.click();
 });
-addNoticePopupErrorPopupOkayBtn.addEventListener("click", async () => {
-  await fadeOutEffect(addNoticePopup);
-  fadeOutEffect(addNoticePopupErrorPopup);
-  resetAddNoticePopup();
-});
-addNoticePopupcreateBtn.addEventListener("click", async () => {
-  const title = addNoticeTitleInput.value.trim();
-  const description = addNoticeDescriptionInput.value.trim();
-  const file = addNoticefileInput.files[0];
-  const type = addNoticeScopeInput.value;
-  console.log(type);
-
-  fadeOutEffect(addNoticePopuptitleError);
-  fadeOutEffect(addNoticePopupdescriptionError);
-  fadeOutEffect(addNoticePopupLinkError);
-  fadeOutEffect(addNoticePopupScopeError);
-  const link = addNoticeLinkInput.value.trim();
-  fadeOutEffect(addNoticePopupLinkError);
+DOM.noticePopup.successBtn.addEventListener("click", async () => {
+  hideElement(DOM.noticePopup.errors.title);
+  hideElement(DOM.noticePopup.errors.description);
+  hideElement(DOM.noticePopup.errors.link);
+  hideElement(DOM.noticePopup.errors.scope);
+  hideElement(DOM.noticePopup.errors.link);
+  const title = DOM.noticePopup.inputs.title.value.trim();
+  const description = DOM.noticePopup.inputs.description.value.trim();
+  const file = DOM.noticePopup.inputs.file.files[0];
+  const type = DOM.noticePopup.inputs.scope.value;
+  const link = DOM.noticePopup.inputs.link.value.trim();
   let hasError = false;
   if (!title) {
-    addNoticePopuptitleError.textContent = "Title is required";
-    fadeInEffect(addNoticePopuptitleError);
+    DOM.noticePopup.errors.title.textContent = "Title is required";
+    showElement(DOM.noticePopup.errors.title);
     hasError = true;
   }
   if (!type) {
-    addNoticePopupScopeError.textContent = "Scope is required";
-    fadeInEffect(addNoticePopupScopeError);
+    DOM.noticePopup.errors.scope.textContent = "Scope is required";
+    showElement(DOM.noticePopup.errors.scope);
     hasError = true;
   }
   if (!description) {
-    addNoticePopupdescriptionError.textContent = "Description is required";
-    fadeInEffect(addNoticePopupdescriptionError);
+    DOM.noticePopup.errors.description.textContent = "Description is required";
+    showElement(DOM.noticePopup.errors.description);
     hasError = true;
   }
   if (!file && link && !/^https?:\/\//.test(link)) {
-    addNoticePopupLinkError.textContent =
-      "Enter a valid link starting with http:// or https://";
-    fadeInEffect(addNoticePopupLinkError);
+    DOM.noticePopup.errors.link.textContent = "Enter a valid link";
+    showElement(DOM.noticePopup.errors.link);
     hasError = true;
   }
   if (file && link) {
-    fadeInEffect(addNoticePopupErrorPopup);
+    await showWarningPopup("Only 1 can be uploaded: link or attachment");
+    await fadeOutEffect(DOM.noticePopup.popup);
+    resetNoticePopup();
     return;
   }
   if (hasError) return;
@@ -244,24 +545,23 @@ addNoticePopupcreateBtn.addEventListener("click", async () => {
   showSectionLoader("Uploading attachment...");
   if (file) {
     let uploaded;
-
     if (type === "department") {
       console.log("Uploading file to Drive...");
       uploaded = await uploadDriveFile(file, `resources/globalData/notices`);
     } else if (type === "division") {
       uploaded = await uploadDriveFile(
         file,
-        `resources/${appState.activeSem}/${appState.activeDiv}/divisionData/notices`
+        `resources/${appState.activeSem}/${appState.activeDiv}/divisionData/notices`,
       );
     } else if (type === "semester") {
       uploaded = await uploadDriveFile(
         file,
-        `resources/${appState.activeSem}/semesterData/notices`
+        `resources/${appState.activeSem}/semesterData/notices`,
       );
     } else {
       uploaded = await uploadDriveFile(
         file,
-        `resources/${appState.activeSem}/${appState.activeDiv}/${appState.activeSubject}/notices`
+        `resources/${appState.activeSem}/${appState.activeDiv}/${appState.activeSubject}/notices`,
       );
     }
     if (!uploaded) return;
@@ -285,58 +585,52 @@ addNoticePopupcreateBtn.addEventListener("click", async () => {
   } else if (type === "division") {
     await pushData(
       `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/noticeData/divisionNoticeList`,
-      obj
+      obj,
     );
   } else if (type === "semester") {
     await pushData(
       `semesterList/${appState.activeSem}/semesterGlobalData/noticeList`,
-      obj
+      obj,
     );
   } else {
     obj.scope = type;
     await pushData(
       `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/noticeData/subjectNoticeData/${type}`,
-      obj
+      obj,
     );
     console.log("nothing added");
   }
-  await fadeOutEffect(addNoticePopup);
-  resetAddNoticePopup();
+  await fadeOutEffect(DOM.noticePopup.popup);
+  resetNoticePopup();
   await showSectionLoader("Syncing data...");
   await syncDbData();
   await hideSectionLoader();
   await loadDashboard();
   showDashboard();
 });
+
 function loadTypeSelectorSubjects() {
   for (const key in appState.subjectMetaData) {
     const element = appState.subjectMetaData[key];
     const option = document.createElement("option");
     option.value = key;
     option.textContent = `${element.name} notice`;
-    addNoticeScopeInput.appendChild(option);
+    console.log("this is called", DOM.noticePopup.inputs.scope);
+    DOM.noticePopup.inputs.scope.appendChild(option);
   }
 }
-async function resetAddNoticePopup() {
-  addNoticeTitleInput.value = "";
-  addNoticeDescriptionInput.value = "";
-  addNoticefileInput.value = "";
-  addNoticeLinkInput.value = "";
-  addNoticeScopeInput.value = "";
-  addNotivePopupFileAttachmentText.textContent = "Upload (Optional)";
-  await fadeInEffect(addNoticeTypePlaceholder);
-  await fadeInEffect(addNoticePopupFileAttachmentIcon);
-  await fadeOutEffect(addNoticePopupLinkError);
-  await fadeOutEffect(addNoticePopupdescriptionError);
-  await fadeOutEffect(addNoticePopuptitleError);
-}
-async function renderSwiper() {
+async function renderNoticeSlider() {
   const noticeEntries = getFlatNoticeOrdered();
+  if (!noticeEntries || Object.keys(noticeEntries).length === 0) {
+    DOM.noticeSwiper.swiper.el.classList.add("!hidden");
+    return;
+  }
+  DOM.noticeSwiper.swiper.el.classList.remove("!hidden");
   for (const key in noticeEntries) {
     const noticeData = noticeEntries[key];
     const swiperSlide = document.createElement("div");
     swiperSlide.className =
-      "swiper-slide w-full max-w-[600px] bg-surface-2 !flex !flex-col gap-3 rounded-2xl p-4 lg:p-5";
+      "swiper-slide w-full max-w-[37.5rem] bg-surface-2 !flex !flex-col gap-3 rounded-2xl p-4 lg:p-5";
     const topWrapper = document.createElement("div");
     topWrapper.className = "wrapper flex items-center gap-4  justify-between";
 
@@ -346,7 +640,7 @@ async function renderSwiper() {
 
     const icon = document.createElement("div");
     icon.className =
-      "icon bg-surface flex h-[50px] w-[50px] items-center justify-center rounded-full shrink-0";
+      "icon bg-surface flex h-[3rem] w-[3rem] items-center justify-center rounded-full shrink-0";
 
     const iconInner = document.createElement("i");
     iconInner.className = "ri-file-text-line text-2xl";
@@ -354,7 +648,8 @@ async function renderSwiper() {
 
     const title = document.createElement("p");
     title.className = "slider-title text-xl font-semibold";
-    title.textContent = noticeData.title;
+    title.textContent =
+      noticeData.title.charAt(0).toUpperCase() + noticeData.title.slice(1);
 
     iconTitleWrapper.appendChild(icon);
     iconTitleWrapper.appendChild(title);
@@ -383,7 +678,9 @@ async function renderSwiper() {
 
     const description = document.createElement("div");
     description.className = "description text-text-secondary line-clamp-5";
-    description.innerHTML = noticeData.description.replace(/\n/g, "<br>");
+    description.innerHTML =
+      noticeData.description.charAt(0).toUpperCase() +
+      noticeData.description.slice(1).replace(/\n/g, "<br>");
 
     const linkWrapper = document.createElement("div");
     linkWrapper.className =
@@ -400,7 +697,6 @@ async function renderSwiper() {
     attachment.target = "_blank";
     deleteIcon.addEventListener("click", async () => {
       console.log("this is gonna delete");
-
       deleteNotice(key, noticeData.attachmentId, noticeData.scope);
     });
 
@@ -418,13 +714,8 @@ async function renderSwiper() {
     wrapper2.appendChild(linkWrapper);
     swiperSlide.appendChild(topWrapper);
     swiperSlide.appendChild(wrapper2);
-    noticeSwiper.appendSlide(swiperSlide);
-    requestAnimationFrame(() => {
-      if (description.scrollHeight > description.clientHeight) {
-        readmore.style.display = "inline";
-      }
-    });
-
+    DOM.noticeSwiper.swiper.appendSlide(swiperSlide);
+    setupReadmoreObserver(description, readmore);
     readmore.addEventListener("click", () => {
       const popup = document.getElementById("readmore-popup");
       const popupTitle = document.getElementById("readmore-popup-title");
@@ -440,9 +731,26 @@ async function renderSwiper() {
       } else {
         popupAttachment.classList.add("hidden");
       }
-      popup.classList.remove("hidden");
+      fadeInEffect(popup);
     });
   }
+}
+document
+  .getElementById("close-readmore-popup")
+  ?.addEventListener("click", () => {
+    const element = document.getElementById("readmore-popup");
+    fadeOutEffect(element);
+  });
+function setupReadmoreObserver(description, readmore) {
+  const observer = new ResizeObserver((entries) => {
+    for (let entry of entries) {
+      const target = entry.target;
+      if (target.scrollHeight > target.clientHeight) {
+        readmore.style.display = "inline";
+      }
+    }
+  });
+  observer.observe(description);
 }
 function getFlatNoticeOrdered() {
   const now = Date.now();
@@ -467,14 +775,12 @@ function getFlatNoticeOrdered() {
       older: older.reverse(), // latest old first
     };
   };
-
   // Collect all major groups
   const global = splitAndReverse(appState.globalData?.noticeList);
   const semester = splitAndReverse(appState.semesterGlobalData?.noticeList);
   const division = splitAndReverse(
-    appState.divisionData?.noticeData?.divisionNoticeList
+    appState.divisionData?.noticeData?.divisionNoticeList,
   );
-
   // Flatten and split subject notices
   const subjectRaw = appState.divisionData?.noticeData?.subjectNoticeData || {};
   const subjectFlat = {};
@@ -485,14 +791,12 @@ function getFlatNoticeOrdered() {
     }
   }
   const subject = splitAndReverse(subjectFlat);
-
   // Merge all in priority + recency order
   const addToMerged = (pairs) => {
     for (const [key, val] of pairs) {
       merged[key] = val;
     }
   };
-
   // Final merging: recent → old, global → semester → division → subject
   addToMerged(global.recent);
   addToMerged(semester.recent);
@@ -502,12 +806,11 @@ function getFlatNoticeOrdered() {
   addToMerged(semester.older);
   addToMerged(division.older);
   addToMerged(subject.older);
-
   return merged;
 }
 async function deleteNotice(key, attachmentId, scope) {
   const confirmed = await showConfirmationPopup(
-    "The notice will be deleted permenantly"
+    "The notice will be deleted permenantly",
   );
   if (!confirmed) return;
   showSectionLoader("Deleting notice...");
@@ -524,19 +827,19 @@ async function deleteNotice(key, attachmentId, scope) {
     await deleteData(`globalData/noticeList/${key}`);
   } else if (scope === "semester") {
     await deleteData(
-      `semesterList/${appState.activeSem}/semesterGlobalData/noticeList/${key}`
+      `semesterList/${appState.activeSem}/semesterGlobalData/noticeList/${key}`,
     );
   } else if (scope === "division") {
     await deleteData(
-      `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/noticeData/divisionNoticeList/${key}`
+      `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/noticeData/divisionNoticeList/${key}`,
     );
   } else {
     await deleteData(
-      `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/noticeData/subjectNoticeData/${scope}/${key}`
+      `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/noticeData/subjectNoticeData/${scope}/${key}`,
     );
   }
   await deleteData(
-    `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/notice/${appState.activeSubject}/${key}`
+    `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/notice/${appState.activeSubject}/${key}`,
   );
   await showSectionLoader("Syncing data...");
   await syncDbData();
@@ -544,39 +847,37 @@ async function deleteNotice(key, attachmentId, scope) {
   await loadDashboard();
   showDashboard();
 }
-// upcoming sessions
-const UpcomingSessionsSwiper = new Swiper(
-  "#dashboard-upcoming-sessions-swiper",
-  {
-    direction: "horizontal",
-    loop: true,
-    // speed: 0,
-    // effect: "fade",
-    slidesPerView: 1,
-    spaceBetween: 30,
-    autoplay: {
-      delay: 2000,
-    },
-
-    fadeEffect: {
-      crossFade: true,
-    },
-  }
-);
+function resetNoticePopup() {
+  DOM.noticePopup.inputs.title.value = "";
+  DOM.noticePopup.inputs.link.value = "";
+  DOM.noticePopup.inputs.description.value = "";
+  DOM.noticePopup.inputs.scope.value = "";
+  DOM.noticePopup.inputs.file.value = "";
+  DOM.noticePopup.fileAttachment.text.textContent = "Upload File";
+  showElement(DOM.noticePopup.fileAttachment.icon);
+  showElement(DOM.noticePopup.fakeScopePlaceholder);
+  hideElement(DOM.noticePopup.errors.title);
+  hideElement(DOM.noticePopup.errors.description);
+  hideElement(DOM.noticePopup.errors.link);
+  hideElement(DOM.noticePopup.errors.scope);
+  hideElement(DOM.noticePopup.errors.file);
+}
+// upcoming session
 async function renderUpcomingSessions() {
-  const upcomingSessions =
-    appState?.globalData?.sessionData?.upcomingSessionList;
-
-  if (!upcomingSessions || Object.keys(upcomingSessions).length === 0) {
+  const data = appState?.globalData?.sessionData?.upcomingSessionList || {};
+  console.log("Upcoming sessions data from dashboard:", data);
+  if (!data || Object.keys(data).length === 0) {
     console.log("No upcoming sessions found from dashboard.");
     return;
   }
 
-  for (const key in upcomingSessions) {
-    const session = upcomingSessions[key];
-    const { title, description, link, date, time, duration, hostUserId } =
+  for (const key in data) {
+    const session = data[key];
+    let { title, description, link, date, fromTime, toTime, hostUserId } =
       session;
-
+    toTime = new Date("1970-01-01 " + toTime);
+    fromTime = new Date("1970-01-01 " + fromTime);
+    const duration = Math.round((toTime - fromTime) / (1000 * 60));
     const mentorData = await get(ref(db, `userData/${hostUserId}`))
       .then((snapshot) => (snapshot.exists() ? snapshot.val() : null))
       .catch((error) => {
@@ -590,7 +891,7 @@ async function renderUpcomingSessions() {
     const name = `${mentorData.firstName} ${mentorData.lastName}`;
     const mentorClass = getFormattedClass(
       mentorData.semester,
-      mentorData.division
+      mentorData.division,
     );
     const pfp = mentorData.pfpLink;
 
@@ -611,7 +912,7 @@ async function renderUpcomingSessions() {
             alt="Mentor"
           />
           <div class="wrapper">
-            <p class="text-xl">${name}</p>
+            <p class="text-xl">${name.charAt(0).toUpperCase() + name.slice(1)}</p>
             <p class="text-xs text-text-tertiary">${mentorClass}</p>
           </div>
         </div>
@@ -623,23 +924,22 @@ async function renderUpcomingSessions() {
       </div>
 
       <div class="wrapper flex flex-col gap-2">
-        <p class="title text-xl font-semibold">${title}</p>
-        <div class="description text-text-secondary">
-          ${description}
+        <p class="title text-xl font-semibold">${title.charAt(0).toUpperCase() + title.slice(1)}</p>
+        <div class="description text-text-secondary overflow-y-auto h-full">
+          ${description.charAt(0).toUpperCase() + description.slice(1)}
         </div>
       </div>
 
       <div class="duration-date-wrapper text-xs font-light flex flex-col gap-1">
-        <p class="day">${formatDate(date)} at ${time}</p>
+        <p class="day">${formatDate(date)} at ${formatTime(toTime)}</p>
         <p class="duration">Duration : ${duration}</p>
       </div>
     `;
 
     swiperSlide.appendChild(card);
-    UpcomingSessionsSwiper.appendSlide(swiperSlide);
+    DOM.upcomingSessions.swiper.appendSlide(swiperSlide);
   }
 }
-
 function getFormattedClass(sem, div) {
   const semMap = {
     1: "FYCO",
@@ -652,10 +952,19 @@ function getFormattedClass(sem, div) {
   const formattedSem = semMap[sem] || sem;
   return `${formattedSem}-${div}`;
 }
+function formatTime(dateObj) {
+  console.log("Formatting time: from session", dateObj);
+  return dateObj
+    .toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    })
+    .toLowerCase(); // for "pm" instead of "PM"
+}
 function formatDate(dateString) {
   const dateObj = new Date(dateString);
   const now = new Date();
-
   // Calculate difference in days
   const diffTime = dateObj.getTime() - now.getTime();
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
@@ -680,109 +989,50 @@ function formatDate(dateString) {
   const year = dateObj.getFullYear().toString().slice(-2);
   return `${day}-${month}-${year}`;
 }
-
-// time table - time table popup
+DOM.upcomingSessions.viewPreviousSessionsBtn.addEventListener("click", () => {
+  history.pushState({}, "", '?sessions=""');
+  initRouting();
+});
 // time table popup
-export const timetablePopupSwiper = new Swiper("#time-table-popup-swiper", {
-  direction: "horizontal",
-  loop: true,
-  slidesPerView: 1,
-  spaceBetween: 30,
-  effect: "fade",
-  fadeEffect: {
-    crossFade: true,
-  },
-  navigation: {
-    nextEl: ".swiper-button-next",
-    prevEl: ".swiper-button-prev",
-  },
-});
-export const timetablePopup = document.querySelector(
-  ".time-table-popup-wrapper"
-);
-const timetablePopupCloseBtn = timetablePopup.querySelector(".close-popup-btn");
-timetablePopupCloseBtn.addEventListener("click", async () => {
-  await fadeOutEffect(timetablePopup);
-  timetablePopupSwiper.slideTo(0, 0);
-});
-let seletectedDay = null;
-let seletedEntry = null;
+let selectedDay = null;
+let selectedEntry = null;
 let isTimeTableEditing = false;
-const addTimeTablePopup = document.querySelector(
-  ".add-time-table-popup-wrapper"
-);
-const addTimeTablePopupTitle = addTimeTablePopup.querySelector(".popup-title");
-// placeholders
-const timeTableSubjectPlaceholder = addTimeTablePopup.querySelector(
-  ".subject-placeholder"
-);
-const timeTableTypePlaceholder =
-  addTimeTablePopup.querySelector(".type-placeholder");
-const timeTableTimeFromPlaceholder = addTimeTablePopup.querySelector(
-  ".time-from-placeholder"
-);
-const timeTableTimeToPlaceholder = addTimeTablePopup.querySelector(
-  ".time-to-placeholder"
-);
-// inputs
-const timeTableSubjectInput = addTimeTablePopup.querySelector(
-  "#timetable-subject-selection-drop-down"
-);
-const timeTableTypeInput = addTimeTablePopup.querySelector(
-  "#timetable-type-selection-drop-down"
-);
-const timeTableTimeFrom = addTimeTablePopup.querySelector(".time-from-input");
-const timeTableTimeTo = addTimeTablePopup.querySelector(".time-to-input");
-// errors
-const TimeTableSubjectError = addTimeTablePopup.querySelector(
-  ".subject-related-error"
-);
-const TimeTableTypeError = addTimeTablePopup.querySelector(
-  ".type-related-error"
-);
-const TimeTableTimeFromError = addTimeTablePopup.querySelector(
-  ".time-from-related-error"
-);
-const TimeTableTimeToError = addTimeTablePopup.querySelector(
-  ".time-to-related-error"
-);
-// buttons
-const timeTablePopupCloseBtn =
-  addTimeTablePopup.querySelector(".close-popup-btn");
-const timeTableAddBtn = addTimeTablePopup.querySelector(".add-btn");
-const timeTableDeleteBtn = addTimeTablePopup.querySelector(".delete-icon");
-timeTablePopupCloseBtn.addEventListener("click", async () => {
-  await fadeOutEffect(addTimeTablePopup);
+DOM.timeTablePopupSwiper.closeBtn.addEventListener("click", async () => {
+  await fadeOutEffect(DOM.timeTablePopupSwiper.popup);
+  timeTablePopupSwiper.slideTo(0, 0);
+});
+DOM.timeTablePopup.closeBtn.addEventListener("click", async () => {
+  await fadeOutEffect(DOM.timeTablePopup.popup);
   resetTimeTablePopup();
 });
-timeTableAddBtn.addEventListener("click", async () => {
-  const subject = timeTableSubjectInput.value;
-  const type = timeTableTypeInput.value;
-  const timeFrom = timeTableTimeFrom.value;
-  const timeTo = timeTableTimeTo.value;
+DOM.timeTablePopup.successBtn.addEventListener("click", async () => {
+  hideElement(DOM.timeTablePopup.errors.subject);
+  hideElement(DOM.timeTablePopup.errors.type);
+  hideElement(DOM.timeTablePopup.errors.fromTime);
+  hideElement(DOM.timeTablePopup.errors.toTime);
+  const subject = DOM.timeTablePopup.inputs.subject.value;
+  const type = DOM.timeTablePopup.inputs.type.value;
+  const timeFrom = DOM.timeTablePopup.inputs.fromTime.value;
+  const timeTo = DOM.timeTablePopup.inputs.toTime.value;
   let isError = false;
   if (!subject) {
-    await fadeInEffect(TimeTableSubjectError);
-    TimeTableSubjectError.textContent = "Required";
-    fadeInEffect(TimeTableSubjectError);
+    DOM.timeTablePopup.errors.subject.textContent = "Required";
+    showElement(DOM.timeTablePopup.errors.subject);
     isError = true;
   }
   if (!type) {
-    await fadeInEffect(TimeTableTypeError);
-    TimeTableTypeError.textContent = "Required";
-    fadeInEffect(TimeTableTypeError);
+    DOM.timeTablePopup.errors.type.textContent = "Required";
+    showElement(DOM.timeTablePopup.errors.type);
     isError = true;
   }
   if (!timeFrom) {
-    await fadeInEffect(TimeTableTimeFromError);
-    TimeTableTimeFromError.textContent = "Required";
-    fadeInEffect(TimeTableTimeFromError);
+    DOM.timeTablePopup.errors.fromTime.textContent = "Required";
+    showElement(DOM.timeTablePopup.errors.fromTime);
     isError = true;
   }
   if (!timeTo) {
-    await fadeInEffect(TimeTableTimeToError);
-    TimeTableTimeToError.textContent = "Required";
-    fadeInEffect(TimeTableTimeToError);
+    DOM.timeTablePopup.errors.toTime.textContent = "Required";
+    showElement(DOM.timeTablePopup.errors.toTime);
     isError = true;
   }
   if (isError) return;
@@ -795,78 +1045,75 @@ timeTableAddBtn.addEventListener("click", async () => {
   if (isTimeTableEditing) {
     showSectionLoader("Updating slot...");
     await updateData(
-      `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/timetableDayList/${seletectedDay}/slotList/${seletedEntry}`,
-      newSlot
+      `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/timetableDayList/${selectedDay}/slotList/${selectedEntry}`,
+      newSlot,
     );
   } else {
     showSectionLoader("Adding slot...");
 
     await pushData(
-      `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/timetableDayList/${seletectedDay}/slotList`,
-      newSlot
+      `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/timetableDayList/${selectedDay}/slotList`,
+      newSlot,
     );
   }
   showSectionLoader("syncing data...");
-  await fadeOutEffect(addTimeTablePopup);
-  await fadeOutEffect(timetablePopup);
+  await fadeOutEffect(DOM.timeTablePopup.popup);
+  await fadeOutEffect(DOM.timeTablePopupSwiper.popup);
   await syncDbData();
+  resetTimeTablePopup();
   hideSectionLoader();
   await loadDashboard();
   showDashboard();
 });
-timeTableTimeFrom.addEventListener("click", () => {
-  timeTableTimeFrom.showPicker();
+DOM.timeTablePopup.inputs.fromTime.addEventListener("click", () => {
+  DOM.timeTablePopup.inputs.fromTime.showPicker();
 });
-timeTableTimeTo.addEventListener("click", () => {
-  timeTableTimeTo.showPicker();
+DOM.timeTablePopup.inputs.toTime.addEventListener("click", () => {
+  DOM.timeTablePopup.inputs.toTime.showPicker();
 });
-timeTableSubjectInput.addEventListener("change", () => {
-  fadeOutEffect(timeTableSubjectPlaceholder);
+DOM.timeTablePopup.inputs.subject.addEventListener("change", () => {
+  hideElement(DOM.timeTablePopup.fakeSubjectPlaceholder);
 });
-timeTableTypeInput.addEventListener("change", () => {
-  fadeOutEffect(timeTableTypePlaceholder);
+DOM.timeTablePopup.inputs.type.addEventListener("change", () => {
+  hideElement(DOM.timeTablePopup.fakeTypePlaceholder);
 });
-timeTableTimeFrom.addEventListener("change", () => {
-  fadeOutEffect(timeTableTimeFromPlaceholder);
+DOM.timeTablePopup.inputs.fromTime.addEventListener("change", () => {
+  hideElement(DOM.timeTablePopup.fakeFromTimePlaceholder);
 });
-timeTableTimeTo.addEventListener("change", () => {
-  fadeOutEffect(timeTableTimeToPlaceholder);
+DOM.timeTablePopup.inputs.toTime.addEventListener("change", () => {
+  hideElement(DOM.timeTablePopup.fakeToTimePlaceholder);
 });
-timeTableSubjectInput.addEventListener("click", () => {
-  fadeOutEffect(timeTableSubjectPlaceholder);
+DOM.timeTablePopup.inputs.subject.addEventListener("click", () => {
+  hideElement(DOM.timeTablePopup.fakeSubjectPlaceholder);
 });
-timeTableTypeInput.addEventListener("click", () => {
-  fadeOutEffect(timeTableTypePlaceholder);
+DOM.timeTablePopup.inputs.type.addEventListener("click", () => {
+  hideElement(DOM.timeTablePopup.fakeTypePlaceholder);
 });
-timeTableTimeFrom.addEventListener("click", () => {
-  fadeOutEffect(timeTableTimeFromPlaceholder);
-});
-timeTableTimeTo.addEventListener("click", () => {
-  fadeOutEffect(timeTableTimeToPlaceholder);
+DOM.timeTablePopupSwiper.popup.addEventListener("click", (e) => {
+  const target = e.target.closest(".popup");
+  const popup = DOM.timeTablePopupSwiper.popup.querySelector(".popup");
+  if (target === popup) return;
+  else fadeOutEffect(DOM.timeTablePopupSwiper.popup);
 });
 async function resetTimeTablePopup() {
-  addTimeTablePopupTitle.textContent = "Add Slot";
-  timeTableSubjectInput.value = "";
-  timeTableTypeInput.value = "";
-  timeTableTimeFrom.value = "";
-  timeTableTimeTo.value = "";
-  timeTableAddBtn.textContent = "Add Slot";
+  DOM.timeTablePopup.popupTitle.textContent = "Add Slot";
+  DOM.timeTablePopup.inputs.subject.value = "";
+  DOM.timeTablePopup.inputs.type.value = "";
+  DOM.timeTablePopup.inputs.toTime.value = "";
+  DOM.timeTablePopup.inputs.fromTime.value = "";
+  DOM.timeTablePopup.successBtn.textContent = "Add Slot";
   isTimeTableEditing = false;
-  await fadeInEffect(timeTableSubjectPlaceholder);
-  await fadeInEffect(timeTableTypePlaceholder);
-  await fadeInEffect(timeTableTimeFromPlaceholder);
-  await fadeInEffect(timeTableTimeToPlaceholder);
-  await fadeOutEffect(timeTableDeleteBtn);
-  await fadeOutEffect(TimeTableTypeError);
-  await fadeOutEffect(TimeTableSubjectError);
-  await fadeOutEffect(TimeTableTimeFromError);
-  await fadeOutEffect(TimeTableTimeToError);
+  showElement(DOM.timeTablePopup.fakeSubjectPlaceholder);
+  showElement(DOM.timeTablePopup.fakeTypePlaceholder);
+  showElement(DOM.timeTablePopup.fakeFromTimePlaceholder);
+  showElement(DOM.timeTablePopup.fakeToTimePlaceholder);
+  hideElement(DOM.timeTablePopup.deleteBtn);
+  hideElement(DOM.timeTablePopup.errors.type);
+  hideElement(DOM.timeTablePopup.errors.subject);
+  hideElement(DOM.timeTablePopup.errors.fromTime);
+  hideElement(DOM.timeTablePopup.errors.toTime);
 }
-
-function renderSubjects() {
-  const subjectSelectionDropDown = document.querySelector(
-    "#timetable-subject-selection-drop-down"
-  );
+function renderTimeTablePopupSubjects() {
   const subjectData = appState.subjectMetaData;
   for (const key in subjectData) {
     const subject = subjectData[key];
@@ -874,45 +1121,45 @@ function renderSubjects() {
     option.value = key;
     option.textContent = subject.name;
     option.className = "text-text-primary";
-    subjectSelectionDropDown.appendChild(option);
+    DOM.timeTablePopup.inputs.subject.appendChild(option);
   }
-  subjectSelectionDropDown.value = "";
+  DOM.timeTablePopup.inputs.subject.value = "";
 }
 async function editSlot(subjectName, type, timeFrom, timeTo, key) {
-  await fadeInEffect(timeTableDeleteBtn);
+  showElement(DOM.timeTablePopup.deleteBtn);
   isTimeTableEditing = true;
-  seletedEntry = key;
-  addTimeTablePopupTitle.textContent = "Edit Slot";
-  timeTableSubjectInput.value = subjectName;
-  timeTableTypeInput.value = type;
-  timeTableTimeFrom.value = timeFrom;
-  timeTableTimeTo.value = timeTo;
-  timeTableAddBtn.textContent = "Update Slot";
-  hideElement(timeTableSubjectPlaceholder);
-  hideElement(timeTableTypePlaceholder);
-  hideElement(timeTableTimeFromPlaceholder);
-  hideElement(timeTableTimeToPlaceholder);
-  fadeInEffect(addTimeTablePopup);
+  selectedEntry = key;
+  DOM.timeTablePopup.popupTitle.textContent = "Edit Slot";
+  DOM.timeTablePopup.inputs.subject.value = subjectName;
+  DOM.timeTablePopup.inputs.type.value = type;
+  DOM.timeTablePopup.inputs.fromTime.value = timeFrom;
+  DOM.timeTablePopup.inputs.toTime.value = timeTo;
+  DOM.timeTablePopup.successBtn.textContent = "Update Slot";
+  hideElement(DOM.timeTablePopup.fakeSubjectPlaceholder);
+  hideElement(DOM.timeTablePopup.fakeTypePlaceholder);
+  hideElement(DOM.timeTablePopup.fakeFromTimePlaceholder);
+
+  hideElement(DOM.timeTablePopup.fakeToTimePlaceholder);
+  fadeInEffect(DOM.timeTablePopup.popup);
 }
-timeTableDeleteBtn.addEventListener("click", async () => {
+DOM.timeTablePopup.deleteBtn.addEventListener("click", async () => {
   const isConfirmed = await showConfirmationPopup(
-    "Are you sure you want to delete this slot?"
+    "Are you sure you want to delete this slot?",
   );
   if (!isConfirmed) return;
   showSectionLoader("Deleting slot...");
   await deleteData(
-    `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/timetableDayList/${seletectedDay}/slotList/${seletedEntry}`
+    `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/timetableDayList/${selectedDay}/slotList/${selectedEntry}`,
   );
-  await fadeOutEffect(addTimeTablePopup);
+  await fadeOutEffect(DOM.timeTablePopup.popup);
   showSectionLoader("Syncing data...");
-  await fadeOutEffect(addTimeTablePopup);
+  await fadeOutEffect(DOM.timeTablePopupSwiper.popup);
   resetTimeTablePopup();
   await syncDbData();
   hideSectionLoader();
   await loadDashboard();
   await showDashboard();
 });
-
 async function renderTimeTableSlides(swiperInstance) {
   const daysOfWeek = [
     "sunday",
@@ -951,9 +1198,9 @@ async function renderTimeTableSlides(swiperInstance) {
     dayDiv.appendChild(plusIcon);
     daySlide.appendChild(dayDiv);
     plusIcon.addEventListener("click", () => {
-      seletectedDay = key;
-      seletedEntry = null;
-      fadeInEffect(addTimeTablePopup);
+      selectedDay = key;
+      selectedEntry = null;
+      fadeInEffect(DOM.timeTablePopup.popup);
     });
     if (!day.slotList) {
       const wrapper = document.createElement("div");
@@ -1032,8 +1279,8 @@ async function renderTimeTableSlides(swiperInstance) {
       daySlide.appendChild(dayDiv);
       wrapper.addEventListener("click", () => {
         if (!appState.isEditing) return;
-        seletectedDay = key;
-        seletedEntry = key2;
+        selectedDay = key;
+        selectedEntry = key2;
         console.log("clicked");
 
         editSlot(subjectName, type, timeFrom, timeTo, key2);
@@ -1045,45 +1292,45 @@ async function renderTimeTableSlides(swiperInstance) {
     swiperInstance.slideTo(0, 0);
   }
 }
-//rest data
-// upcoming card elements
-const upcomingTestCard = document.querySelector(
-  ".dashboard-upcoming-test .card"
-);
-const upcomingTestCardTitle = upcomingTestCard.querySelector(".title");
-const upcomingTestCardDescription =
-  upcomingTestCard.querySelector(".description");
-const upcomingTestCardDay = upcomingTestCard.querySelector(".day");
-const upcomingTestCardDuration = upcomingTestCard.querySelector(".duration");
-const upcomingTestCardLink = upcomingTestCard.querySelector(".link");
-const upcomingTestJoinBtn = upcomingTestCard.querySelector(".join-btn");
-const upcomingTestTitle = document.querySelector(".upcoming-test .main-title");
-const comingSoonLabel = upcomingTestCard.querySelector(".coming-soon-label");
-//no test elements
-const noTest = upcomingTestCard.querySelector(".no-test");
 
-//account popup
-export const accountPopupWrapper = document.querySelector(
-  ".account-popup-wrapper"
-);
-export const accountPopup = document.querySelector(".account-popup");
-const accountPopupUserName = accountPopup.querySelector(".user-name");
-const editPfpBtn = accountPopup.querySelector(".edit-pfp-btn");
-const points = accountPopup.querySelector(".points");
-const goldMedal = accountPopup.querySelector(".gold-medal .qty");
-const silverMedal = accountPopup.querySelector(".silver-medal .qty");
-const bronzeMedal = accountPopup.querySelector(".bronze-medal .qty");
-const accountPopupCloseBtn = accountPopup.querySelector(".close-popup-btn");
-const lgUserPfp = document.querySelector(".navigation-pfp");
-const accountPopupProfile = accountPopup.querySelector(".account-popup-pfp");
-const accountLogoutBtn = accountPopup.querySelector(".account-logout");
-const accountDetailsBtn = accountPopup.querySelector(".account-details-btn");
-
-editPfpBtn.addEventListener("click", async () => {
-  await fadeOutEffect(accountPopup);
+// upcoming test card
+function initUpcomingTestCard() {
+  if (appState.divisionData.testData.upcomingTest.isVisible == false) {
+    hideElement(DOM.upcomingTest.card);
+    showElement(DOM.upcomingTest.noUpcomingTest);
+    return;
+  } else {
+    showElement(DOM.upcomingTest.card);
+    hideElement(DOM.upcomingTest.noUpcomingTest);
+    const data = appState.divisionData.testData.upcomingTest;
+    console.log(data);
+    DOM.upcomingTest.cardTitle.textContent =
+      data.title.charAt(0).toUpperCase() + data.title.slice(1);
+    DOM.upcomingTest.cardDescription.textContent =
+      data.description.charAt(0).toUpperCase() + data.description.slice(1);
+    DOM.upcomingTest.cardDay.textContent = `Day : ${data.day.charAt(0).toUpperCase() + data.day.slice(1)}`;
+    DOM.upcomingTest.cardDuration.textContent = `Duration : ${data.duration}`;
+    if (data.link) {
+      DOM.upcomingTest.cardJoinBtn.href = data.link;
+      DOM.upcomingTest.containerTitle.textContent = "Current Test";
+      hideElement(DOM.upcomingTest.cardComingSoonLabel);
+      showElement(DOM.upcomingTest.cardJoinBtn);
+    } else {
+      DOM.upcomingTest.cardTitle.textContent = "Upcoming Test";
+      hideElement(DOM.upcomingTest.cardJoinBtn);
+      showElement(DOM.upcomingTest.cardComingSoonLabel);
+    }
+  }
+}
+DOM.upcomingTest.viewPreviousTestsBtn.addEventListener("click", () => {
+  history.pushState({}, "", '?tests=""');
+  initRouting();
+});
+DOM.menuPopup.editPfpBtn.addEventListener("click", async () => {
+  await fadeOutEffect(DOM.accountDetailsPopup.popup);
   await fadeInEffect(pfpSelectionPopup);
 });
-accountLogoutBtn.addEventListener("click", async () => {
+DOM.menuPopup.logoutBtn.addEventListener("click", async () => {
   showSectionLoader("Logging out...");
   await signOutUser().then(async () => {
     await fadeOutEffect(document.body);
@@ -1092,119 +1339,69 @@ accountLogoutBtn.addEventListener("click", async () => {
     }, 500);
   });
 });
-accountPopupProfile.addEventListener("click", async () => {
-  await fadeOutEffect(accountPopup);
+DOM.menuPopup.accountDetailsBtn.addEventListener("click", async () => {
+  await fadeOutEffect(DOM.menuPopup.popup);
+  await fadeInEffect(DOM.accountDetailsPopup.popup);
+});
+DOM.menuPopup.closePopupBtn.addEventListener("click", async () => {
+  fadeOutEffect(DOM.menuPopup.popup);
+});
+DOM.accountDetailsPopup.pfpOverlay.addEventListener("click", async () => {
+  await fadeOutEffect(DOM.accountDetailsPopup.popup);
   await fadeInEffect(pfpSelectionPopup);
 });
-lgUserPfp.addEventListener("click", () => {
-  fadeInEffect(accountPopupWrapper);
-});
-accountPopupCloseBtn.addEventListener("click", async () => {
-  fadeOutEffect(accountPopupWrapper);
-});
-headerIcon.addEventListener("click", () => {
-  console.log("header icon clicked");
-  if (dashboardSection.classList.contains("hidden")) return;
-  fadeInEffect(accountPopupWrapper);
-});
-
-const accountDetailsPopup = document.querySelector(".account-details-popup");
-const accountDetailsCloseBtn =
-  accountDetailsPopup.querySelector(".close-popup-btn");
-const accountDetailsFirstName =
-  accountDetailsPopup.querySelector(".first-name");
-const accountDetailsLastName = accountDetailsPopup.querySelector(".last-name");
-const accountDetailsEmail = accountDetailsPopup.querySelector(".email");
-const accountDetailsSemester = accountDetailsPopup.querySelector(".semester");
-const accountDetailsDivision = accountDetailsPopup.querySelector(".division");
-const accountDetailsRollno = accountDetailsPopup.querySelector(".roll-no");
-const accountDetailsDisplayName =
-  accountDetailsPopup.querySelector(".user-name");
-const accountDetailsPfp = accountDetailsPopup.querySelector(
-  ".account-details-popup-pfp"
-);
-const accountDetailsEditPfpBtn =
-  accountDetailsPopup.querySelector(".edit-pfp-btn");
-const accountDetailsPoints = accountDetailsPopup.querySelector(".points");
-const accountDetailsGoldMedal =
-  accountDetailsPopup.querySelector(".gold-medal .qty");
-const accountDetailsSilverMedal =
-  accountDetailsPopup.querySelector(".silver-medal .qty");
-const accountDetailsBronzeMedal =
-  accountDetailsPopup.querySelector(".bronze-medal .qty");
-accountPopupCloseBtn.addEventListener("click", async () => {
-  await fadeOutEffect(accountPopupWrapper);
-});
-accountDetailsBtn.addEventListener("click", async () => {
-  await fadeOutEffect(accountPopup);
-  await fadeInEffect(accountDetailsPopup);
-});
-accountDetailsCloseBtn.addEventListener("click", async () => {
-  await fadeOutEffect(accountDetailsPopup);
-  await fadeInEffect(accountPopup);
-});
-accountDetailsPfp.addEventListener("click", async () => {
-  await fadeOutEffect(accountDetailsPopup);
+DOM.accountDetailsPopup.userPfp.addEventListener("click", async () => {
+  await fadeOutEffect(DOM.accountDetailsPopup.popup);
   await fadeInEffect(pfpSelectionPopup);
 });
-accountDetailsEditPfpBtn.addEventListener("click", async () => {
-  await fadeOutEffect(accountDetailsPopup);
+DOM.menuPopup.userPfp.addEventListener("click", async () => {
+  await fadeOutEffect(DOM.menuPopup.popup);
   await fadeInEffect(pfpSelectionPopup);
 });
-function initUpcomingTestCard() {
-  const testData = appState.divisionData.testData.upcomingTest;
-  upcomingTestCardDay.textContent = `Day : ${testData.day}`;
-  upcomingTestCardDuration.textContent = `Duration : ${testData.duration}`;
-  upcomingTestCardTitle.textContent = testData.title;
-  upcomingTestCardDescription.textContent = testData.description;
-  if (testData.link) {
-    upcomingTestJoinBtn.href = testData.link;
-    fadeOutEffect(comingSoonLabel);
-    fadeInEffect(upcomingTestJoinBtn);
-  } else {
-    fadeOutEffect(upcomingTestJoinBtn);
-    fadeInEffect(comingSoonLabel);
-  }
-}
-export async function loadDashboard() {
-  await unloadDashboard();
-  await renderSwiper();
-  await renderUpcomingSubmissions();
-  await renderTimeTableSlides(timetableSwiper);
-  await renderTimeTableSlides(timetablePopupSwiper);
-  await renderUpcomingSessions();
-  initUserInfo();
-  UpcomingSessionsSwiper.update();
-  await initUpcomingTestCard();
-  await loadTypeSelectorSubjects();
-  renderSubjects();
-}
-export async function showDashboard() {
-  headerTitle.textContent = `Hello ${appState.userData.firstName}`;
-  await hideSections();
-  await applyEditModeUI();
-  headerIcon.src = appState.userData.pfpLink;
-  if (window.innerWidth > 1024) hideElement(headerIcon);
-  else showElement(headerIcon);
-
-  await fadeInEffect(dashboardSection);
-  UpcomingSessionsSwiper.update();
-  UpcomingSessionsSwiper.autoplay.start();
-  timetablePopupSwiper.update();
-  timetableSwiper.update();
-}
-export async function unloadDashboard() {
-  const subjectSelectionDropDown = document.querySelector(
-    "#timetable-subject-selection-drop-down"
-  );
-  noticeSwiper.removeAllSlides();
-  await fadeOutEffect(dashboardSection);
-  subjectSelectionDropDown.innerHTML = "";
-  upcomingSubmissionCardContainer.innerHTML = "";
-  timetableSwiper.removeAllSlides();
-  timetablePopupSwiper.removeAllSlides();
-  noticeSwiper.removeAllSlides();
-}
+document.addEventListener("click", (e) => {
+  if (
+    (DOM.menuPopup.popup.classList.contains("hidden") &&
+      e.target === DOM.navPfp) ||
+    (DOM.menuPopup.popup.classList.contains("hidden") &&
+      e.target === headerIcon &&
+      !dashboardSection.classList.contains("hidden"))
+  ) {
+    fadeInEffect(DOM.menuPopup.popup);
+  } else fadeOutEffect(DOM.menuPopup.popup);
+});
+document.addEventListener("click", (e) => {
+  if (
+    DOM.themePopup.popup.classList.contains("hidden") &&
+    e.target === DOM.themeBtn
+  ) {
+    fadeInEffect(DOM.themePopup.popup);
+  } else if (window.innerWidth > 1024) fadeOutEffect(DOM.themePopup.popup);
+});
+DOM.smThemeBtn.addEventListener("click", async () => {
+  await fadeOutEffect(DOM.menuPopup.popup);
+  await fadeInEffect(DOM.themePopup.popup);
+});
+DOM.themePopup.closeBtn.addEventListener("click", async () => {
+  await fadeOutEffect(DOM.themePopup.popup);
+  await fadeInEffect(DOM.menuPopup.popup);
+});
+DOM.statsCard.card.addEventListener("click", async () => {
+  history.pushState({}, "", "/?leaderboard=''");
+  initRouting();
+});
+// account details
+DOM.accountDetailsPopup.closePopupBtn.addEventListener("click", async () => {
+  await fadeOutEffect(DOM.accountDetailsPopup.popup);
+  await fadeInEffect(DOM.menuPopup.popup);
+});
+DOM.accountDetailsPopup.userPfp.addEventListener("click", async () => {
+  await fadeOutEffect(DOM.accountDetailsPopup.popup);
+  await fadeInEffect(pfpSelectionPopup);
+});
+DOM.accountDetailsPopup.editPfpBtn.addEventListener("click", async () => {
+  await fadeOutEffect(DOM.accountDetailsPopup.popup);
+  await fadeInEffect(pfpSelectionPopup);
+});
 window.addEventListener("resize", () => {
   if (
     window.innerWidth > 1024 &&
@@ -1220,24 +1417,35 @@ function initUserInfo() {
   const silver = Number(appState.userData.medalList.silver || 0);
   const bronze = Number(appState.userData.medalList.bronze || 0);
   const totalPoints = gold * 30 + silver * 20 + bronze * 10;
-  accountPopupProfile.src = appState.userData.pfpLink;
-  accountPopupUserName.textContent = `${appState.userData.firstName} ${appState.userData.lastName}`;
-  editPfpBtn.src = appState.userData.pfpLink;
-  goldMedal.textContent = gold;
-  silverMedal.textContent = silver;
-  bronzeMedal.textContent = bronze;
-  points.textContent = totalPoints;
-  accountDetailsPfp.src = appState.userData.pfpLink;
-  accountDetailsDisplayName.textContent = `${appState.userData.firstName} ${appState.userData.lastName}`;
-  accountDetailsRollno.textContent = `Roll No : ${appState.userData.rollNo}`;
-  accountDetailsFirstName.textContent = `First name : ${appState.userData.firstName}`;
-  accountDetailsLastName.textContent = `Last name : ${appState.userData.lastName}`;
-  accountDetailsEmail.textContent = `Email : ${appState.userData.email}`;
-  accountDetailsSemester.textContent = `Semester : ${appState.userData.semester}`;
-  accountDetailsDivision.textContent = `Division : ${appState.userData.division}`;
-  accountDetailsGoldMedal.textContent = gold;
-  accountDetailsSilverMedal.textContent = silver;
-  accountDetailsBronzeMedal.textContent = bronze;
-  accountDetailsPoints.textContent = totalPoints;
-  accountDetailsEditPfpBtn.src = appState.userData.pfpLink;
+  DOM.menuPopup.userPfp.src = appState.userData.pfpLink;
+  DOM.menuPopup.userName.textContent = `${appState.userData.firstName} ${appState.userData.lastName}`;
+  DOM.menuPopup.editPfpBtn.src = appState.userData.pfpLink;
+  DOM.menuPopup.medals.gold.textContent = gold;
+  DOM.menuPopup.medals.silver.textContent = silver;
+  DOM.menuPopup.medals.bronze.textContent = bronze;
+  DOM.menuPopup.points.textContent = totalPoints;
+  DOM.accountDetailsPopup.userPfp.src = appState.userData.pfpLink;
+  DOM.accountDetailsPopup.userName.textContent = `${appState.userData.firstName} ${appState.userData.lastName}`;
+  DOM.accountDetailsPopup.details.rollNo.textContent = `Roll No : ${appState.userData.rollNo}`;
+  DOM.accountDetailsPopup.details.firstName.textContent = `First name : ${appState.userData.firstName}`;
+  DOM.accountDetailsPopup.details.lastName.textContent = `Last name : ${appState.userData.lastName}`;
+  DOM.accountDetailsPopup.details.email.textContent = `Email : ${appState.userData.email}`;
+  DOM.accountDetailsPopup.details.semester.textContent = `Semester : ${appState.userData.semester}`;
+  DOM.accountDetailsPopup.details.division.textContent = `Division : ${appState.userData.division}`;
+  DOM.accountDetailsPopup.medals.gold.textContent = gold;
+  DOM.accountDetailsPopup.medals.silver.textContent = silver;
+  DOM.accountDetailsPopup.medals.bronze.textContent = bronze;
+  DOM.accountDetailsPopup.points.textContent = totalPoints;
+}
+//stats card
+function initStatsCard() {
+  DOM.statsCard.rank.textContent = appState.userData.rank
+    .toString()
+    .padStart(2, "0");
+  console.log("stats card:", appState.userData.rank);
+  DOM.statsCard.totalStudents.textContent = appState.totalStudents;
+  DOM.statsCard.points.textContent = appState.userData.points;
+  DOM.statsCard.medals.gold.textContent = `x ${appState.userData.medalList.gold}`;
+  DOM.statsCard.medals.silver.textContent = `x ${appState.userData.medalList.silver}`;
+  DOM.statsCard.medals.bronze.textContent = `x ${appState.userData.medalList.bronze}`;
 }

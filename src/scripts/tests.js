@@ -3,6 +3,7 @@ import {
   showSectionLoader,
   hideSectionLoader,
   showConfirmationPopup,
+  applyEditModeUI,
 } from "./index.js";
 import {
   fadeInEffect,
@@ -15,10 +16,153 @@ import { headerIcon, headerTitle } from "./navigation.js";
 import { appState, syncDbData } from "./appstate.js";
 import { deleteDriveFile, uploadDriveFile } from "./driveApi.js";
 const testsSection = document.querySelector(".tests-section");
+const DOM = {
+  testsSection: document.querySelector(".tests-section"),
+  // Upcoming Test
+  upcomingTest: {
+    container: document.querySelector(".upcoming-test"),
+    card: document.querySelector(".upcoming-test .card"),
+    containerTitle: document.querySelector(".upcoming-test .container-title"),
+    cardTitle: document.querySelector(".upcoming-test .card .title"),
+    cardDescription: document.querySelector(".upcoming-test .description"),
+    cardDay: document.querySelector(".upcoming-test .day"),
+    cardDuration: document.querySelector(".upcoming-test .duration"),
+    cardJoinBtn: document.querySelector(".upcoming-test .join-btn"),
+    cardComingSoonLabel: document.querySelector(
+      ".upcoming-test .coming-soon-label",
+    ),
+    noUpcomingTest: document.querySelector(".upcoming-test .no-test"),
+    scheduleBtn: document.querySelector(".schedule-test-btn"),
+  },
+  // Upcoming Test Popup
+  upcomingTestPopup: {
+    popup: document.querySelector(".edit-upcoming-test-popup-wrapper"),
+    popupTitle: document.querySelector(
+      ".edit-upcoming-test-popup-wrapper .popup-title",
+    ),
+    closeBtn: document.querySelector(
+      ".edit-upcoming-test-popup-wrapper .close-popup-btn",
+    ),
+    successBtn: document.querySelector(
+      ".edit-upcoming-test-popup-wrapper .success-btn",
+    ),
+    hideBtn: document.querySelector(
+      ".edit-upcoming-test-popup-wrapper .hide-icon",
+    ),
+
+    inputs: {
+      title: document.querySelector(
+        ".edit-upcoming-test-popup-wrapper .title-input",
+      ),
+      description: document.querySelector(
+        ".edit-upcoming-test-popup-wrapper .description-input",
+      ),
+      link: document.querySelector(
+        ".edit-upcoming-test-popup-wrapper .link-input",
+      ),
+      day: document.querySelector(
+        ".edit-upcoming-test-popup-wrapper .day-input",
+      ),
+      duration: document.querySelector(
+        ".edit-upcoming-test-popup-wrapper .duration-input",
+      ),
+    },
+    errors: {
+      title: document.querySelector(
+        ".edit-upcoming-test-popup-wrapper .title-related-error",
+      ),
+      description: document.querySelector(
+        ".edit-upcoming-test-popup-wrapper .description-related-error",
+      ),
+      link: document.querySelector(
+        ".edit-upcoming-test-popup-wrapper .link-related-error",
+      ),
+      day: document.querySelector(
+        ".edit-upcoming-test-popup-wrapper .day-related-error",
+      ),
+      duration: document.querySelector(
+        ".edit-upcoming-test-popup-wrapper .duration-related-error",
+      ),
+    },
+  },
+  // Previous Test
+  previousTest: {
+    container: document.querySelector(".previous-tests"),
+    noPreviousTest: document.querySelector(".no-previous-test"),
+    addContentBtn: document.querySelector(".previous-tests .add-content-btn"),
+    cardContainer: document.querySelector(".previous-tests .card-container"),
+  },
+  // Previous Test Popup
+  previousTestPopup: {
+    popup: document.querySelector(".previous-test-popup-wrapper"),
+    popupTitle: document.querySelector(
+      ".previous-test-popup-wrapper .popup-title",
+    ),
+    successBtn: document.querySelector(
+      ".previous-test-popup-wrapper .success-btn",
+    ),
+    closeBtn: document.querySelector(
+      ".previous-test-popup-wrapper .close-popup-btn",
+    ),
+    deleteBtn: document.querySelector(
+      ".previous-test-popup-wrapper .delete-btn",
+    ),
+    fakeDatePlaceholder: document.querySelector(
+      ".previous-test-popup-wrapper .fake-placeholder",
+    ),
+
+    inputs: {
+      title: document.querySelector("#previous-test-title-input"),
+      date: document.querySelector("#previous-test-date-input"),
+      duration: document.querySelector("#previous-test-duration-input"),
+      answerFile: document.querySelector("#answer-file-input"),
+      resultFile: document.querySelector("#result-file-input"),
+    },
+    errors: {
+      title: document.querySelector(
+        ".previous-test-popup-wrapper .title-related-error",
+      ),
+      date: document.querySelector(
+        ".previous-test-popup-wrapper .date-related-error",
+      ),
+      duration: document.querySelector(
+        ".previous-test-popup-wrapper .duration-related-error",
+      ),
+      answer: document.querySelector(
+        ".previous-test-popup-wrapper .answer-file-related-error",
+      ),
+      result: document.querySelector(
+        ".previous-test-popup-wrapper .result-file-related-error",
+      ),
+    },
+    attachments: {
+      answer: {
+        icon: document.querySelector(
+          ".answer-file-attachment-container .upload-icon",
+        ),
+        text: document.querySelector(
+          ".answer-file-attachment-container .upload-text",
+        ),
+        inputWrapper: document.querySelector(".answer-file-input-wrapper"),
+      },
+      result: {
+        icon: document.querySelector(
+          ".result-file-attachment-container .upload-icon",
+        ),
+        text: document.querySelector(
+          ".result-file-attachment-container .upload-text",
+        ),
+        inputWrapper: document.querySelector(".result-file-input-wrapper"),
+      },
+    },
+  },
+};
+
 export async function loadTestSection() {
   await unloadTestsSection();
-  await renderUpcomingTests();
-  await renderPreviousTestCard();
+  initUpcomingTestCard();
+  renderPreviousTestCard();
+  applyEditModeUI();
 }
 export async function showTestsSection() {
   headerIcon.src =
@@ -29,170 +173,147 @@ export async function showTestsSection() {
 }
 async function unloadTestsSection() {
   await fadeOutEffect(testsSection);
-  previousTestCardWrapper.innerHTML = "";
+  DOM.previousTest.cardContainer.innerHTML = "";
 }
-
-// upcoming card elements
-const upcomingTestCard = document.querySelector(".upcoming-test .card");
-const upcomingTestCardTitle = upcomingTestCard.querySelector(".title");
-const upcomingTestCardDescription =
-  upcomingTestCard.querySelector(".description");
-const upcomingTestCardDay = upcomingTestCard.querySelector(".day");
-const upcomingTestCardDuration = upcomingTestCard.querySelector(".duration");
-const upcomingTestCardLink = upcomingTestCard.querySelector(".link");
-const upcomingTestJoinBtn = upcomingTestCard.querySelector(".join-btn");
-const upcomingTestTitle = document.querySelector(".upcoming-test .main-title");
-const comingSoonLabel = upcomingTestCard.querySelector(".coming-soon-label");
-//no test elements
-const noTest = document.querySelector(".upcoming-test .no-test");
-const scheduleTestButton = noTest.querySelector(".schedule-test-btn");
-scheduleTestButton.addEventListener("click", async () => {
+// upcoming test listner and functions
+DOM.upcomingTest.scheduleBtn.addEventListener("click", async () => {
   await resetUpcomingTestPopup();
-  hideElement(hideUpcomingTestBtn);
-  upcomingTestDescriptionInput.value =
+  DOM.upcomingTestPopup.popupTitle.textContent = "Add test";
+  hideElement(DOM.upcomingTestPopup.hideBtn);
+  DOM.upcomingTestPopup.inputs.description.value =
     appState.divisionData.testData.upcomingTest.description;
-  fadeInEffect(upcomingTestPopup);
+  fadeInEffect(DOM.upcomingTestPopup.popup);
 });
-function renderUpcomingTests() {
+function initUpcomingTestCard() {
   if (appState.divisionData.testData.upcomingTest.isVisible == false) {
-    fadeOutEffect(upcomingTestCard);
-    fadeInEffect(noTest);
+    hideElement(DOM.upcomingTest.card);
+    showElement(DOM.upcomingTest.noUpcomingTest);
     return;
   } else {
-    fadeInEffect(upcomingTestCard);
-    fadeOutEffect(noTest);
+    showElement(DOM.upcomingTest.card);
+    hideElement(DOM.upcomingTest.noUpcomingTest);
     const data = appState.divisionData.testData.upcomingTest;
-    upcomingTestCardTitle.textContent = data.title;
-    upcomingTestCardDescription.textContent = data.description;
-    upcomingTestCardDay.textContent = `Day : ${data.day}`;
-    upcomingTestCardDuration.textContent = `Duration : ${data.duration}`;
+    DOM.upcomingTest.cardTitle.textContent =
+      data.title.charAt(0).toUpperCase() + data.title.slice(1);
+    DOM.upcomingTest.cardDescription.textContent =
+      data.description.charAt(0).toUpperCase() + data.description.slice(1);
+    DOM.upcomingTest.cardDay.textContent = `Day : ${data.day.charAt(0).toUpperCase() + data.day.slice(1)}`;
+    DOM.upcomingTest.cardDuration.textContent = `Duration : ${data.duration} mins`;
     if (data.link) {
-      upcomingTestJoinBtn.href = data.link;
-      upcomingTestTitle.textContent = "Current Test";
-      fadeOutEffect(comingSoonLabel);
-      fadeInEffect(upcomingTestJoinBtn);
+      DOM.upcomingTest.cardJoinBtn.href = data.link;
+      DOM.upcomingTest.containerTitle.textContent = "Current Test";
+      hideElement(DOM.upcomingTest.cardComingSoonLabel);
+      showElement(DOM.upcomingTest.cardJoinBtn);
     } else {
-      upcomingTestTitle.textContent = "Upcoming Test";
-      fadeOutEffect(upcomingTestJoinBtn);
-      fadeInEffect(comingSoonLabel);
+      DOM.upcomingTest.containerTitle.textContent = "Upcoming Test";
+      hideElement(DOM.upcomingTest.cardJoinBtn);
+      showElement(DOM.upcomingTest.cardComingSoonLabel);
     }
   }
 }
-const upcomingTest = document.querySelector(".upcoming-test ");
-const upcomingTestPopup = document.querySelector(
-  ".edit-upcoming-test-popup-wrapper"
-);
-const upcomingTestPopupTitle = upcomingTestPopup.querySelector(".popup-title");
-let toBeUnhide = null;
-// buttons inside popup
-const upcomingTestPopupCloseBtn =
-  upcomingTestPopup.querySelector(".close-popup-btn");
-const upcomingTestPopupCreateBtn =
-  upcomingTestPopup.querySelector(".create-btn");
-// inputs
-const upcomingTestTitleInput = upcomingTestPopup.querySelector(".title-input");
-const upcomingTestDescriptionInput =
-  upcomingTestPopup.querySelector(".description-input");
-const upcomingTestLinkInput = upcomingTestPopup.querySelector(".link-input");
-const upcomingTestDayInput = upcomingTestPopup.querySelector(".day-input");
-const upcomingTestDurationInput =
-  upcomingTestPopup.querySelector(".duration-input");
-// error messages
-const upcomingTestTitleError = upcomingTestPopup.querySelector(
-  ".title-related-error"
-);
-const upcomingTestDescriptionError = upcomingTestPopup.querySelector(
-  ".description-related-error"
-);
-const upcomingTestLinkError = upcomingTestPopup.querySelector(
-  ".link-related-error"
-);
-const upcomingTestDayError =
-  upcomingTestPopup.querySelector(".day-related-error");
-const upcomingTestDurationError = upcomingTestPopup.querySelector(
-  ".duration-related-error"
-);
-const hideUpcomingTestBtn = upcomingTestPopup.querySelector(".hide-icon");
-upcomingTestPopupCloseBtn.addEventListener("click", async () => {
-  await fadeOutEffect(upcomingTestPopup);
+
+// upcoming test popup functions and listeners
+DOM.upcomingTestPopup.closeBtn.addEventListener("click", async () => {
+  await fadeOutEffect(DOM.upcomingTestPopup.popup);
   resetUpcomingTestPopup();
 });
-upcomingTestPopupCreateBtn.addEventListener("click", async () => {
+DOM.upcomingTestPopup.successBtn.addEventListener("click", async () => {
   let isError = false;
-  const title = upcomingTestTitleInput.value.trim();
-  const description = upcomingTestDescriptionInput.value.trim();
-  const day = upcomingTestDayInput.value.trim();
-  const duration = upcomingTestDurationInput.value.trim();
-  const link = upcomingTestLinkInput.value.trim();
-  if (!title) {
-    upcomingTestTitleError.textContent = "Title is required";
-    fadeInEffect(upcomingTestTitleError);
+  hideElement(DOM.upcomingTestPopup.errors.title);
+  hideElement(DOM.upcomingTestPopup.errors.description);
+  hideElement(DOM.upcomingTestPopup.errors.link);
+  hideElement(DOM.upcomingTestPopup.errors.day);
+  hideElement(DOM.upcomingTestPopup.errors.duration);
+  const inputTitle = DOM.upcomingTestPopup.inputs.title.value.trim();
+  const inputDescription =
+    DOM.upcomingTestPopup.inputs.description.value.trim();
+  const inputDay = DOM.upcomingTestPopup.inputs.day.value.trim();
+  let inputDuration = DOM.upcomingTestPopup.inputs.duration.value.trim();
+  const inputLink = DOM.upcomingTestPopup.inputs.link.value.trim();
+  if (!inputTitle) {
+    DOM.upcomingTestPopup.errors.title.textContent = "Title is required";
+    showElement(DOM.upcomingTestPopup.errors.title);
     isError = true;
   }
-  if (!description) {
-    upcomingTestDescriptionError.textContent = "Description is required";
-    fadeInEffect(upcomingTestDescriptionError);
+  if (!inputDescription) {
+    DOM.upcomingTestPopup.errors.description.textContent =
+      "Description is required";
+    showElement(DOM.upcomingTestPopup.errors.description);
     isError = true;
   }
-  if (!day) {
-    upcomingTestDayError.textContent = "Day is required";
-    fadeInEffect(upcomingTestDayError);
+  if (!inputDay) {
+    DOM.upcomingTestPopup.errors.day.textContent = "Day is required";
+    showElement(DOM.upcomingTestPopup.errors.day);
     isError = true;
   }
-  if (!duration) {
-    upcomingTestDurationError.textContent = "Duration is required";
-    fadeInEffect(upcomingTestDurationError);
+  if (!inputDuration) {
+    DOM.upcomingTestPopup.errors.duration.textContent = "Duration is required";
+    showElement(DOM.upcomingTestPopup.errors.duration);
     isError = true;
   }
-  if (link) {
-    if (!/^https?:\/\//.test(link)) {
-      upcomingTestLinkError.textContent =
+  if (inputLink) {
+    if (!/^https?:\/\//.test(inputLink)) {
+      DOM.upcomingTestPopup.errors.link.textContent =
         "Enter a valid link starting with http:// or https://";
-      fadeInEffect(upcomingTestLinkError);
+      showElement(DOM.upcomingTestPopup.errors.link);
       isError = true;
     }
   }
   if (isError) return;
   showSectionLoader("Updating data...");
+  inputDuration = Number(inputDuration);
   await updateData(
     `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/testData/upcomingTest`,
     {
-      title: upcomingTestTitleInput.value.trim(),
-      description: upcomingTestDescriptionInput.value.trim(),
-      day: upcomingTestDayInput.value.trim(),
-      duration: upcomingTestDurationInput.value.trim(),
-      link: upcomingTestLinkInput.value.trim(),
+      title: inputTitle,
+      description: inputDescription,
+      day: inputDay,
+      duration: inputDuration,
+      link: inputLink,
       isVisible: true,
-    }
+    },
   );
-  fadeOutEffect(upcomingTestPopup);
+  fadeOutEffect(DOM.upcomingTestPopup.popup);
   showSectionLoader("Syncing data...");
-  resetPreviousTestPopup();
+  resetUpcomingTestPopup();
   await syncDbData();
   hideSectionLoader();
   await loadTestSection();
   showTestsSection();
 });
-upcomingTestCard.addEventListener("click", () => {
+DOM.upcomingTestPopup.inputs.duration.addEventListener("input", () => {
+  if (DOM.upcomingTestPopup.inputs.duration.value.length == 3) {
+    DOM.upcomingTestPopup.errors.duration.textContent =
+      "Max time can be 99 min";
+    DOM.upcomingTestPopup.inputs.duration.value =
+      DOM.upcomingTestPopup.inputs.duration.value.slice(0, 2);
+    showElement(DOM.upcomingTestPopup.errors.duration);
+  } else {
+    hideElement(DOM.upcomingTestPopup.errors.duration);
+  }
+});
+DOM.upcomingTest.card.addEventListener("click", () => {
   if (!appState.isEditing) return;
   if (appState.divisionData.testData.upcomingTest.visible === true) {
-    fadeInEffect(hideUpcomingTestBtn);
+    showElement(hideUpcomingTestBtn);
   }
-  upcomingTestTitleInput.value =
-    appState.divisionData.testData.upcomingTest.title;
-  upcomingTestDescriptionInput.value =
-    appState.divisionData.testData.upcomingTest.description;
-  upcomingTestDayInput.value = appState.divisionData.testData.upcomingTest.day;
-  upcomingTestDurationInput.value =
-    appState.divisionData.testData.upcomingTest.duration;
-  upcomingTestLinkInput.value =
-    appState.divisionData.testData.upcomingTest.link;
+  console.log(appState.divisionData.testData.upcomingTest);
 
-  fadeInEffect(upcomingTestPopup);
+  DOM.upcomingTestPopup.inputs.title.value =
+    appState.divisionData.testData.upcomingTest.title;
+  DOM.upcomingTestPopup.inputs.description.value =
+    appState.divisionData.testData.upcomingTest.description;
+  DOM.upcomingTestPopup.inputs.day.value =
+    appState.divisionData.testData.upcomingTest.day;
+  DOM.upcomingTestPopup.inputs.duration.value =
+    appState.divisionData.testData.upcomingTest.duration;
+  DOM.upcomingTestPopup.inputs.link.value =
+    appState.divisionData.testData.upcomingTest.link;
+  fadeInEffect(DOM.upcomingTestPopup.popup);
 });
-hideUpcomingTestBtn.addEventListener("click", async () => {
+DOM.upcomingTestPopup.hideBtn.addEventListener("click", async () => {
   const isConfirmed = await showConfirmationPopup(
-    "Are you sure you want to hide this test?"
+    "Are you sure you want to hide this test?",
   );
   if (!isConfirmed) return;
   showSectionLoader("Hiding test...");
@@ -200,9 +321,9 @@ hideUpcomingTestBtn.addEventListener("click", async () => {
     `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/testData/upcomingTest`,
     {
       isVisible: false,
-    }
+    },
   );
-  fadeOutEffect(upcomingTestPopup);
+  fadeOutEffect(DOM.upcomingTestPopup.popup);
   showSectionLoader("Syncing data...");
   await syncDbData();
   hideSectionLoader();
@@ -210,182 +331,158 @@ hideUpcomingTestBtn.addEventListener("click", async () => {
   await loadTestSection();
   showTestsSection();
 });
-function resetUpcomingTestPopup() {
-  upcomingTestTitleInput.value = "";
-  upcomingTestDescriptionInput.value = "";
-  upcomingTestLinkInput.value = "";
-  upcomingTestDayInput.value = "";
-  upcomingTestDurationInput.value = "";
-  upcomingTestPopupTitle.textContent = "Edit";
-  showElement(hideUpcomingTestBtn);
-  fadeOutEffect(upcomingTestTitleError);
-  fadeOutEffect(upcomingTestDescriptionError);
-  fadeOutEffect(upcomingTestLinkError);
-  fadeOutEffect(upcomingTestDayError);
-  fadeOutEffect(upcomingTestDurationError);
-}
-upcomingTestTitleInput.addEventListener("input", () => {
-  if (upcomingTestTitleInput.value.length == 12)
-    upcomingTestTitleError.textContent = "Max 12 characters reached";
-  showElement(upcomingTestTitleError);
+DOM.upcomingTestPopup.inputs.title.addEventListener("input", () => {
+  if (DOM.upcomingTestPopup.inputs.title.value.length == 13) {
+    DOM.upcomingTestPopup.errors.title.textContent =
+      "Max 12 characters reached";
+
+    DOM.upcomingTestPopup.inputs.title.value =
+      DOM.upcomingTestPopup.inputs.title.value.slice(0, 12);
+    showElement(DOM.upcomingTestPopup.errors.title);
+  } else {
+    hideElement(DOM.upcomingTestPopup.errors.title);
+  }
 });
+DOM.upcomingTestPopup.inputs.description.addEventListener("input", () => {
+  if (DOM.upcomingTestPopup.inputs.description.value.length == 201) {
+    DOM.upcomingTestPopup.errors.description.textContent =
+      "Max 200 characters reached";
+    DOM.upcomingTestPopup.inputs.description.value =
+      DOM.upcomingTestPopup.inputs.description.value.slice(0, 200);
+    showElement(DOM.upcomingTestPopup.errors.description);
+  } else {
+    hideElement(DOM.upcomingTestPopup.errors.description);
+  }
+});
+function resetUpcomingTestPopup() {
+  DOM.upcomingTestPopup.inputs.title.value = "";
+  DOM.upcomingTestPopup.inputs.description.value = "";
+  DOM.upcomingTestPopup.inputs.link.value = "";
+  DOM.upcomingTestPopup.inputs.day.value = "";
+  DOM.upcomingTestPopup.inputs.duration.value = "";
+  DOM.upcomingTestPopup.popupTitle.textContent = "Edit";
+  showElement(DOM.upcomingTestPopup.hideBtn);
+  hideElement(DOM.upcomingTestPopup.errors.title);
+  hideElement(DOM.upcomingTestPopup.errors.description);
+  hideElement(DOM.upcomingTestPopup.errors.link);
+  hideElement(DOM.upcomingTestPopup.errors.day);
+  hideElement(DOM.upcomingTestPopup.errors.duration);
+}
+
 //previous tests
 let isPreviousTestEditing = false;
 let previousTestEditingKey = null;
-const noPreviousTest = document.querySelector(".no-previous-test");
-const previousTest = document.querySelector(".previous-tests");
-const previousTestPopup = document.querySelector(
-  ".previous-test-popup-wrapper"
-);
-const previousTestFakePlaceholder =
-  previousTestPopup.querySelector(".fake-placeholder");
-const addPreviousTestBtn = document.querySelector(".previous-tests .add-btn");
-const previousTestPopupTitle = previousTestPopup.querySelector(".popup-title");
-// button inside popup
-const previousTestPopupCreateBtn =
-  previousTestPopup.querySelector(".create-btn");
-const previousTestPopupCloseBtn =
-  previousTestPopup.querySelector(".close-popup-btn");
-const previousTestCardWrapper = document.querySelector(
-  ".previous-tests .card-container"
-);
-const previousTestPopupDeleteBtn =
-  previousTestPopup.querySelector(".delete-btn");
-// inputs
-const previousTestTitleInput = previousTestPopup.querySelector(
-  "#previous-test-title-input"
-);
-const previousTestDateInput = previousTestPopup.querySelector(
-  "#previous-test-date-input"
-);
-const previousTestDurationInput = previousTestPopup.querySelector(
-  "#previous-test-duration-input"
-);
-const resultFileInput = previousTestPopup.querySelector("#result-file-input");
-const answerFileInput = previousTestPopup.querySelector("#answer-file-input");
-// error messages
-const previousTestTitleError = previousTestPopup.querySelector(
-  ".title-related-error"
-);
-const previousTestDateError = previousTestPopup.querySelector(
-  ".date-related-error"
-);
-const previousTestDurationError = previousTestPopup.querySelector(
-  ".duration-related-error"
-);
-const resultFileAttachmentError = previousTestPopup.querySelector(
-  " .result-file-related-error"
-);
-const answerFileAttachmentError = previousTestPopup.querySelector(
-  ".answer-file-related-error"
-);
-// result upload ui
-const resultFileAttachment = previousTestPopup.querySelector(
-  ".result-file-attachment"
-);
-const resultFileInputWrapper = previousTestPopup.querySelector(
-  ".result-file-input-wrapper"
-);
-const resultFileAttachmentIcon = resultFileAttachment.querySelector(
-  ".upload-attachment-icon"
-);
-const resultFileAttachmentText =
-  resultFileAttachment.querySelector(".upload-text");
-const answerFileAttachment = previousTestPopup.querySelector(
-  ".answer-file-attachment"
-);
-const answerFileInputWrapper = previousTestPopup.querySelector(
-  ".answer-file-input-wrapper"
-);
-const answerFileAttachmentIcon = answerFileAttachment.querySelector(
-  ".upload-attachment-icon"
-);
-const answerFileAttachmentText =
-  answerFileAttachment.querySelector(".upload-text");
-previousTestPopupCloseBtn.addEventListener("click", async () => {
-  await fadeOutEffect(previousTestPopup);
+DOM.previousTestPopup.closeBtn.addEventListener("click", async () => {
+  await fadeOutEffect(DOM.previousTestPopup.popup);
   resetPreviousTestPopup();
 });
-previousTestTitleInput.addEventListener("input", () => {
-  if (previousTestTitleInput.value.length == 12)
-    previousTestTitleError.textContent = "Max 12 characters reached";
-  showElement(previousTestTitleError);
-});
-resultFileInput.addEventListener("change", () => {
-  const file = resultFileInput.files[0];
-  if (file) {
-    if (file.size > 20000000) {
-      resultFileAttachmentError.textContent =
-        "File size must be less than 20 mb";
-      fadeInEffect(resultFileAttachmentError);
-      return;
-    }
-    resultFileAttachmentIcon.classList.add("hidden");
-    resultFileAttachmentText.textContent = "1 file uploaded";
-  }
-});
-resultFileAttachment.addEventListener("click", () => {
-  resultFileInput.click();
-});
-answerFileInput.addEventListener("change", () => {
-  const file = answerFileInput.files[0];
-  if (file) {
-    if (file.size > 20000000) {
-      answerFileAttachmentError.textContent =
-        "File size must be less than 20mb";
-      fadeInEffect(answerFileAttachmentError);
-      return;
-    }
-    answerFileAttachmentIcon.classList.add("hidden");
-    answerFileAttachmentText.textContent = "1 file uploaded";
-  }
-});
-answerFileAttachment.addEventListener("click", () => {
-  answerFileInput.click();
-});
-addPreviousTestBtn.addEventListener("click", () => {
-  fadeInEffect(previousTestPopup);
-});
-previousTestDateInput.addEventListener("input", () => {
-  previousTestFakePlaceholder.focus();
-  fadeOutEffect(previousTestFakePlaceholder);
-});
-previousTestDateInput.addEventListener("click", () => {
-  if (previousTestDateInput.showPicker) {
-    previousTestDateInput.showPicker();
+DOM.previousTestPopup.inputs.title.addEventListener("input", () => {
+  if (DOM.previousTestPopup.inputs.title.value.length == 13) {
+    DOM.previousTestPopup.inputs.title.value =
+      DOM.previousTestPopup.inputs.title.value.slice(0, 12);
+    DOM.previousTestPopup.errors.title.textContent =
+      "Max 12 characters reached";
+    showElement(DOM.previousTestPopup.errors.title);
   } else {
-    previousTestDateInput.focus();
+    hideElement(DOM.previousTestPopup.errors.title);
   }
 });
-previousTestPopupCreateBtn.addEventListener("click", async () => {
-  fadeOutEffect(previousTestDateError);
-  fadeOutEffect(previousTestDurationError);
-  fadeOutEffect(previousTestTitleError);
-  fadeOutEffect(answerFileAttachmentError);
-  fadeOutEffect(resultFileAttachmentError);
-  const title = previousTestTitleInput.value.trim();
-  const date = previousTestDateInput.value;
-  const duration = previousTestDurationInput.value.trim();
-  const answerFile = answerFileInput.files[0];
-  const resultFile = resultFileInput.files[0];
+DOM.previousTestPopup.inputs.duration.addEventListener("input", () => {
+  if (DOM.previousTestPopup.inputs.duration.value.length == 3) {
+    DOM.previousTestPopup.errors.duration.textContent =
+      "Max time can be 99 min";
+    DOM.previousTestPopup.inputs.duration.value =
+      DOM.previousTestPopup.inputs.duration.value.slice(0, 2);
+    showElement(DOM.previousTestPopup.errors.duration);
+  } else {
+    hideElement(DOM.previousTestPopup.errors.duration);
+  }
+});
+DOM.previousTestPopup.inputs.resultFile.addEventListener("change", () => {
+  const file = DOM.previousTestPopup.inputs.resultFile.files[0];
+  if (file) {
+    if (file.size > 20000000) {
+      DOM.previousTestPopup.errors.result.textContent =
+        "File size must be less than 20 mb";
+      showElement(DOM.previousTestPopup.errors.result);
+      DOM.previousTestPopup.inputs.resultFile.value = "";
+      return;
+    }
+    DOM.previousTestPopup.attachments.result.icon.classList.add("hidden");
+    DOM.previousTestPopup.attachments.result.text.textContent =
+      "1 file uploaded";
+  }
+});
+DOM.previousTestPopup.attachments.result.inputWrapper.addEventListener(
+  "click",
+  () => {
+    DOM.previousTestPopup.inputs.resultFile.click();
+  },
+);
+DOM.previousTestPopup.inputs.answerFile.addEventListener("change", () => {
+  const file = DOM.previousTestPopup.inputs.answerFile.files[0];
+  if (file) {
+    if (file.size > 20000000) {
+      DOM.previousTestPopup.errors.answer.textContent =
+        "File size must be less than 20mb";
+      DOM.previousTestPopup.inputs.answerFile.value = "";
+      showElement(DOM.previousTestPopup.errors.answer);
+      return;
+    }
+    DOM.previousTestPopup.attachments.answer.icon.classList.add("hidden");
+    DOM.previousTestPopup.attachments.answer.text.textContent =
+      "1 file uploaded";
+  }
+});
+DOM.previousTestPopup.attachments.answer.inputWrapper.addEventListener(
+  "click",
+  () => {
+    DOM.previousTestPopup.inputs.answerFile.click();
+  },
+);
+DOM.previousTest.addContentBtn.addEventListener("click", () => {
+  fadeInEffect(DOM.previousTestPopup.popup);
+});
+DOM.previousTestPopup.inputs.date.addEventListener("input", () => {
+  DOM.previousTestPopup.fakeDatePlaceholder.focus();
+  hideElement(DOM.previousTestPopup.fakeDatePlaceholder);
+});
+DOM.previousTestPopup.inputs.date.addEventListener("click", () => {
+  if (DOM.previousTestPopup.inputs.date.showPicker) {
+    DOM.previousTestPopup.inputs.date.showPicker();
+  } else {
+    DOM.previousTestPopup.inputs.date.focus();
+  }
+});
+DOM.previousTestPopup.successBtn.addEventListener("click", async () => {
+  hideElement(DOM.previousTestPopup.errors.date);
+  hideElement(DOM.previousTestPopup.errors.duration);
+  hideElement(DOM.previousTestPopup.errors.title);
+  hideElement(DOM.previousTestPopup.errors.answer);
+  hideElement(DOM.previousTestPopup.errors.result);
+  const title = DOM.previousTestPopup.inputs.title.value.trim();
+  const date = DOM.previousTestPopup.inputs.date.value;
+  const duration = DOM.previousTestPopup.inputs.duration.value.trim();
+  const answerFile = DOM.previousTestPopup.inputs.answerFile.files[0];
+  const resultFile = DOM.previousTestPopup.inputs.resultFile.files[0];
   let isError = false;
   let answerAttachmentUrl;
   let answerAttachmentId;
   let resultAttachmentUrl;
   let resultAttachmentId;
   if (!title) {
-    previousTestTitleError.textContent = "Title is required";
-    fadeInEffect(previousTestTitleError);
+    DOM.previousTestPopup.errors.title.textContent = "Title is required";
+    showElement(DOM.previousTestPopup.errors.title);
     isError = true;
   }
   if (!date) {
-    previousTestDateError.textContent = "Date is required";
-    fadeInEffect(previousTestDateError);
+    DOM.previousTestPopup.errors.date.textContent = "Date is required";
+    showElement(DOM.previousTestPopup.errors.date);
     isError = true;
   }
   if (!duration) {
-    previousTestDurationError.textContent = "Duration is required";
-    fadeInEffect(previousTestDurationError);
+    DOM.previousTestPopup.errors.duration.textContent = "Duration is required";
+    showElement(DOM.previousTestPopup.errors.duration);
     isError = true;
   }
   if (isPreviousTestEditing) {
@@ -399,24 +496,26 @@ previousTestPopupCreateBtn.addEventListener("click", async () => {
         title: title,
         date: date,
         duration: duration,
-      }
+      },
     );
   } else {
     if (!answerFile) {
-      answerFileAttachmentError.textContent = "Answer file is required";
-      fadeInEffect(answerFileAttachmentError);
+      DOM.previousTestPopup.errors.answer.textContent =
+        "Answer file is required";
+      showElement(DOM.previousTestPopup.errors.answer);
       isError = true;
     }
     if (!resultFile) {
-      resultFileAttachmentError.textContent = "Result file is required";
-      fadeInEffect(resultFileAttachmentError);
+      DOM.previousTestPopup.errors.result.textContent =
+        "Result file is required";
+      showElement(DOM.previousTestPopup.errors.result);
       isError = true;
     }
     if (isError) return;
     showSectionLoader("Uploading answer key...");
     let uploaded = await uploadDriveFile(
       answerFile,
-      `${appState.activeSem}/divisionData/division${appState.activeDiv}/previousTestData/answerKey`
+      `${appState.activeSem}/divisionData/division${appState.activeDiv}/previousTestData/answerKey`,
     );
     if (!uploaded) {
       hideSectionLoader();
@@ -427,7 +526,7 @@ previousTestPopupCreateBtn.addEventListener("click", async () => {
     showSectionLoader("Uploading result...");
     let resultUploaded = await uploadDriveFile(
       resultFile,
-      `${appState.activeSem}/divisionData/division${appState.activeDiv}/previousTestData/result`
+      `${appState.activeSem}/divisionData/division${appState.activeDiv}/previousTestData/result`,
     );
     if (!resultUploaded) {
       hideSectionLoader();
@@ -446,21 +545,21 @@ previousTestPopupCreateBtn.addEventListener("click", async () => {
         resultFileId: resultAttachmentId,
         answerFileUrl: answerAttachmentUrl,
         resultFileUrl: resultAttachmentUrl,
-      }
+      },
     );
   }
   showSectionLoader("Syncing data...");
-  await fadeOutEffect(previousTestPopup);
+  await fadeOutEffect(DOM.previousTestPopup.popup);
   await syncDbData();
   hideSectionLoader();
   resetPreviousTestPopup();
   await loadTestSection();
   showTestsSection();
 });
-previousTestPopupDeleteBtn.addEventListener("click", async () => {
+DOM.previousTestPopup.deleteBtn.addEventListener("click", async () => {
   if (!isPreviousTestEditing) return;
   const isConfirmed = await showConfirmationPopup(
-    "Are you sure you want to delete this test? This action cannot be undone."
+    "Are you sure you want to delete this test? This action cannot be undone.",
   );
   if (!isConfirmed) return;
   const resultId =
@@ -475,11 +574,11 @@ previousTestPopupDeleteBtn.addEventListener("click", async () => {
   await deleteDriveFile(answerId);
   showSectionLoader("Deleting test...");
   await deleteData(
-    `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/testData/previousTestList/${previousTestEditingKey}`
+    `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/testData/previousTestList/${previousTestEditingKey}`,
   );
   await hideSectionLoader();
   resetPreviousTestPopup();
-  fadeOutEffect(previousTestPopup);
+  fadeOutEffect(DOM.previousTestPopup.popup);
   showSectionLoader("Syncing data...");
   await syncDbData();
   await loadTestSection();
@@ -492,11 +591,10 @@ function renderPreviousTestCard() {
   if (Object.keys(previousTestsdata).length === 0 || !previousTestsdata) {
     console.log("this is called");
     console.log(previousTestsdata);
-    fadeInEffect(noPreviousTest);
-
+    showElement(DOM.previousTest.noPreviousTest);
     return;
   }
-  hideElement(noPreviousTest);
+  hideElement(DOM.previousTest.noPreviousTest);
   for (const key in previousTestsdata) {
     const data = previousTestsdata[key];
     const title = data.title;
@@ -513,8 +611,9 @@ function renderPreviousTestCard() {
       "lg:gap-5",
       "w-full",
       "rounded-3xl",
-      "lg:max-w-[500px]",
-      "p-6"
+      "lg:max-w-[31.24rem]",
+      "p-6",
+      "editor-hover-pointer",
     );
     const wrapper = document.createElement("div");
     wrapper.classList.add(
@@ -522,7 +621,7 @@ function renderPreviousTestCard() {
       "w-full",
       "flex",
       "items-center",
-      "justify-between"
+      "justify-between",
     );
     const iconNameWrapper = document.createElement("div");
     iconNameWrapper.classList.add(
@@ -530,16 +629,16 @@ function renderPreviousTestCard() {
       "items-center",
       "gap-2",
       "lg:gap-3",
-      "icon-name-wrapper"
+      "icon-name-wrapper",
     );
     const img = document.createElement("img");
     img.src =
       "https://ik.imagekit.io/yn9gz2n2g/others/test.png?updatedAt=1751607386764";
-    img.classList.add("h-[45px]");
+    img.classList.add("h-[3rem]");
     img.alt = "";
     const testTitle = document.createElement("p");
     testTitle.classList.add("text-xl", "font-semibold");
-    testTitle.textContent = title;
+    testTitle.textContent = title.charAt(0).toUpperCase() + title.slice(1);
     iconNameWrapper.appendChild(img);
     iconNameWrapper.appendChild(testTitle);
     const resultLink = document.createElement("a");
@@ -558,7 +657,7 @@ function renderPreviousTestCard() {
       "font-light",
       "flex",
       "flex-col",
-      "gap-1"
+      "gap-1",
     );
     const day = document.createElement("p");
     day.classList.add("date");
@@ -573,7 +672,17 @@ function renderPreviousTestCard() {
     dateWrapper.appendChild(answerLink);
     card.appendChild(wrapper);
     card.appendChild(dateWrapper);
-    previousTestCardWrapper.appendChild(card);
+    DOM.previousTest.cardContainer.appendChild(card);
+    resultBtn.addEventListener("click", (e) => {
+      if (appState.isEditing) {
+        e.preventDefault();
+      }
+    });
+    answerLink.addEventListener("click", (e) => {
+      if (appState.isEditing) {
+        e.preventDefault();
+      }
+    });
     card.addEventListener("click", () => {
       if (appState.isEditing) {
         editPreviousTestCard(key);
@@ -581,47 +690,44 @@ function renderPreviousTestCard() {
     });
   }
 }
-
 function editPreviousTestCard(key) {
-  console.log("this is from the test page", appState.divisionData);
   const data = appState.divisionData.testData.previousTestList[key];
-  showElement(previousTestPopupDeleteBtn);
   isPreviousTestEditing = true;
   previousTestEditingKey = key;
-  previousTestTitleInput.value = data.title;
-  previousTestDateInput.value = data.date;
-  previousTestDurationInput.value = data.duration;
-  previousTestPopupTitle.textContent = "Edit test";
-  previousTestPopupCreateBtn.textContent = "Update";
-  fadeOutEffect(previousTestFakePlaceholder);
-  fadeOutEffect(answerFileInputWrapper);
-  fadeOutEffect(resultFileInputWrapper);
-  fadeInEffect(previousTestPopup);
+  DOM.previousTestPopup.inputs.title.value = data.title;
+  DOM.previousTestPopup.inputs.date.value = data.date;
+  DOM.previousTestPopup.inputs.duration.value = data.duration;
+  DOM.previousTestPopup.popupTitle.textContent = "Edit test";
+  DOM.previousTestPopup.successBtn.textContent = "Update";
+  showElement(DOM.previousTestPopup.deleteBtn);
+  hideElement(DOM.previousTestPopup.fakeDatePlaceholder);
+  hideElement(DOM.previousTestPopup.attachments.answer.inputWrapper);
+  hideElement(DOM.previousTestPopup.attachments.result.inputWrapper);
+  fadeInEffect(DOM.previousTestPopup.popup);
 }
 function resetPreviousTestPopup() {
-  fadeOutEffect(previousTestPopup);
-  previousTestTitleInput.value = "";
-  previousTestDateInput.value = "";
-  previousTestDurationInput.value = "";
-  previousTestPopupTitle.textContent = "Add test";
-  previousTestPopupCreateBtn.textContent = "Create";
-  resultFileAttachmentText.textContent = "Upload Result Pdf";
-  answerFileAttachmentText.textContent = "Upload Answer Pdf";
-  hideElement(previousTestPopupDeleteBtn);
-  fadeOutEffect(previousTestDateError);
-  fadeOutEffect(previousTestDurationError);
-  fadeOutEffect(previousTestTitleError);
-  fadeOutEffect(answerFileAttachmentError);
-  fadeOutEffect(resultFileAttachmentError);
-  fadeInEffect(answerFileAttachmentIcon);
-  fadeInEffect(resultFileAttachmentIcon);
-  fadeInEffect(resultFileAttachmentText);
-  fadeInEffect(answerFileAttachmentText);
-  fadeInEffect(answerFileAttachment);
-  fadeInEffect(resultFileAttachment);
+  fadeOutEffect(DOM.previousTestPopup.popup);
+  DOM.previousTestPopup.inputs.title.value = "";
+  DOM.previousTestPopup.inputs.date.value = "";
+  DOM.previousTestPopup.inputs.duration.value = "";
+  DOM.previousTestPopup.popupTitle.textContent = "Add test";
+  DOM.previousTestPopup.successBtn.textContent = "Create";
+  DOM.previousTestPopup.attachments.result.text.textContent =
+    "Upload Result Pdf";
+  DOM.previousTestPopup.attachments.answer.text.textContent =
+    "Upload Answer Pdf";
+  hideElement(DOM.previousTestPopup.deleteBtn);
+  hideElement(DOM.previousTestPopup.errors.date);
+  hideElement(DOM.previousTestPopup.errors.duration);
+  hideElement(DOM.previousTestPopup.errors.title);
+  hideElement(DOM.previousTestPopup.errors.answer);
+  hideElement(DOM.previousTestPopup.deleteBtn);
+  hideElement(DOM.previousTestPopup.errors.result);
+  showElement(DOM.previousTestPopup.attachments.answer.icon);
+  showElement(DOM.previousTestPopup.attachments.result.icon);
+  showElement(DOM.previousTestPopup.attachments.answer.inputWrapper);
+  showElement(DOM.previousTestPopup.attachments.result.inputWrapper);
+  showElement(DOM.previousTestPopup.fakeDatePlaceholder);
   isPreviousTestEditing = false;
   previousTestEditingKey = null;
-  fadeInEffect(previousTestFakePlaceholder);
-  fadeInEffect(answerFileInputWrapper);
-  fadeInEffect(resultFileInputWrapper);
 }

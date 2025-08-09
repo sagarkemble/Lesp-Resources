@@ -25,8 +25,8 @@ import {
   query,
   orderByChild,
 } from "firebase/database";
+import { getAnalytics, logEvent, setUserId } from "firebase/analytics";
 import { showErrorSection } from "./error";
-import { fadeOutEffect } from "./animation";
 const firebaseConfig = {
   apiKey: "AIzaSyDM6R7E9NRG1FjBsu8v_T9QdKth0LUeLDU",
   authDomain: "lesp-resources-350d1.firebaseapp.com",
@@ -39,6 +39,17 @@ const firebaseConfig = {
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const analytics = getAnalytics(app);
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    setUserId(analytics, user.uid);
+    logEvent(analytics, "login", { method: "firebase" });
+    // Just to test Analytics works at all
+    logEvent(analytics, "test_event", { debug: true });
+
+    console.log("event logged");
+  }
+});
 const db = getDatabase(app);
 // functions
 export function deleteData(path) {
@@ -109,4 +120,7 @@ export {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   setPersistence,
+  setUserId,
+  analytics,
+  logEvent,
 };

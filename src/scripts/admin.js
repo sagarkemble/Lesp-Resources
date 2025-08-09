@@ -24,9 +24,159 @@ import {
 import { headerIcon, headerTitle } from "./navigation";
 import { hideSections } from "./index";
 const adminSection = document.querySelector(".admin-section");
+let activeStudentId = null;
+let activeStudentObj = null;
+const DOM = {
+  adminSection: document.querySelector(".admin-section"),
+  semesterList: document.querySelector(".semester-list"),
+  semCardContainer: document.querySelector(".sem-card-container"),
+  divisionList: document.querySelector(".division-list"),
+  divCardContainer: document.querySelector(".div-card-container"),
+  classRoom: document.querySelector(".class-room"),
+  studentCardContainer: document.querySelector(".student-card-container"),
+  addStudentBtn: document.querySelector(".class-room .add-student-btn"),
+  addTeacherBtn: document.querySelector(".class-room .add-teacher-btn"),
+  addUserPopup: {
+    popup: document.querySelector(".add-user-link-popup-wrapper"),
+    link: document.querySelector("#add-user-link"),
+    successBtn: document.querySelector(
+      ".add-user-link-popup-wrapper .success-btn",
+    ),
+  },
+  individualUserPopup: {
+    popup: document.querySelector(".individual-user-popup-wrapper"),
+    displayName: document.querySelector(
+      ".individual-user-popup-wrapper .display-name",
+    ),
+    firstName: document.querySelector(
+      ".individual-user-popup-wrapper .first-name",
+    ),
+    lastName: document.querySelector(
+      ".individual-user-popup-wrapper .last-name",
+    ),
+    rollNo: document.querySelector(".individual-user-popup-wrapper .roll-no"),
+    email: document.querySelector(".individual-user-popup-wrapper .email"),
+    sem: document.querySelector(".individual-user-popup-wrapper .sem"),
+    div: document.querySelector(".individual-user-popup-wrapper .div"),
+    role: document.querySelector(".individual-user-popup-wrapper .role"),
+    pfp: document.querySelector(".individual-user-popup-wrapper .pfp"),
+    medalPointWrapper: document.querySelector(
+      ".individual-user-popup-wrapper .medal-point-wrapper",
+    ),
+    medals: {
+      gold: document.querySelector(
+        ".individual-user-popup-wrapper .gold-medal .qty",
+      ),
+      silver: document.querySelector(
+        ".individual-user-popup-wrapper .silver-medal .qty",
+      ),
+      bronze: document.querySelector(
+        ".individual-user-popup-wrapper .bronze-medal .qty",
+      ),
+    },
+    points: document.querySelector(".individual-user-popup-wrapper .points"),
+    closePopupBtn: document.querySelector(
+      ".individual-user-popup-wrapper .close-popup-btn",
+    ),
+  },
+  namePopup: {
+    popup: document.querySelector(".edit-name-popup-wrapper"),
+    inputs: {
+      firstName: document.querySelector("#user-first-name-input"),
+      lastName: document.querySelector("#user-last-name-input"),
+    },
+    errors: {
+      firstName: document.querySelector(
+        ".edit-name-popup-wrapper .first-name-error",
+      ),
+      lastName: document.querySelector(
+        ".edit-name-popup-wrapper .last-name-error",
+      ),
+    },
+    successBtn: document.querySelector(".edit-name-popup-wrapper .success-btn"),
+    closePopupBtn: document.querySelector(
+      ".edit-name-popup-wrapper .close-popup-btn",
+    ),
+  },
+  rollNoPopup: {
+    popup: document.querySelector(".edit-roll-no-popup-wrapper"),
+    input: document.querySelector(".edit-roll-no-popup-wrapper .roll-no-input"),
+    error: document.querySelector(".edit-roll-no-popup-wrapper .roll-no-error"),
+    successBtn: document.querySelector(
+      ".edit-roll-no-popup-wrapper .success-btn",
+    ),
+    closePopupBtn: document.querySelector(
+      ".edit-roll-no-popup-wrapper .close-popup-btn",
+    ),
+  },
+  emailPopup: {
+    popup: document.querySelector(".edit-email-popup-wrapper"),
+    input: document.querySelector(".edit-email-popup-wrapper .email-input"),
+    error: document.querySelector(".edit-email-popup-wrapper .email-error"),
+    successBtn: document.querySelector(
+      ".edit-email-popup-wrapper .success-btn",
+    ),
+    closePopupBtn: document.querySelector(
+      ".edit-email-popup-wrapper .close-popup-btn",
+    ),
+  },
+  rolePopup: {
+    popup: document.querySelector(".edit-role-popup-wrapper"),
+    input: document.querySelector(".edit-role-popup-wrapper .role-input"),
+    error: document.querySelector(".edit-role-popup-wrapper .role-error"),
+    successBtn: document.querySelector(".edit-role-popup-wrapper .success-btn"),
+    closePopupBtn: document.querySelector(
+      ".edit-role-popup-wrapper .close-popup-btn",
+    ),
+  },
+  semDivPopup: {
+    popup: document.querySelector(".edit-sem-div-popup-wrapper"),
+    inputs: {
+      semester: document.querySelector(
+        ".edit-sem-div-popup-wrapper .semester-input",
+      ),
+      division: document.querySelector(
+        ".edit-sem-div-popup-wrapper .division-input",
+      ),
+    },
+    errors: {
+      semester: document.querySelector(
+        ".edit-sem-div-popup-wrapper .semester-error",
+      ),
+      division: document.querySelector(
+        ".edit-sem-div-popup-wrapper .division-error",
+      ),
+    },
+    successBtn: document.querySelector(
+      ".edit-sem-div-popup-wrapper .success-btn",
+    ),
+    closePopupBtn: document.querySelector(
+      ".edit-sem-div-popup-wrapper .close-popup-btn",
+    ),
+  },
+  medalPopup: {
+    inputs: {
+      gold: document.querySelector(
+        ".edit-medal-popup-wrapper .gold-medal-input",
+      ),
+      silver: document.querySelector(
+        ".edit-medal-popup-wrapper .silver-medal-input",
+      ),
+      bronze: document.querySelector(
+        ".edit-medal-popup-wrapper .bronze-medal-input",
+      ),
+    },
+    error: document.querySelector(".edit-medal-popup-wrapper .medal-error"),
+    successBtn: document.querySelector(
+      ".edit-medal-popup-wrapper .success-btn",
+    ),
+    closePopupBtn: document.querySelector(
+      ".edit-medal-popup-wrapper .close-popup-btn",
+    ),
+    popup: document.querySelector(".edit-medal-popup-wrapper"),
+  },
+};
 //semester section
-const semesterList = adminSection.querySelector(".semester-list");
-const semCardContainer = semesterList.querySelector(".sem-card-container");
 async function showSemesterList() {
   await hideAdminDivisions();
   headerIcon.src =
@@ -43,7 +193,7 @@ async function showSemesterList() {
       "rounded-3xl",
       "p-6",
       "text-center",
-      "font-semibold"
+      "font-semibold",
     );
     card.textContent = semesterName;
     card.addEventListener("click", async (e) => {
@@ -52,33 +202,27 @@ async function showSemesterList() {
       history.pushState(
         { sem: activeSem },
         "",
-        `admin.html?sem=${encodeURIComponent(activeSem)}`
+        `admin.html?sem=${encodeURIComponent(activeSem)}`,
       );
       showDivisionList();
     });
-    semCardContainer.appendChild(card);
+    DOM.semCardContainer.appendChild(card);
   }
-  fadeInEffect(semesterList);
+  fadeInEffect(DOM.semesterList);
 }
 async function unloadSemesterList() {
-  semCardContainer.innerHTML = "";
-  fadeOutEffect(semesterList);
+  DOM.semCardContainer.innerHTML = "";
+  fadeOutEffect(DOM.semesterList);
 }
-
 //division section
-const divisionList = adminSection.querySelector(".division-list");
-const divCardContainer = divisionList.querySelector(".div-card-container");
 async function showDivisionList() {
   await hideAdminDivisions();
   headerIcon.src =
     "https://ik.imagekit.io/yn9gz2n2g/others/semester.png?updatedAt=1751607364675";
   headerTitle.textContent = adminAppState.activeSem;
-  console.log(adminAppState.semesterData[adminAppState.activeSem].divisionList);
-
   for (const key in adminAppState.semesterData[adminAppState.activeSem]
     .divisionList) {
     const divisionName = `Div - ${key}`;
-
     const card = document.createElement("div");
     card.classList.add(
       "card",
@@ -88,10 +232,9 @@ async function showDivisionList() {
       "rounded-3xl",
       "p-6",
       "text-center",
-      "font-semibold"
+      "font-semibold",
     );
     card.textContent = divisionName;
-
     card.addEventListener("click", async (e) => {
       let activeDiv = e.target.textContent.replace("Div - ", "");
       adminAppState.activeDiv = activeDiv;
@@ -99,23 +242,20 @@ async function showDivisionList() {
         { div: activeDiv },
         "",
         `admin.html?sem=${encodeURIComponent(
-          adminAppState.activeSem
-        )}&div=${encodeURIComponent(activeDiv)}`
+          adminAppState.activeSem,
+        )}&div=${encodeURIComponent(activeDiv)}`,
       );
       showClassRoom();
     });
-    divCardContainer.appendChild(card);
+    DOM.divCardContainer.appendChild(card);
   }
-  fadeInEffect(divisionList);
+  fadeInEffect(DOM.divisionList);
 }
 async function unloadDivisionList() {
-  divCardContainer.innerHTML = "";
-  fadeOutEffect(divisionList);
+  DOM.divCardContainer.innerHTML = "";
+  fadeOutEffect(DOM.divisionList);
 }
-
 // class room section
-const classRoom = adminSection.querySelector(".class-room");
-const studentCardContainer = classRoom.querySelector(".student-card-container");
 const viewClassRoomButton = document.querySelector(".visit-classroom-btn");
 async function showClassRoom() {
   await hideAdminDivisions();
@@ -123,7 +263,6 @@ async function showClassRoom() {
     "https://ik.imagekit.io/yn9gz2n2g/others/semester.png?updatedAt=1751607364675";
   headerTitle.textContent = adminAppState.activeDiv;
   const studentRawData = await getStudentRawData();
-  console.log(studentRawData);
   let sortedRollNoWiseStudentData = {};
   if (studentRawData) {
     sortedRollNoWiseStudentData = Object.entries(studentRawData)
@@ -135,25 +274,15 @@ async function showClassRoom() {
   } else {
     sortedRollNoWiseStudentData = {};
   }
-  console.log();
-
   adminAppState.semesterData[adminAppState.activeSem].divisionList[
     adminAppState.activeDiv
   ].studentList = sortedRollNoWiseStudentData;
-  console.log(
-    adminAppState.semesterData[adminAppState.activeSem].divisionList[
-      adminAppState.activeDiv
-    ].studentList
-  );
   renderIndividualStudentCard();
-  await fadeInEffect(classRoom);
-}
-async function hideClassRoom() {
-  fadeOutEffect(classRoom);
+  fadeInEffect(DOM.classRoom);
 }
 async function unloadClassRoom() {
-  studentCardContainer.innerHTML = "";
-  fadeOutEffect(classRoom);
+  DOM.studentCardContainer.innerHTML = "";
+  fadeOutEffect(DOM.classRoom);
 }
 export async function initAdminRouting(userData) {
   if (userData) {
@@ -166,7 +295,6 @@ export async function initAdminRouting(userData) {
   const urlParams = new URLSearchParams(window.location.search);
   const sem = urlParams.get("sem");
   const div = urlParams.get("div");
-  console.log(div);
   if (div) {
     console.log("Div found");
     adminAppState.activeSem = sem;
@@ -194,9 +322,8 @@ function getStudentRawData() {
   const q = query(
     usersRef,
     orderByChild("division"),
-    equalTo(adminAppState.activeDiv)
+    equalTo(adminAppState.activeDiv),
   );
-
   return get(q).then((snapshot) => {
     if (snapshot.exists()) {
       return snapshot.val();
@@ -239,52 +366,47 @@ function renderIndividualStudentCard() {
         ].studentList[key];
       initIndividualStudentPopup();
     });
-    // card.addEventListener("click", () => {
-    //   activeStudentObj = student;
-    //   activeStudent = `${student.firstName}${student.lastName}`;
-    //   history.pushState(
-    //     { student: activeStudent },
-    //     "",
-    //     `admin.html?sem=${encodeURIComponent(
-    //       activeSem
-    //     )}&div=${activeDiv}&student=${activeStudent}`
-    //   );
-    //   loadIndividualStudentPage();
-    // });
-    studentCardContainer.appendChild(card);
+    DOM.studentCardContainer.appendChild(card);
   }
 }
 
 //add student link
-const addStudentButton = adminSection.querySelector(".add-student-btn");
-const addStudentPopup = adminSection.querySelector(
-  ".add-student-link-popup-wrapper"
-);
-const addStudentLink = adminSection.querySelector("#add-student-link");
-const addStudentLinkOkayBtn = addStudentPopup.querySelector(".okay-btn");
 let encryptedLink = "";
-addStudentButton.addEventListener("click", () => {
+DOM.addStudentBtn.addEventListener("click", () => {
   const encryptedData = encryptLink({
     division: `${adminAppState.activeDiv}`,
-    semester: `${adminAppState.activeSem}`,
+    semester: `${adminAppState.activeSem.replace("semester- ", "")}`,
     role: "student",
   });
   encryptedLink = encryptedData;
   const signupUrl = `http://localhost:5173/signup?data=${encodeURIComponent(
-    encryptedData
+    encryptedData,
   )}`;
-  addStudentLink.textContent = signupUrl;
-  fadeInEffect(addStudentPopup);
+  DOM.addUserPopup.link.textContent = signupUrl;
+  fadeInEffect(DOM.addUserPopup.popup);
 });
-addStudentLinkOkayBtn.addEventListener("click", () => {
-  fadeOutEffect(addStudentPopup);
+DOM.addTeacherBtn.addEventListener("click", () => {
+  const encryptedData = encryptLink({
+    division: `${adminAppState.activeDiv}`,
+    semester: `${adminAppState.activeSem.replace("semester- ", "")}`,
+    role: "teacher",
+  });
+  encryptedLink = encryptedData;
+  const signupUrl = `http://localhost:5173/signup?data=${encodeURIComponent(
+    encryptedData,
+  )}`;
+  DOM.addUserPopup.link.textContent = signupUrl;
+  fadeInEffect(DOM.addUserPopup.popup);
 });
-addStudentLink.addEventListener("click", (e) => {
+DOM.addUserPopup.successBtn.addEventListener("click", () => {
+  fadeOutEffect(DOM.addUserPopup.popup);
+});
+DOM.addUserPopup.link.addEventListener("click", (e) => {
   e.preventDefault();
-  navigator.clipboard.writeText(addStudentLink.textContent);
-  addStudentLink.textContent = "Copied!";
+  navigator.clipboard.writeText(DOM.addUserPopup.link.textContent);
+  DOM.addUserPopup.link.textContent = "Copied!";
   setTimeout(() => {
-    addStudentLink.textContent = encryptedLink;
+    DOM.addUserPopup.link.textContent = encryptedLink;
   }, 2000);
 });
 function encryptLink(obj) {
@@ -293,104 +415,73 @@ function encryptLink(obj) {
   return btoa(reversed);
 }
 // individual student related
-let activeStudentId = null;
-let activeStudentObj = null;
-const individualStudentPopup = adminSection.querySelector(
-  ".individual-student-popup"
-);
-const displayName = individualStudentPopup.querySelector(
-  ".student-display-name"
-);
-const firstNameP = individualStudentPopup.querySelector(".first-name");
-const lastNameP = individualStudentPopup.querySelector(".last-name");
-const rollNoP = individualStudentPopup.querySelector(".roll-no");
-const emailP = individualStudentPopup.querySelector(".email");
-const semP = individualStudentPopup.querySelector(".sem");
-const divP = individualStudentPopup.querySelector(".div");
-const roleP = individualStudentPopup.querySelector(".role");
-const pfpImg = individualStudentPopup.querySelector(".student-display-pfp");
-const goldMedal = individualStudentPopup.querySelector(".gold-medal .qty");
-const silverMedals = individualStudentPopup.querySelector(".silver-medal .qty");
-const bronzMedals = individualStudentPopup.querySelector(".bronz-medal .qty");
-const medalsPointsP = individualStudentPopup.querySelector(".points");
-const medalPointWrapper = individualStudentPopup.querySelector(
-  ".medal-point-wrapper"
-);
-const individualStudentCloseBtn =
-  individualStudentPopup.querySelector(".close-popup-btn");
-individualStudentCloseBtn.addEventListener("click", () => {
-  fadeOutEffect(individualStudentPopup);
+DOM.individualUserPopup.closePopupBtn.addEventListener("click", () => {
+  fadeOutEffect(DOM.individualUserPopup.popup);
 });
 function initIndividualStudentPopup() {
-  const student =
-    adminAppState.semesterData[adminAppState.activeSem].divisionList[
-      adminAppState.activeDiv
-    ].studentList[activeStudentId];
+  const student = activeStudentObj;
   console.log(student);
-  firstNameP.textContent = `First Name: ${student.firstName}`;
-  lastNameP.textContent = `Last Name: ${student.lastName}`;
-  displayName.textContent = `${student.firstName} ${student.lastName}`;
-  rollNoP.textContent = `Roll No: ${student.rollNumber}`;
-  emailP.textContent = `Email: ${student.email}`;
-  roleP.textContent = `Role: ${student.role
+  DOM.individualUserPopup.firstName.textContent = `First Name: ${student.firstName}`;
+  DOM.individualUserPopup.lastName.textContent = `Last Name: ${student.lastName}`;
+  DOM.individualUserPopup.displayName.textContent = `${student.firstName} ${student.lastName}`;
+  DOM.individualUserPopup.rollNo.textContent = `Roll No: ${student.rollNumber}`;
+  DOM.individualUserPopup.email.textContent = `Email: ${student.email}`;
+  DOM.individualUserPopup.role.textContent = `Role: ${student.role
     .charAt(0)
     .toUpperCase()}${student.role.slice(1)}`;
   const sem = student.semester;
   const div = student.division;
-  semP.textContent = `Semester: ${sem}`;
-  divP.textContent = `Division: ${div.toUpperCase()}`;
-  pfpImg.src = student.pfpLink;
+  DOM.individualUserPopup.sem.textContent = `Semester: ${sem}`;
+  DOM.individualUserPopup.div.textContent = `Division: ${div.toUpperCase()}`;
+  DOM.individualUserPopup.pfp.src = student.pfpLink;
   const gold = student.medalList.gold || 0;
   const silver = student.medalList.silver || 0;
   const bronze = student.medalList.bronze || 0;
-  goldMedal.textContent = gold;
-  silverMedals.textContent = silver;
-  bronzMedals.textContent = bronze;
+  DOM.individualUserPopup.medals.gold.textContent = gold;
+  DOM.individualUserPopup.medals.silver.textContent = silver;
+  DOM.individualUserPopup.medals.bronze.textContent = bronze;
   const totalPoints = gold * 30 + silver * 20 + bronze * 10;
-  medalsPointsP.textContent = totalPoints;
-  fadeInEffect(individualStudentPopup);
+  DOM.individualUserPopup.points.textContent = totalPoints;
+  fadeInEffect(DOM.individualUserPopup.popup);
 }
 
 //first name last name
-const editNamePopup = adminSection.querySelector(".edit-name-popup-wrapper");
-const editNameFirstNameInput = editNamePopup.querySelector(".first-name-input");
-const editNameLastNameInput = editNamePopup.querySelector(".last-name-input");
-const editNameEditBtn = editNamePopup.querySelector(".edit-btn");
-const editNameCloseBtn = editNamePopup.querySelector(".close-popup-btn");
-const firstNameError = editNamePopup.querySelector(".first-name-related-error");
-const lastNameError = editNamePopup.querySelector(".last-name-related-error");
-firstNameP.addEventListener("click", () => {
-  editNameFirstNameInput.value = firstNameP.textContent.split(": ")[1];
-  editNameLastNameInput.value = lastNameP.textContent.split(": ")[1];
-  fadeInEffect(editNamePopup);
+DOM.individualUserPopup.firstName.addEventListener("click", () => {
+  DOM.namePopup.inputs.firstName.value =
+    DOM.individualUserPopup.firstName.textContent.split(": ")[1];
+  DOM.namePopup.inputs.lastName.value =
+    DOM.individualUserPopup.lastName.textContent.split(": ")[1];
+  fadeInEffect(DOM.namePopup.popup);
 });
-lastNameP.addEventListener("click", () => {
-  editNameFirstNameInput.value = firstNameP.textContent.split(": ")[1];
-  editNameLastNameInput.value = lastNameP.textContent.split(": ")[1];
-  fadeInEffect(editNamePopup);
+DOM.individualUserPopup.lastName.addEventListener("click", () => {
+  DOM.namePopup.inputs.firstName.value =
+    DOM.individualUserPopup.firstName.textContent.split(": ")[1];
+  DOM.namePopup.inputs.lastName.value =
+    DOM.individualUserPopup.lastName.textContent.split(": ")[1];
+  fadeInEffect(DOM.namePopup.popup);
 });
-editNameCloseBtn.addEventListener("click", () => {
-  fadeOutEffect(editNamePopup);
+DOM.namePopup.closePopupBtn.addEventListener("click", () => {
+  fadeOutEffect(DOM.namePopup.popup);
 });
-editNameEditBtn.addEventListener("click", async () => {
-  fadeOutEffect(firstNameError);
-  fadeOutEffect(lastNameError);
-  const firstName = editNameFirstNameInput.value.trim();
-  const lastName = editNameLastNameInput.value.trim();
+DOM.namePopup.successBtn.addEventListener("click", async () => {
+  fadeOutEffect(DOM.namePopup.errors.firstName);
+  fadeOutEffect(DOM.namePopup.errors.lastName);
+  const firstName = DOM.namePopup.inputs.firstName.value.trim();
+  const lastName = DOM.namePopup.inputs.lastName.value.trim();
   let isError = false;
   if (!firstName) {
-    firstNameError.textContent = "First Name is required";
-    fadeInEffect(firstNameError);
+    DOM.namePopup.errors.firstName.textContent = "First Name is required";
+    fadeInEffect(DOM.namePopup.errors.firstName);
     isError = true;
   }
   if (!lastName) {
-    lastNameError.textContent = "Last Name is required";
-    fadeInEffect(lastNameError);
+    DOM.namePopup.errors.lastName.textContent = "Last Name is required";
+    fadeInEffect(DOM.namePopup.errors.lastName);
     isError = true;
   }
   if (isError) return;
   const isConfirmed = await showConfirmationPopup(
-    "This will change the name of the student. Are you sure?"
+    "This will change the name of the student. Are you sure?",
   );
   if (!isConfirmed) return;
   showSectionLoader("Updating name...");
@@ -398,8 +489,8 @@ editNameEditBtn.addEventListener("click", async () => {
     firstName: firstName,
     lastName: lastName,
   });
-  await fadeOutEffect(editNamePopup);
-  await fadeOutEffect(individualStudentPopup);
+  await fadeOutEffect(DOM.namePopup.popup);
+  await fadeOutEffect(DOM.individualUserPopup.popup);
   showSectionLoader("Syncing data...");
   await syncAdminData();
   hideSectionLoader();
@@ -408,129 +499,62 @@ editNameEditBtn.addEventListener("click", async () => {
 });
 
 // roll no
-const editRollNoPopup = adminSection.querySelector(
-  ".edit-roll-no-popup-wrapper"
-);
-const editRollNoInput = editRollNoPopup.querySelector(".roll-no-input");
-const editRollNoEditBtn = editRollNoPopup.querySelector(".edit-btn");
-const editRollNoCloseBtn = editRollNoPopup.querySelector(".close-popup-btn");
-const rollNoError = editRollNoPopup.querySelector(".roll-no-related-error");
-rollNoP.addEventListener("click", () => {
-  editRollNoInput.value = rollNoP.textContent.split(": ")[1];
-  fadeInEffect(editRollNoPopup);
+DOM.individualUserPopup.rollNo.addEventListener("click", () => {
+  DOM.rollNoPopup.input.value = DOM.individualUserPopup.rollNo.textContent =
+    activeStudentObj.rollNumber;
+  fadeInEffect(DOM.rollNoPopup.popup);
 });
-editRollNoCloseBtn.addEventListener("click", () => {
-  fadeOutEffect(editRollNoPopup);
+DOM.rollNoPopup.closePopupBtn.addEventListener("click", () => {
+  fadeOutEffect(DOM.rollNoPopup.popup);
 });
-editRollNoEditBtn.addEventListener("click", async () => {
-  fadeOutEffect(rollNoError);
-  const rollNo = Number(editRollNoInput.value.trim());
-  const length = editRollNoInput.value.trim().length;
-  console.log(length, rollNo);
-
+DOM.rollNoPopup.successBtn.addEventListener("click", async () => {
+  fadeOutEffect(DOM.rollNoPopup.error);
+  const rollNo = Number(DOM.rollNoPopup.input.value.trim());
+  const length = DOM.rollNoPopup.input.value.trim().length;
+  let isError = false;
   if (length < 6) {
-    rollNoError.textContent = "Roll No must be 6 digits";
-    fadeInEffect(rollNoError);
+    DOM.rollNoPopup.error.textContent = "Roll No must be 6 digits";
+    fadeInEffect(DOM.rollNoPopup.error);
     return;
   }
   if (rollNo < 0) {
-    rollNoError.textContent = "Roll No is required";
-    fadeInEffect(rollNoError);
+    DOM.rollNoPopup.error.textContent = "Roll No is required";
+    fadeInEffect(DOM.rollNoPopup.error);
     return;
   }
   if (rollNo) {
     showSectionLoader("Checking rollno...");
     const q = query(
-      ref(db, "users"),
+      ref(db, "userData"),
       orderByChild("rollNumber"),
-      equalTo(rollNo)
+      equalTo(rollNo),
     );
     await get(q).then(async (snapshot) => {
       if (snapshot.exists()) {
-        rollNoError.textContent = "Roll No already exists";
-        fadeInEffect(rollNoError);
+        DOM.rollNoPopup.error.textContent = "Roll No already exists";
+        fadeInEffect(DOM.rollNoPopup.error);
         hideSectionLoader();
         isError = true;
         return;
       } else {
         hideSectionLoader();
         const isConfirmed = await showConfirmationPopup(
-          "This will change the roll no of the student. Are you sure?"
+          "This will change the roll no of the student. Are you sure?",
         );
         if (!isConfirmed) return;
         else {
           showSectionLoader("Updating roll number...");
-          await updateData(`users/${activeStudentId}`, {
-            rollNumber: rollNumber,
+          await updateData(`userData/${activeStudentId}`, {
+            rollNumber: rollNo,
           });
-          fadeOutEffect(editRollNoPopup);
+          fadeOutEffect(DOM.rollNoPopup.popup);
         }
       }
-      if (isError) return;
     });
-  }
-  await fadeOutEffect(editRollNoPopup);
-  await fadeOutEffect(individualStudentPopup);
-  showSectionLoader("Syncing data...");
-  await syncAdminData();
-  hideSectionLoader();
-  hideAdminDivisions();
-  await showClassRoom();
-});
-
-// email
-const editEmailPopup = adminSection.querySelector(".edit-email-popup-wrapper");
-const editEmailInput = editEmailPopup.querySelector(".email-input");
-const editEmailEditBtn = editEmailPopup.querySelector(".edit-btn");
-const editEmailCloseBtn = editEmailPopup.querySelector(".close-popup-btn");
-const emailError = editEmailPopup.querySelector(".email-related-error");
-emailP.addEventListener("click", () => {
-  editEmailInput.value = emailP.textContent.split(": ")[1];
-  fadeInEffect(editEmailPopup);
-});
-editEmailCloseBtn.addEventListener("click", () => {
-  fadeOutEffect(editEmailPopup);
-});
-editEmailEditBtn.addEventListener("click", async () => {
-  fadeOutEffect(emailError);
-  const email = editEmailInput.value.trim();
-  if (!email) {
-    emailError.textContent = "Email is required";
-    fadeInEffect(emailError);
-    return;
-  }
-  if (!email.includes("@")) {
-    emailError.textContent = "Invalid email format";
-    fadeInEffect(emailError);
-    return;
-  }
-  showSectionLoader("Checking email...");
-  const q = query(ref(db, "userData"), orderByChild("email"), equalTo(email));
-  await get(q).then(async (snapshot) => {
-    if (snapshot.exists()) {
-      emailError.textContent = "Email already exists";
-      fadeInEffect(emailError);
-      hideSectionLoader();
-      isError;
-      return;
-    } else {
-      hideSectionLoader();
-      const isConfirmed = await showConfirmationPopup(
-        "This will change the email of the student. Are you sure?"
-      );
-      if (!isConfirmed) return;
-      else {
-        showSectionLoader("Updating email...");
-        await updateData(`userData/${activeStudentId}`, {
-          email: email,
-        });
-        fadeOutEffect(editEmailPopup);
-      }
-    }
     if (isError) return;
-  });
-  await fadeOutEffect(editEmailPopup);
-  await fadeOutEffect(individualStudentPopup);
+  }
+  await fadeOutEffect(DOM.rollNoPopup.popup);
+  await fadeOutEffect(DOM.individualUserPopup.popup);
   showSectionLoader("Syncing data...");
   await syncAdminData();
   hideSectionLoader();
@@ -538,31 +562,27 @@ editEmailEditBtn.addEventListener("click", async () => {
   await showClassRoom();
 });
 
-//role
-const editRolePopup = adminSection.querySelector(".edit-role-popup-wrapper");
-const editRoleInput = editRolePopup.querySelector(".role-input");
-const editRoleEditBtn = editRolePopup.querySelector(".edit-btn");
-const editRoleCloseBtn = editRolePopup.querySelector(".close-popup-btn");
-const roleError = editRolePopup.querySelector(".role-related-error");
-roleP.addEventListener("click", () => {
-  if (activeStudentObj.role === "student") editRoleInput.value = "student";
-  else if (activeStudentObj.role === "editor") editRoleInput.value = "editor";
-  fadeInEffect(editRolePopup);
+// role
+DOM.individualUserPopup.role.addEventListener("click", () => {
+  if (activeStudentObj.role === "student")
+    DOM.rolePopup.input.value = "student";
+  else if (activeStudentObj.role === "editor")
+    DOM.rolePopup.input.value = "editor";
+  fadeInEffect(DOM.rolePopup.popup);
 });
-editRoleCloseBtn.addEventListener("click", () => {
-  fadeOutEffect(editRolePopup);
+DOM.rolePopup.closePopupBtn.addEventListener("click", () => {
+  fadeOutEffect(DOM.rolePopup.popup);
 });
-editRoleEditBtn.addEventListener("click", async () => {
-  fadeOutEffect(roleError);
-  const role = editRoleInput.value.trim();
-  console.log(role);
+DOM.rolePopup.successBtn.addEventListener("click", async () => {
+  fadeOutEffect(DOM.rolePopup.error);
+  const role = DOM.rolePopup.input.value.trim();
   if (!role) {
-    roleError.textContent = "Role is required";
-    fadeInEffect(roleError);
+    DOM.rolePopup.error.textContent = "Role is required";
+    fadeInEffect(DOM.rolePopup.error);
     return;
   }
   const isConfirmed = await showConfirmationPopup(
-    "This will change the role of the student and their permissions. Are you sure?"
+    "This will change the role of the student and their permissions. Are you sure?",
   );
   if (!isConfirmed) return;
   else {
@@ -570,10 +590,10 @@ editRoleEditBtn.addEventListener("click", async () => {
     await updateData(`userData/${activeStudentId}`, {
       role: role,
     });
-    fadeOutEffect(editRolePopup);
+    fadeOutEffect(DOM.rolePopup.popup);
   }
-  await fadeOutEffect(editRolePopup);
-  await fadeOutEffect(individualStudentPopup);
+  await fadeOutEffect(DOM.rolePopup.popup);
+  await fadeOutEffect(DOM.individualUserPopup.popup);
   showSectionLoader("Syncing data...");
   await syncAdminData();
   hideSectionLoader();
@@ -582,59 +602,51 @@ editRoleEditBtn.addEventListener("click", async () => {
 });
 
 // sem div
-const editSemDivPopup = adminSection.querySelector(
-  ".edit-sem-div-popup-wrapper"
-);
-const editSemInput = editSemDivPopup.querySelector(".semester-input");
-const editDivInput = editSemDivPopup.querySelector(".division-input");
-const editSemDivEditBtn = editSemDivPopup.querySelector(".edit-btn");
-const editSemDivCloseBtn = editSemDivPopup.querySelector(".close-popup-btn");
-const semError = editSemDivPopup.querySelector(".semester-related-error");
-const divError = editSemDivPopup.querySelector(".division-related-error");
-semP.addEventListener("click", () => {
-  editSemInput.value = activeStudentObj.sem;
-  editDivInput.value = activeStudentObj.div;
-  fadeInEffect(editSemDivPopup);
+DOM.individualUserPopup.sem.addEventListener("click", () => {
+  DOM.semDivPopup.inputs.semester.value = activeStudentObj.semester;
+  DOM.semDivPopup.inputs.division.value = activeStudentObj.division;
+  fadeInEffect(DOM.semDivPopup.popup);
 });
-divP.addEventListener("click", () => {
-  editSemInput.value = activeStudentObj.sem;
-  editDivInput.value = activeStudentObj.div;
-  fadeInEffect(editSemDivPopup);
+DOM.individualUserPopup.div.addEventListener("click", () => {
+  DOM.semDivPopup.inputs.semester.value = activeStudentObj.semester;
+  DOM.semDivPopup.inputs.division.value = activeStudentObj.division;
+  fadeInEffect(DOM.semDivPopup.popup);
 });
-editSemDivCloseBtn.addEventListener("click", () => {
-  fadeOutEffect(editSemDivPopup);
+DOM.semDivPopup.closePopupBtn.addEventListener("click", () => {
+  fadeOutEffect(DOM.semDivPopup.popup);
 });
-editSemDivEditBtn.addEventListener("click", async () => {
-  fadeOutEffect(semError);
-  fadeOutEffect(divError);
+DOM.semDivPopup.successBtn.addEventListener("click", async () => {
+  fadeOutEffect(DOM.semDivPopup.errors.semester);
+  fadeOutEffect(DOM.semDivPopup.errors.division);
   let isError = false;
-  const sem = editSemInput.value.trim();
-  const div = editDivInput.value.trim();
+  let sem = DOM.semDivPopup.inputs.semester.value.trim();
+  const div = DOM.semDivPopup.inputs.division.value.trim();
   if (!sem) {
-    semError.textContent = "Semester is required";
-    fadeInEffect(semError);
+    DOM.semDivPopup.errors.semester.textContent = "Semester is required";
+    fadeInEffect(DOM.semDivPopup.errors.semester);
     isError = true;
   }
   if (!div) {
-    divError.textContent = "Division is required";
-    fadeInEffect(divError);
+    DOM.semDivPopup.errors.division.textContent = "Division is required";
+    fadeInEffect(DOM.semDivPopup.errors.division);
     isError = true;
   }
   if (isError) return;
   const isConfirmed = await showConfirmationPopup(
-    "This will change the semester and division of the student. Are you sure?"
+    "This will change the semester and division of the student. Are you sure?",
   );
   if (!isConfirmed) return;
   else {
+    sem = Number(sem);
     showSectionLoader("Updating sem and div...");
     await updateData(`userData/${activeStudentId}`, {
       semester: sem,
       division: div,
     });
-    fadeOutEffect(editSemDivPopup);
+    fadeOutEffect(DOM.semDivPopup.popup);
   }
-  await fadeOutEffect(editSemDivPopup);
-  await fadeOutEffect(individualStudentPopup);
+  await fadeOutEffect(DOM.semDivPopup.popup);
+  await fadeOutEffect(DOM.individualUserPopup.popup);
   showSectionLoader("Syncing data...");
   await syncAdminData();
   hideSectionLoader();
@@ -643,55 +655,43 @@ editSemDivEditBtn.addEventListener("click", async () => {
 });
 
 //medals
-const editMedalsPopup = adminSection.querySelector(".edit-medal-popup-wrapper");
-const editGoldMedalInput = editMedalsPopup.querySelector(".gold-medal-input");
-const editSilverMedalInput = editMedalsPopup.querySelector(
-  ".silver-medal-input"
-);
-const editBronzeMedalInput = editMedalsPopup.querySelector(
-  ".bronze-medal-input"
-);
-const editMedalsEditBtn = editMedalsPopup.querySelector(".edit-btn");
-const editMedalsCloseBtn = editMedalsPopup.querySelector(".close-popup-btn");
-const goldMedalError = editMedalsPopup.querySelector(
-  ".gold-medal-related-error"
-);
-const medalError = editMedalsPopup.querySelector(".medal-related-error");
-
-medalPointWrapper.addEventListener("click", () => {
-  editGoldMedalInput.value = goldMedal.textContent;
-  editSilverMedalInput.value = silverMedals.textContent;
-  editBronzeMedalInput.value = bronzMedals.textContent;
-  fadeInEffect(editMedalsPopup);
+DOM.individualUserPopup.medalPointWrapper.addEventListener("click", () => {
+  DOM.medalPopup.inputs.gold.value =
+    DOM.individualUserPopup.medals.gold.textContent;
+  DOM.medalPopup.inputs.silver.value =
+    DOM.individualUserPopup.medals.silver.textContent;
+  DOM.medalPopup.inputs.bronze.value =
+    DOM.individualUserPopup.medals.bronze.textContent;
+  fadeInEffect(DOM.medalPopup.popup);
 });
-editMedalsCloseBtn.addEventListener("click", () => {
-  fadeOutEffect(editMedalsPopup);
+DOM.medalPopup.closePopupBtn.addEventListener("click", () => {
+  fadeOutEffect(DOM.medalPopup.popup);
 });
-editMedalsEditBtn.addEventListener("click", async () => {
-  fadeOutEffect(medalError);
-  const gold = Number(editGoldMedalInput.value.trim());
-  const silver = Number(editSilverMedalInput.value.trim());
-  const bronze = Number(editBronzeMedalInput.value.trim());
+DOM.medalPopup.successBtn.addEventListener("click", async () => {
+  fadeOutEffect(DOM.medalPopup.error);
+  const gold = Number(DOM.medalPopup.inputs.gold.value.trim());
+  const silver = Number(DOM.medalPopup.inputs.silver.value.trim());
+  const bronze = Number(DOM.medalPopup.inputs.bronze.value.trim());
   let isError = false;
   if (gold > 5) {
-    medalError.textContent = "Gold medal cannot be more than 5";
-    fadeInEffect(medalError);
+    DOM.medalPopup.error.textContent = "Gold medal cannot be more than 5";
+    fadeInEffect(DOM.medalPopup.error);
     isError = true;
   }
   if (silver > 5) {
-    medalError.textContent = "Silver medal cannot be more than 5";
-    fadeInEffect(medalError);
+    DOM.medalPopup.error.textContent = "Silver medal cannot be more than 5";
+    fadeInEffect(DOM.medalPopup.error);
     isError = true;
   }
   if (bronze > 5) {
-    medalError.textContent = "Bronze medal cannot be more than 5";
-    fadeInEffect(medalError);
+    DOM.medalPopup.error.textContent = "Bronze medal cannot be more than 5";
+    fadeInEffect(DOM.medalPopup.error);
     isError = true;
   }
 
   if (isError) return;
   const isConfirmed = await showConfirmationPopup(
-    "This will change the medal counts for the student. Are you sure?"
+    "This will change the medal counts for the student. Are you sure?",
   );
   if (!isConfirmed) return;
   else {
@@ -701,10 +701,10 @@ editMedalsEditBtn.addEventListener("click", async () => {
       silver: silver,
       bronze: bronze,
     });
-    fadeOutEffect(editMedalsPopup);
+    fadeOutEffect(DOM.medalPopup.popup);
   }
-  await fadeOutEffect(editMedalsPopup);
-  await fadeOutEffect(individualStudentPopup);
+  await fadeOutEffect(DOM.medalPopup.popup);
+  await fadeOutEffect(DOM.individualUserPopup.popup);
   showSectionLoader("Syncing data...");
   await syncAdminData();
   hideSectionLoader();

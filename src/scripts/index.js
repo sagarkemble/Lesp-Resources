@@ -1,4 +1,12 @@
-import { app, auth, onAuthStateChanged, signOutUser } from "./firebase.js";
+import {
+  app,
+  auth,
+  onAuthStateChanged,
+  signOutUser,
+  setUserId,
+  analytics,
+  logEvent,
+} from "./firebase.js";
 import {
   fadeInEffect,
   fadeOutEffect,
@@ -17,7 +25,7 @@ import {
   leaderboardIcon,
   loadSubjectSelectionList,
   sessionsIcon,
-  timeTabelIcon,
+  timeTableIcon,
   testsIcon,
   sideBar,
   subjectSelectorPopup,
@@ -37,9 +45,9 @@ import {
   adminAppState,
 } from "./appstate.js";
 import { showErrorSection } from "./error.js";
-const lottieLoadingScreen = document.querySelector(".loading-screen");
+const lottieLoadingScreen = document.querySelector(".lottie-loading-screen");
 const lottieLoader = document.querySelector("#lottie-loader");
-const sectionLoader = document.querySelector(".section-loader-wrapper");
+const sectionLoader = document.querySelector(".task-loader-wrapper");
 const sectionLoaderMessage = sectionLoader.querySelector(".loader-status");
 const editModeToggleButton = document.querySelector(".edit-mode-toggle-btn");
 const confirmationPopup = document.querySelector(".confirmation-popup-wrapper");
@@ -47,7 +55,8 @@ const confirmationDescription = confirmationPopup.querySelector(".description");
 const confirmationTitle = confirmationPopup.querySelector(".title");
 const confirmButton = confirmationPopup.querySelector(".confirm-btn");
 const cancelButton = confirmationPopup.querySelector(".cancel-btn");
-const lgUserPfp = document.querySelector(".navigation-pfp");
+const lgUserPfp = document.querySelector(".navigation-user-pfp");
+let localUserData;
 export async function showSectionLoader(message = "Loading...") {
   sectionLoaderMessage.textContent = message;
   await fadeInEffect(sectionLoader);
@@ -58,13 +67,13 @@ export async function hideSectionLoader() {
 async function loadContent() {
   await loadTestSection();
   await loadSubjectSelectionList();
-  await loadDashboard();
   await loadLeaderboardSection();
   await loadSessionsSection();
+  await loadDashboard();
 }
 export async function showConfirmationPopup(
   description = "This action cannot be undone.",
-  title = "Are you sure?"
+  title = "Are you sure?",
 ) {
   return new Promise((resolve) => {
     confirmationTitle.textContent = title;
@@ -81,17 +90,20 @@ export async function showConfirmationPopup(
   });
 }
 document.addEventListener("DOMContentLoaded", async () => {
-  // if (true) {
-  //   await signOutUser();
-  //   // return;
-  // }
   await fadeInEffect(lottieLoadingScreen);
   onAuthStateChanged(auth, async (userCredential) => {
     if (userCredential) {
+      setUserId(analytics, userCredential.uid);
+      logEvent(analytics, "login", { method: "firebase" });
+      // Just to test Analytics works at all
+      logEvent(analytics, "test_event", { debug: true });
+
+      console.log("event logged");
       const user = await getUserData(userCredential.uid);
+
       console.log("this is user data ", user);
       if (user.role === "admin") {
-        console.log("Admin user detected");
+        localUserData = user;
         await fadeOutEffect(lottieLoadingScreen);
         initAdminRouting(user);
         return;
@@ -124,6 +136,13 @@ export async function initRouting() {
     showDashboard();
   } else if (activeSubject) {
     appState.activeSubject = activeSubject;
+    trackPageView(
+      "subject_page",
+      appState.activeSem,
+      appState.activeDiv,
+      appState.activeSubject,
+    );
+
     setActiveNavIcon(subjectIcon);
     await fadeOutEffect(lottieLoadingScreen);
     loadSubjectSection();
@@ -152,7 +171,7 @@ export async function hideSections(
   showHeaderIcon = true,
   showHeaderTitle = true,
   showSidebar = true,
-  showHeader = true
+  showHeader = true,
 ) {
   if (!showSidebar)
     document.querySelector("main").classList.remove("lg:ml-[4.375rem]");
@@ -184,13 +203,17 @@ export async function applyEditModeUI() {
   const editorTool = document.querySelectorAll(".editor-tool");
   const editorOnlyContent = document.querySelectorAll(".editor-only-content");
   const editorOnlyContentCard = document.querySelectorAll(
-    ".editor-only-content-card"
+    ".editor-only-content-card",
   );
   const subjectSectionUpcomingSubmissions = document.querySelector(
-    ".subject-page-section .upcoming-submissions"
+    ".subject-page-section .upcoming-submissions",
   );
+  const editorMousePointer = document.querySelectorAll(".editor-hover-pointer");
   if (appState.isEditing) {
     editorOnlyContent.forEach((content) => showElement(content));
+    editorMousePointer.forEach((element) => {
+      element.style.cursor = "pointer";
+    });
     editorOnlyContentCard.forEach((card) => {
       const wrapper = card.closest("a");
       if (wrapper?.classList.contains("hidden")) {
@@ -214,6 +237,9 @@ export async function applyEditModeUI() {
       hideElement(subjectSectionUpcomingSubmissions);
     }
     editorOnlyContent.forEach((content) => hideElement(content));
+    editorMousePointer.forEach((element) => {
+      element.style.cursor = "default";
+    });
     editorOnlyContentCard.forEach((card) => {
       hideElement(card);
       const wrapper = card.closest("a");
@@ -224,10 +250,48 @@ export async function applyEditModeUI() {
   }
 }
 window.addEventListener("popstate", () => {
-  if (appState.userData.role === "admin") {
+  if (localUserData.role === "admin") {
     initAdminRouting();
   } else {
     initRouting();
   }
   // initRouting();
+});
+function trackPageView(pageName, sem, div, subject) {
+  logEvent(analytics, "page_view_custom", {
+    page_name: pageName,
+    semester: appState.activeSem,
+    division: appState.activeDiv,
+    subject: subject || "N/A",
+  });
+}
+import { registerSW } from "virtual:pwa-register";
+
+const updateSW = registerSW({
+  onNeedRefresh() {
+    if (confirm("New version available. Refresh?")) {
+      updateSW();
+    }
+  },
+  onOfflineReady() {
+    console.log("App ready to work offline");
+  },
+});
+
+let deferredPrompt;
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault(); // Stop the browser from showing it automatically
+  deferredPrompt = e;
+
+  // Show the prompt as soon as window loads
+  window.addEventListener("load", () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        console.log(`User response: ${choiceResult.outcome}`);
+        deferredPrompt = null;
+      });
+    }
+  });
 });

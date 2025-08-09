@@ -1,33 +1,16 @@
-import {
-  app,
-  signInWithEmailAndPassword,
-  auth,
-  get,
-  equalTo,
-  ref,
-  db,
-  child,
-  onAuthStateChanged,
-  orderByChild,
-  onValue,
-  signOut,
-  query,
-  getDatabase,
-} from "./firebase.js";
+import { get, ref, db, child } from "./firebase.js";
 export let appState = {
-  // userData: null,
-  // userId: null,
-  // semesterGlobalData: null,
-  // globalData: null,
-  // subjectData: null,
-  // divisionData: null,
-  // activeSem: null,
-  // activeDiv: null,
-  // isEditing: false,
-  // studentData: null,
-  // activeSubject: null,
-  // activeNavIcon: null,
-  // subjectMetaData: null,
+  userData: null,
+  userId: null,
+  semesterGlobalData: null,
+  globalData: null,
+  subjectData: null,
+  divisionData: null,
+  activeSe: null,
+  activeDiv: null,
+  isEditing: false,
+  activeSubject: null,
+  subjectMetaData: null,
 };
 export let adminAppState = {
   userData: null,
@@ -40,30 +23,23 @@ export let adminAppState = {
 };
 export async function initAppState(userData, semester, division) {
   semester = `semester${semester}`;
-  console.log("this is sample ", semester, division, userData);
-
-  // division = `division${division}`;
   const globalData = await getGlobalData();
   const semesterGlobalData = await getSemesterGlobalData(semester);
   const divisionData = await getDivisionData(semester, division);
-  console.log(divisionData);
-
   appState.userData = userData;
   appState.userId = userData.userId;
   appState.semesterGlobalData = semesterGlobalData || {};
   appState.globalData = globalData || {};
-  appState.subjectData = divisionData.subjectList;
   appState.divisionData = divisionData;
+  appState.subjectData = divisionData.subjectList;
   appState.activeSem = semester;
   appState.activeDiv = division;
   appState.isEditing = false;
-  // appState.studentData = divisionData.students || {};
   appState.activeSubject = null;
   appState.activeNavIcon = null;
   appState.subjectMetaData = appState.divisionData.subjectMetaDataList;
 }
 async function initAdminAppState() {}
-
 // all data fetching functions based on userId
 export function getUserData(userId) {
   return get(child(ref(db), `userData/${userId}`))
@@ -112,7 +88,7 @@ function getGlobalData() {
 }
 function getDivisionData(semester, division) {
   return get(
-    child(ref(db), `semesterList/${semester}/divisionList/${division}`)
+    child(ref(db), `semesterList/${semester}/divisionList/${division}`),
   )
     .then((snapshot) => {
       if (snapshot.exists()) {
@@ -142,12 +118,11 @@ export function getWholeSemesterData() {
       return null;
     });
 }
-
 export async function syncDbData() {
   appState.semesterGlobalData = await getSemesterGlobalData(appState.activeSem);
   appState.divisionData = await getDivisionData(
     appState.activeSem,
-    appState.activeDiv
+    appState.activeDiv,
   );
   appState.globalData = await getGlobalData();
   appState.subjectData = appState.divisionData.subjectList;

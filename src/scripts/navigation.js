@@ -4,17 +4,17 @@ import {
   fadeInEffectOpacity,
   fadeOutEffect,
 } from "./animation.js";
-import { timetablePopupSwiper, timetablePopup } from "./dashboard.js";
+import { timeTablePopupSwiper } from "./dashboard.js";
 const sideBarContent = document.querySelector(".side-bar-content");
 import { appState } from "./appstate.js";
 export const sideBar = document.querySelector("nav");
 export let activeNavIcon = null;
 const slider = document.querySelector(".slider");
 export const subjectSelectorPopup = document.querySelector(
-  ".subject-selector-popup"
+  ".subject-selector-popup",
 );
 const subjectSelectorCardWrapper = document.querySelector(
-  ".subject-selector-popup .card-wrapper"
+  ".subject-selector-popup .card-wrapper",
 );
 export const header = document.querySelector("header");
 export const headerIcon = document.querySelector(".header-icon");
@@ -54,24 +54,12 @@ export const dashboardIcon = document.querySelector(".home-icon");
 export const subjectIcon = document.querySelector(".subject-icon");
 export const leaderboardIcon = document.querySelector(".leaderboard-icon");
 export const sessionsIcon = document.querySelector(".sessions-icon");
-export const timeTabelIcon = document.querySelector(".timetabel-icon");
+export const timeTableIcon = document.querySelector(".timetable-icon");
 export const testsIcon = document.querySelector(".tests-icon");
-const loginSection = document.querySelector(".login-section");
+const timetablePopup = document.querySelector(".time-table-popup-wrapper");
 dashboardIcon.addEventListener("click", (e) => {
   history.pushState({}, "", "/?dashboard=''");
   initRouting();
-});
-subjectIcon.addEventListener("click", (e) => {
-  if (window.innerWidth <= 1024) {
-    const rect = subjectIcon.getBoundingClientRect();
-    const f = rect.left;
-    subjectSelectorPopup.style.left = `${f}px`;
-  }
-  if (!subjectSelectorPopup.classList.contains("hidden")) {
-    fadeOutEffect(subjectSelectorPopup);
-  } else fadeInEffect(subjectSelectorPopup);
-
-  // setActiveNavIcon(subjectIcon);
 });
 leaderboardIcon.addEventListener("click", () => {
   history.pushState({}, "", "/?leaderboard=''");
@@ -81,10 +69,10 @@ sessionsIcon.addEventListener("click", () => {
   history.pushState({}, "", '?sessions=""');
   initRouting();
 });
-timeTabelIcon.addEventListener("click", async () => {
+timeTableIcon.addEventListener("click", async () => {
   await fadeInEffect(timetablePopup);
-  timetablePopupSwiper.slideTo(0, 0);
-  timetablePopupSwiper.update();
+  timeTablePopupSwiper.slideTo(0, 0);
+  timeTablePopupSwiper.update();
 });
 testsIcon.addEventListener("click", () => {
   history.pushState({}, "", '?tests=""');
@@ -99,7 +87,7 @@ export function loadSubjectSelectionList() {
 
     const subjectCard = document.createElement("div");
     subjectCard.className =
-      "subject-card w-28 bg-surface-2 flex px-3 py-2 rounded-md justify-start items-center gap-4";
+      "subject-card w-28 bg-surface-2 flex px-3 py-2 rounded-md justify-start items-center gap-4 transition-all duration-200 cursor-pointer hover:bg-surface-3";
 
     const img = document.createElement("img");
     img.src = subject.iconLink;
@@ -119,6 +107,22 @@ export function loadSubjectSelectionList() {
     subjectSelectorCardWrapper.appendChild(subjectCard);
   }
 }
+document.addEventListener("click", (e) => {
+  const icon = e.target.closest(".subject-icon");
+  if (
+    subjectSelectorPopup.classList.contains("hidden") &&
+    icon === subjectIcon
+  ) {
+    {
+      fadeInEffect(subjectSelectorPopup);
+      if (window.innerWidth <= 1024) {
+        const rect = subjectIcon.getBoundingClientRect();
+        const f = rect.left;
+        subjectSelectorPopup.style.left = `${f}px`;
+      }
+    }
+  } else fadeOutEffect(subjectSelectorPopup);
+});
 let lastScrollY = window.scrollY;
 function handleScroll() {
   if (window.innerWidth < 1024) {

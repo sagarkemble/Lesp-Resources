@@ -1,11 +1,38 @@
 import { defineConfig } from "vite";
 import tailwindcss from "@tailwindcss/vite";
 import { resolve } from "path";
-
+import { VitePWA } from "vite-plugin-pwa";
 export default defineConfig({
-  plugins: [tailwindcss()],
+  plugins: [
+    tailwindcss(),
+    VitePWA({
+      registerType: "autoUpdate",
+      includeAssets: ["favicon.ico", "robots.txt", "apple-touch-icon.png"],
+      manifest: {
+        name: "Lesp resources",
+        short_name: "Lesp",
+        description: "Lesp resources PWA",
+        theme_color: "#ffffff",
+        icons: [
+          {
+            src: "logo.png",
+            sizes: "192x192",
+            type: "image/png",
+          },
+          {
+            src: "logo.png",
+            sizes: "512x512",
+            type: "image/png",
+          },
+        ],
+      },
+    }),
+  ],
   server: {
-    allowedHosts: ["0dab1116c1b7.ngrok-free.app"],
+    allowedHosts: "5fdc182a0d2f.ngrok-free.app",
+  },
+  preview: {
+    allowedHosts: "5fdc182a0d2f.ngrok-free.app", // your ngrok host here
   },
   build: {
     rollupOptions: {

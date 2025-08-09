@@ -3,7 +3,6 @@ import { deleteDriveFile, uploadDriveFile } from "./driveApi.js";
 import { appState, syncDbData } from "./appstate.js";
 import {
   fadeInEffect,
-  fadeInEffectOpacity,
   fadeOutEffect,
   hideElement,
   showElement,
@@ -18,6 +17,231 @@ import {
 import { headerIcon, headerTitle, subjectSelectorPopup } from "./navigation.js";
 import { showErrorSection } from "./error.js";
 const subjectPageSection = document.querySelector(".subject-page-section");
+const DOM = {
+  subjectPageSection: document.querySelector(".subject-page-section"),
+  // Swiper
+  noticeSwiper: {
+    swiper: new Swiper("#subject-page-swiper", {
+      direction: "horizontal",
+      slidesPerView: "auto",
+      spaceBetween: 30,
+      loop: false,
+      centeredSlides: true,
+      watchOverflow: true,
+      breakpoints: {
+        768: {
+          centeredSlides: false,
+        },
+      },
+      pagination: {
+        el: ".swiper-pagination",
+        clickable: true,
+      },
+      navigation: {
+        nextEl: ".swiper-button-next",
+        prevEl: ".swiper-button-prev",
+      },
+
+      observer: true,
+      observeParents: true,
+    }),
+    wrapper: document.querySelector("#subject-page-swiper .swiper-wrapper"),
+    pagination: document.querySelector(".swiper-pagination"),
+    prevBtn: document.querySelector(".swiper-button-prev"),
+    nextBtn: document.querySelector(".swiper-button-next"),
+  },
+  // Editor Tool Buttons
+  editorBtn: {
+    addNoticeBtn: document.querySelector(
+      ".subject-page-section .add-notice-btn",
+    ),
+    addCategoryBtn: document.querySelector(".add-category-container-btn"),
+    addSubmissionBtn: document.querySelector(".add-submission-btn"),
+  },
+  warningPopup: {
+    popup: document.querySelector(
+      ".subject-page-section .warning-popup-wrapper",
+    ),
+    successBtn: document.querySelector(
+      ".subject-page-section .warning-popup-wrapper .success-btn",
+    ),
+    message: document.querySelector(
+      ".subject-page-section .warning-popup-wrapper .message",
+    ),
+  },
+  // Add Notice Popup
+  noticePopup: {
+    popup: document.querySelector(
+      ".subject-page-section .add-notice-popup-wrapper",
+    ),
+    popupTitle: document.querySelector(
+      ".subject-page-section .add-notice-popup-wrapper .popup-title",
+    ),
+    closeBtn: document.querySelector(
+      ".subject-page-section .add-notice-popup-wrapper .close-popup-btn",
+    ),
+    successBtn: document.querySelector(
+      ".subject-page-section .add-notice-popup-wrapper .success-btn",
+    ),
+    inputs: {
+      title: document.querySelector("#subject-section-notice-title"),
+      description: document.querySelector(
+        "#subject-section-notice-description",
+      ),
+      link: document.querySelector("#subject-section-notice-link"),
+      file: document.querySelector("#subject-section-notice-file-input"),
+    },
+    errors: {
+      title: document.querySelector(
+        ".subject-page-section .add-notice-popup-wrapper .title-error",
+      ),
+      description: document.querySelector(
+        ".subject-page-section .add-notice-popup-wrapper .description-error",
+      ),
+      link: document.querySelector(
+        ".subject-page-section .add-notice-popup-wrapper .link-error",
+      ),
+      file: document.querySelector(
+        ".subject-page-section .add-notice-popup-wrapper .file-error",
+      ),
+    },
+    fileAttachment: {
+      icon: document.querySelector(
+        ".subject-page-section .add-notice-popup-wrapper .upload-icon",
+      ),
+      text: document.querySelector(
+        ".subject-page-section .add-notice-popup-wrapper .upload-text",
+      ),
+      inputWrapper: document.querySelector(
+        ".subject-page-section .add-notice-popup-wrapper .file-input-wrapper",
+      ),
+    },
+  },
+
+  // Add Category Popup
+  categoryPopup: {
+    popup: document.querySelector(".add-category-popup-wrapper"),
+    popupTitle: document.querySelector(
+      ".add-category-popup-wrapper .popup-title",
+    ),
+    closeBtn: document.querySelector(
+      ".add-category-popup-wrapper .close-popup-btn",
+    ),
+    successBtn: document.querySelector(
+      ".add-category-popup-wrapper .success-btn",
+    ),
+    input: document.querySelector("#category-title-input"),
+    error: document.querySelector(".add-category-popup-wrapper .title-error"),
+  },
+
+  // Add Item Popup
+  itemPopup: {
+    popup: document.querySelector(".add-item-popup-wrapper"),
+    popupTitle: document.querySelector(".add-item-popup-wrapper .popup-title"),
+    linkInputWrapper: document.querySelector(
+      ".add-item-popup-wrapper .link-input-wrapper",
+    ),
+    closeBtn: document.querySelector(
+      ".add-item-popup-wrapper .close-popup-btn",
+    ),
+    successBtn: document.querySelector(".add-item-popup-wrapper .success-btn"),
+    orLine: document.querySelector(".add-item-popup-wrapper .or-line"),
+    changeAttachmentBtn: document.querySelector(
+      ".add-item-popup-wrapper .change-attachment-btn",
+    ),
+
+    editTools: {
+      wrapper: document.querySelector(".add-item-popup-wrapper .edit-tools"),
+      deleteBtn: document.querySelector(".add-item-popup-wrapper .delete-icon"),
+      hideBtn: document.querySelector(".add-item-popup-wrapper .hide-icon"),
+      unhideBtn: document.querySelector(".add-item-popup-wrapper .unhide-icon"),
+    },
+
+    inputs: {
+      title: document.querySelector("#item-title-input"),
+      link: document.querySelector("#item-link-input"),
+      file: document.querySelector("#item-file-input"),
+    },
+
+    errors: {
+      title: document.querySelector(".add-item-popup-wrapper .title-error"),
+      link: document.querySelector(".add-item-popup-wrapper .link-error"),
+      file: document.querySelector(".add-item-popup-wrapper .item-file-error"),
+    },
+
+    fileAttachment: {
+      icon: document.querySelector(
+        ".item-file-attachment-container .upload-icon",
+      ),
+      text: document.querySelector(
+        ".item-file-attachment-container .upload-text",
+      ),
+      inputWrapper: document.querySelector(".item-file-input-wrapper"),
+    },
+  },
+
+  // Add Submission Popup
+  submissionPopup: {
+    popup: document.querySelector(".add-submission-popup-wrapper"),
+    popupTitle: document.querySelector(
+      ".add-submission-popup-wrapper .popup-title",
+    ),
+    dateInputWrapper: document.querySelector(
+      ".add-submission-popup-wrapper .date-input-wrapper",
+    ),
+    descriptionInputWrapper: document.querySelector(
+      ".add-submission-popup-wrapper .description-input-wrapper",
+    ),
+    closeBtn: document.querySelector(
+      ".add-submission-popup-wrapper .close-popup-btn",
+    ),
+    deleteBtn: document.querySelector(
+      ".add-submission-popup-wrapper .delete-btn",
+    ),
+    successBtn: document.querySelector(
+      ".add-submission-popup-wrapper .success-btn",
+    ),
+    changeDateBtn: document.querySelector(
+      ".add-submission-popup-wrapper .change-date-btn",
+    ),
+    orLine: document.querySelector(".add-submission-popup-wrapper .or-line"),
+    inputs: {
+      title: document.querySelector("#submission-title-input"),
+      description: document.querySelector("#submission-description-input"),
+      date: document.querySelector("#submission-date-input"),
+    },
+
+    errors: {
+      title: document.querySelector(
+        ".add-submission-popup-wrapper .title-error",
+      ),
+      description: document.querySelector(
+        ".add-submission-popup-wrapper .submission-description-error",
+      ),
+      date: document.querySelector(".add-submission-popup-wrapper .date-error"),
+    },
+
+    fakeDatePlaceholder: document.querySelector(
+      ".add-submission-popup-wrapper .fake-placeholder",
+    ),
+  },
+
+  // Upcoming Submissions
+  upcomingSubmissions: {
+    container: document.querySelector(
+      ".subject-page-section .upcoming-submissions",
+    ),
+    containerTitle: document.querySelector(
+      ".subject-page-section .upcoming-submissions .title",
+    ),
+    addContentBtn: document.querySelector(
+      ".subject-page-section .upcoming-submissions .add-content-btn",
+    ),
+    cardContainer: document.querySelector(
+      ".subject-page-section .upcoming-submissions .card-container",
+    ),
+  },
+};
 export async function loadSubjectSection() {
   await unloadSubjectSection();
   await renderNoticeSlider();
@@ -27,8 +251,8 @@ export async function loadSubjectSection() {
   headerTitle.textContent =
     appState.subjectMetaData[appState.activeSubject].name;
   await hideSections();
-  swiper.slideTo(0, 0);
-  swiper.update();
+  DOM.noticeSwiper.swiper.slideTo(0, 0);
+  DOM.noticeSwiper.swiper.update();
   await applyEditModeUI();
   await fadeInEffect(subjectPageSection);
 }
@@ -37,89 +261,31 @@ async function unloadSubjectSection() {
   document.querySelectorAll(".dynamic-container").forEach((container) => {
     container.remove();
   });
-  swiper.removeAllSlides();
-
-  upcomingSubmissionCardContainer.innerHTML = "";
+  DOM.noticeSwiper.swiper.removeAllSlides();
+  DOM.upcomingSubmissions.cardContainer.innerHTML = "";
 }
-
 // notice related functions and var
-const swiper = new Swiper("#subject-page-swiper", {
-  direction: "horizontal",
-  slidesPerView: "auto",
-  spaceBetween: 30,
-  loop: false,
-  centeredSlides: true,
-  watchOverflow: true,
-  breakpoints: {
-    768: {
-      centeredSlides: false,
-    },
-  },
-  pagination: {
-    el: ".swiper-pagination",
-    clickable: true,
-  },
-  navigation: {
-    nextEl: ".swiper-button-next",
-    prevEl: ".swiper-button-prev",
-  },
 
-  observer: true,
-  observeParents: true,
-});
-// const swiperNxtBtn = document.querySelector(".custom-swiper-button-next");
-// const swiperPrevBtn = document.querySelector(".custom-swiper-button-prev");
-const addNoticeBtn = subjectPageSection.querySelector(".add-notice-btn");
-// main add notice popup
-const addNoticePopup = subjectPageSection.querySelector(
-  ".add-notice-popup-wrapper"
-);
-//button inside popup
-const addNoticePopupcloseBtn = addNoticePopup.querySelector(".close-popup-btn");
-const addNoticePopupcreateBtn = addNoticePopup.querySelector(".create-btn");
-// inputs
-const addNoticeTitleInput = addNoticePopup.querySelector(".title-input");
-const addNoticefileInput = addNoticePopup.querySelector("#notice-file-input");
-const addNoticeDescriptionInput =
-  addNoticePopup.querySelector(".description-input");
-const addNoticeLinkInput = addNoticePopup.querySelector(".link-input");
-// error msgs
-const addNoticePopupLinkError = addNoticePopup.querySelector(
-  ".link-related-error"
-);
-const addNoticePopuptitleError = addNoticePopup.querySelector(
-  ".title-related-error"
-);
-const addNoticePopupdescriptionError = addNoticePopup.querySelector(
-  ".description-related-error"
-);
-// file attachment ui
-const addNoticeFileAttachment =
-  addNoticePopup.querySelector(".file-attachment");
-const addNotivePopupFileAttachmentText =
-  addNoticePopup.querySelector(".upload-text");
-const addNoticePopupFileAttachmentIcon = addNoticePopup.querySelector(
-  ".file-attachment-icon"
-);
-// error popup
-const addNoticePopupErrorPopup = addNoticePopup.querySelector(
-  ".error-popup-wrapper"
-);
-const addNoticePopupErrorPopupOkayBtn =
-  addNoticePopupErrorPopup.querySelector(".okay-btn");
-let selectedNotice;
-// functions
 async function renderNoticeSlider() {
-  const noticeList =
+  const noticeEntries =
     appState.divisionData?.noticeData?.subjectNoticeData?.[
       appState.activeSubject
     ] || {};
-  if (!noticeList || !Object.keys(noticeList).length) return; // if no notice data, return
-  const noticeReversedObj = Object.entries(noticeList).reverse();
-  for (const [key, noticeData] of noticeReversedObj) {
+  if (Object.keys(noticeEntries).length === 0 || !noticeEntries) {
+    console.log("this is suisusisiusi no notice data");
+
+    DOM.noticeSwiper.swiper.el.classList.add("!hidden");
+    return;
+  }
+  const reverseEntries = Object.fromEntries(
+    Object.entries(noticeEntries).reverse(),
+  );
+  DOM.noticeSwiper.swiper.el.classList.remove("!hidden");
+  for (const key in reverseEntries) {
+    const noticeData = reverseEntries[key];
     const swiperSlide = document.createElement("div");
     swiperSlide.className =
-      "swiper-slide w-full max-w-[600px] bg-surface-2 !flex !flex-col gap-3 rounded-2xl p-4 lg:p-5";
+      "swiper-slide w-full max-w-[37.5rem] bg-surface-2 !flex !flex-col gap-3 rounded-2xl p-4 lg:p-5";
     const topWrapper = document.createElement("div");
     topWrapper.className = "wrapper flex items-center gap-4  justify-between";
 
@@ -129,7 +295,7 @@ async function renderNoticeSlider() {
 
     const icon = document.createElement("div");
     icon.className =
-      "icon bg-surface flex h-[50px] w-[50px] items-center justify-center rounded-full shrink-0";
+      "icon bg-surface flex h-[3rem] w-[3rem] items-center justify-center rounded-full shrink-0";
 
     const iconInner = document.createElement("i");
     iconInner.className = "ri-file-text-line text-2xl";
@@ -137,7 +303,8 @@ async function renderNoticeSlider() {
 
     const title = document.createElement("p");
     title.className = "slider-title text-xl font-semibold";
-    title.textContent = noticeData.title;
+    title.textContent =
+      noticeData.title.charAt(0).toUpperCase() + noticeData.title.slice(1);
 
     iconTitleWrapper.appendChild(icon);
     iconTitleWrapper.appendChild(title);
@@ -166,7 +333,9 @@ async function renderNoticeSlider() {
 
     const description = document.createElement("div");
     description.className = "description text-text-secondary line-clamp-5";
-    description.innerHTML = noticeData.description.replace(/\n/g, "<br>");
+    description.innerHTML =
+      noticeData.description.charAt(0).toUpperCase() +
+      noticeData.description.slice(1).replace(/\n/g, "<br>");
 
     const linkWrapper = document.createElement("div");
     linkWrapper.className =
@@ -182,7 +351,8 @@ async function renderNoticeSlider() {
     attachment.className = "cursor-pointer hidden";
     attachment.target = "_blank";
     deleteIcon.addEventListener("click", async () => {
-      deleteNotice(key, noticeData.attachmentId);
+      console.log("this is gonna delete");
+      deleteNotice(key, noticeData.attachmentId, noticeData.scope);
     });
 
     if (noticeData.attachmentURL) {
@@ -199,13 +369,8 @@ async function renderNoticeSlider() {
     wrapper2.appendChild(linkWrapper);
     swiperSlide.appendChild(topWrapper);
     swiperSlide.appendChild(wrapper2);
-    swiper.appendSlide(swiperSlide);
-    requestAnimationFrame(() => {
-      if (description.scrollHeight > description.clientHeight) {
-        readmore.style.display = "inline";
-      }
-    });
-
+    DOM.noticeSwiper.swiper.appendSlide(swiperSlide);
+    setupReadmoreObserver(description, readmore);
     readmore.addEventListener("click", () => {
       const popup = document.getElementById("readmore-popup");
       const popupTitle = document.getElementById("readmore-popup-title");
@@ -221,18 +386,31 @@ async function renderNoticeSlider() {
       } else {
         popupAttachment.classList.add("hidden");
       }
-      popup.classList.remove("hidden");
+      fadeInEffect(popup);
     });
   }
 }
 document
   .getElementById("close-readmore-popup")
   ?.addEventListener("click", () => {
-    document.getElementById("readmore-popup")?.classList.add("hidden");
+    const element = document.getElementById("readmore-popup");
+    fadeOutEffect(element);
   });
+function setupReadmoreObserver(description, readmore) {
+  const observer = new ResizeObserver((entries) => {
+    for (let entry of entries) {
+      const target = entry.target;
+      if (target.scrollHeight > target.clientHeight) {
+        readmore.style.display = "inline";
+      }
+    }
+  });
+
+  observer.observe(description);
+}
 async function deleteNotice(key, attachmentId) {
   const confirmed = await showConfirmationPopup(
-    "The notice will be deleted permenantly"
+    "The notice will be deleted permenantly",
   );
   if (!confirmed) return;
   showSectionLoader("Deleting notice...");
@@ -246,7 +424,7 @@ async function deleteNotice(key, attachmentId) {
     showSectionLoader("Deleting notice...");
   }
   await deleteData(
-    `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/noticeData/subjectNoticeData/${appState.activeSubject}/${key}`
+    `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/noticeData/subjectNoticeData/${appState.activeSubject}/${key}`,
   );
   await showSectionLoader("Syncing data...");
   await syncDbData();
@@ -254,76 +432,87 @@ async function deleteNotice(key, attachmentId) {
   loadSubjectSection();
 }
 function resetAddNoticePopup() {
-  addNoticeTitleInput.value = "";
-  addNoticeDescriptionInput.value = "";
-  addNoticefileInput.value = "";
-  addNoticeLinkInput.value = "";
-  addNotivePopupFileAttachmentText.textContent = "Upload (Optional)";
-  fadeInEffect(addNoticePopupFileAttachmentIcon);
-  fadeOutEffect(addNoticePopupLinkError);
-  fadeOutEffect(addNoticePopupdescriptionError);
-  fadeOutEffect(addNoticePopuptitleError);
-} //
+  DOM.noticePopup.inputs.title.value = "";
+  DOM.noticePopup.inputs.description.value = "";
+  DOM.noticePopup.inputs.file.value = "";
+  DOM.noticePopup.inputs.link.value = "";
+  DOM.noticePopup.fileAttachment.text.textContent = "Upload File";
+  showElement(DOM.noticePopup.fileAttachment.icon);
+  hideElement(DOM.noticePopup.errors.link);
+  hideElement(DOM.noticePopup.errors.description);
+  hideElement(DOM.noticePopup.errors.title);
+  hideElement(DOM.noticePopup.errors.file);
+}
+DOM.noticePopup.fileAttachment.inputWrapper.addEventListener("click", () => {
+  DOM.noticePopup.inputs.file.click();
+});
+DOM.editorBtn.addNoticeBtn.addEventListener("click", () => {
+  fadeInEffect(DOM.noticePopup.popup);
+});
+DOM.noticePopup.inputs.title.addEventListener("input", () => {
+  if (DOM.noticePopup.inputs.title.value.length == 21) {
+    DOM.noticePopup.errors.title.textContent = "Max 20 characters reached";
 
-// listeners
-addNoticeFileAttachment.addEventListener("click", () => {
-  addNoticefileInput.click();
-}); //
-addNoticeBtn.addEventListener("click", () => {
-  fadeInEffect(addNoticePopup);
-}); //
-addNoticeTitleInput.addEventListener("input", () => {
-  if (addNoticeTitleInput.value.length == 20) {
-    addNoticePopuptitleError.textContent = "Max 20 characters reached";
-    showElement(addNoticePopuptitleError);
+    DOM.noticePopup.inputs.title.value =
+      DOM.noticePopup.inputs.title.value.slice(0, 20);
+    showElement(DOM.noticePopup.errors.title);
   } else {
-    hideElement(addNoticePopuptitleError);
+    hideElement(DOM.noticePopup.errors.title);
   }
 });
-addNoticePopupcloseBtn.addEventListener("click", async (e) => {
-  await fadeOutEffect(addNoticePopup);
+DOM.noticePopup.closeBtn.addEventListener("click", async () => {
+  await fadeOutEffect(DOM.noticePopup.popup);
   resetAddNoticePopup();
-}); //
-addNoticePopupcreateBtn.addEventListener("click", async () => {
-  const title = addNoticeTitleInput.value.trim();
-  const description = addNoticeDescriptionInput.value.trim();
-  const file = addNoticefileInput.files[0];
-  fadeOutEffect(addNoticePopuptitleError);
-  fadeOutEffect(addNoticePopupdescriptionError);
-  fadeOutEffect(addNoticePopupLinkError);
-  const link = addNoticeLinkInput.value.trim();
-  fadeOutEffect(addNoticePopupLinkError);
-  let hasError = false;
+});
+DOM.noticePopup.successBtn.addEventListener("click", async () => {
+  hideElement(DOM.noticePopup.errors.title);
+  hideElement(DOM.noticePopup.errors.description);
+  hideElement(DOM.noticePopup.errors.link);
+  hideElement(DOM.noticePopup.errors.link);
+  hideElement(DOM.noticePopup.errors.file);
+  const title = DOM.noticePopup.inputs.title.value.trim();
+  const description = DOM.noticePopup.inputs.description.value.trim();
+  const file = DOM.noticePopup.inputs.file.files[0];
+  const link = DOM.noticePopup.inputs.link.value.trim();
+  let isError = false;
   if (!title) {
-    addNoticePopuptitleError.textContent = "Title is required";
-    fadeInEffect(addNoticePopuptitleError);
-    hasError = true;
+    DOM.noticePopup.errors.title.textContent = "Title is required";
+    showElement(DOM.noticePopup.errors.title);
+    isError = true;
   }
   if (!description) {
-    addNoticePopupdescriptionError.textContent = "Description is required";
-    fadeInEffect(addNoticePopupdescriptionError);
-    hasError = true;
+    DOM.noticePopup.errors.description.textContent = "Description is required";
+    showElement(DOM.noticePopup.errors.description);
+    isError = true;
   }
   if (!file && link && !/^https?:\/\//.test(link)) {
-    addNoticePopupLinkError.textContent =
-      "Enter a valid link starting with http:// or https://";
-    fadeInEffect(addNoticePopupLinkError);
-    hasError = true;
+    DOM.noticePopup.errors.link.textContent = "Enter a valid link";
+    showElement(DOM.noticePopup.errors.link);
+    isError = true;
   }
   if (file && link) {
-    fadeInEffect(addNoticePopupErrorPopup);
-    return;
+    const flag = await showWarningPopup(
+      "Please upload either a file or a link, not both.",
+    );
+    if (flag) {
+      await fadeOutEffect(DOM.noticePopup.popup);
+      resetAddNoticePopup();
+      return;
+    }
   }
-  if (hasError) return;
+  if (isError) return;
   let attachmentURL = "";
   let attachmentId = "";
   showSectionLoader("Uploading attachment...");
   if (file) {
     let uploaded = await uploadDriveFile(
       file,
-      `${appState.activeSem}/divisionData/division${appState.activeDiv}/noticeData/subjectNoticeData/${appState.activeSubject}`
+      `${appState.activeSem}/divisionData/division${appState.activeDiv}/noticeData/subjectNoticeData/${appState.activeSubject}`,
     );
-    if (!uploaded) return;
+    if (!uploaded) {
+      showErrorSection();
+      return;
+    }
     attachmentURL = uploaded.webViewLink;
     attachmentId = uploaded.fileId;
   } else if (link) {
@@ -340,101 +529,92 @@ addNoticePopupcreateBtn.addEventListener("click", async () => {
       attachmentId,
       createdAt: Date.now(),
       scope: appState.activeSubject,
-    }
+    },
   );
-  fadeOutEffect(addNoticePopup);
+  await fadeOutEffect(DOM.noticePopup.popup);
+  showSectionLoader("Syncing data...");
   resetAddNoticePopup();
-  await showSectionLoader("Syncing data...");
   await syncDbData();
   await hideSectionLoader();
   loadSubjectSection();
 });
-addNoticefileInput.addEventListener("change", () => {
-  const file = addNoticefileInput.files[0];
+DOM.noticePopup.inputs.file.addEventListener("change", () => {
+  const file = DOM.noticePopup.inputs.file.files[0];
   if (file) {
     if (file.size > 20 * 1024 * 1024) {
-      addNoticefileInput.value = "";
-      addNoticePopupLinkError.textContent = "File too large (max 20MB)";
-      fadeInEffect(addNoticePopupLinkError);
-      fadeInEffect(addNoticePopupFileAttachmentIcon);
+      DOM.noticePopup.inputs.file.value = "";
+      DOM.noticePopup.errors.file.textContent = "File too large (max 20MB)";
+      showElement(DOM.noticePopup.errors.file);
       return;
     }
-    fadeOutEffect(addNoticePopupFileAttachmentIcon);
-    addNotivePopupFileAttachmentText.textContent = "1 file attached";
+    hideElement(DOM.noticePopup.fileAttachment.icon);
+    DOM.noticePopup.fileAttachment.text.textContent = "1 file attached";
   } else {
-    fadeInEffect(addNoticePopupFileAttachmentIcon);
-    addNotivePopupFileAttachmentText.textContent = "Upload (Optional)";
+    showElement(DOM.noticePopup.fileAttachment.icon);
+    DOM.noticePopup.fileAttachment.text.textContent = "Upload File";
   }
-}); //
-addNoticePopupErrorPopupOkayBtn.addEventListener("click", async () => {
-  await fadeOutEffect(addNoticePopup);
-  fadeOutEffect(addNoticePopupErrorPopup);
-  resetAddNoticePopup();
-}); //
+});
+function showWarningPopup(message) {
+  return new Promise((resolve) => {
+    // DOM.warningPopup.message.textContent = message;
+    fadeInEffect(DOM.warningPopup.popup);
+    DOM.warningPopup.successBtn.addEventListener("click", async () => {
+      await fadeOutEffect(DOM.warningPopup.popup);
+      resolve(true);
+    });
+  });
+}
 
-//
 // add category related var and fucntion
 let isCategoryEditing = false;
 let selectedCategoryId = null;
-const addCategoryBtn = document.querySelector(".add-category-container-btn");
-const addCategoryPopup = document.querySelector(".add-category-popup-wrapper");
-const addCategoryPopupTitle = addCategoryPopup.querySelector(".popup-title");
-//popup buttons
-const addCategoryPopupCloseBtn =
-  addCategoryPopup.querySelector(".close-popup-btn");
-const addCategoryPopupCreateBtn = addCategoryPopup.querySelector(".create-btn");
-// inputs
-const addCategoryTitleInput = addCategoryPopup.querySelector(".title-input");
-const addCategoryTitleError = addCategoryPopup.querySelector(
-  ".title-related-error"
-);
-// listners
-addCategoryBtn.addEventListener("click", () => {
-  fadeInEffect(addCategoryPopup);
+DOM.editorBtn.addCategoryBtn.addEventListener("click", () => {
+  fadeInEffect(DOM.categoryPopup.popup);
 });
-addCategoryPopupCloseBtn.addEventListener("click", async () => {
-  await fadeOutEffect(addCategoryPopup);
-  resetAddCategoryPopup();
-});
-addCategoryPopupCreateBtn.addEventListener("click", async () => {
-  const title = addCategoryTitleInput.value.trim();
-  addCategoryTitleError.classList.add("hidden");
+DOM.categoryPopup.successBtn.addEventListener("click", async () => {
+  hideElement(DOM.categoryPopup.error);
+  const title = DOM.categoryPopup.input.value.trim();
   if (!title) {
-    addCategoryTitleError.textContent = "Title is required";
-    fadeInEffect(addCategoryTitleError);
+    DOM.categoryPopup.error.textContent = "Title is required";
+    showElement(DOM.categoryPopup.error);
     return;
   }
   if (isCategoryEditing) {
     await showSectionLoader("Updating category...");
     updateData(
       `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList/${selectedCategoryId}/metaData`,
-      { name: title }
+      { name: title },
     );
   } else {
     showSectionLoader("Adding category...");
     await pushData(
       `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList`,
-      { metaData: { name: title, isVisible: true } }
+      { metaData: { name: title, isVisible: true } },
     );
   }
-  await fadeOutEffect(addCategoryPopup);
-  resetAddCategoryPopup();
+  await fadeOutEffect(DOM.categoryPopup.popup);
   showSectionLoader("Syncing data...");
+  resetAddCategoryPopup();
   await syncDbData();
   hideSectionLoader();
   loadSubjectSection();
 });
-addCategoryTitleInput.addEventListener("input", () => {
-  if (addCategoryTitleInput.value.length == 20) {
-    addCategoryTitleError.textContent = "Max 20 characters reached";
-    showElement(addCategoryTitleError);
+DOM.categoryPopup.input.addEventListener("input", () => {
+  if (DOM.categoryPopup.input.value.length == 21) {
+    DOM.categoryPopup.error.textContent = "Max 20 characters reached";
+    DOM.categoryPopup.input.value = DOM.categoryPopup.input.value.slice(0, 20);
+    showElement(DOM.categoryPopup.error);
   } else {
-    hideElement(addCategoryTitleError);
+    hideElement(DOM.categoryPopup.error);
   }
+});
+DOM.categoryPopup.closeBtn.addEventListener("click", async () => {
+  await fadeOutEffect(DOM.categoryPopup.popup);
+  resetAddCategoryPopup();
 });
 async function deleteCategory() {
   const confirm = await showConfirmationPopup(
-    "All the content in this category will be deleted forever"
+    "All the content in this category will be deleted forever",
   );
   if (!confirm) return;
   showSectionLoader("Deleting category...");
@@ -448,36 +628,37 @@ async function deleteCategory() {
     if (element.attachmentId === "custom-link") continue;
     await deleteDriveFile(element.attachmentId);
   }
+  showSectionLoader("Deleting category...");
   await deleteData(
-    `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList/${selectedCategoryId}`
+    `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList/${selectedCategoryId}`,
   );
   await showSectionLoader("Syncing data...");
   await syncDbData();
-  loadSubjectSection();
   hideSectionLoader();
+  loadSubjectSection();
 }
 async function resetAddCategoryPopup() {
-  fadeInEffect(addItemPopupCreateBtn);
-  addCategoryTitleInput.value = "";
-  fadeOutEffect(addCategoryTitleError);
+  showElement(DOM.categoryPopup.successBtn);
+  hideElement(DOM.categoryPopup.error);
+  DOM.categoryPopup.input.value = "";
+  DOM.categoryPopup.successBtn.textContent = "Create";
+  DOM.categoryPopup.popupTitle.textContent = "Add Category";
   isCategoryEditing = false;
   selectedCategoryId = null;
-  addCategoryPopupCreateBtn.textContent = "Create";
-  addCategoryPopupTitle.textContent = "Add Category";
 }
 function editCategory() {
-  addCategoryTitleInput.value =
+  DOM.categoryPopup.input.value =
     appState.subjectData[appState.activeSubject].containerList[
       selectedCategoryId
     ].metaData.name;
   isCategoryEditing = true;
-  addCategoryPopupCreateBtn.textContent = "Edit";
-  addCategoryPopupTitle.textContent = "Edit Category";
-  fadeInEffect(addCategoryPopup);
+  DOM.categoryPopup.successBtn.textContent = "Edit";
+  DOM.categoryPopup.popupTitle.textContent = "Edit Category";
+  fadeInEffect(DOM.categoryPopup.popup);
 }
 async function toggleCategoryVisibility() {
   const confirm = await showConfirmationPopup(
-    "All the content in this category will not be visible to students until you unhide it"
+    "All the content in this category will not be visible to students until you unhide it",
   );
   if (!confirm) return;
   await showSectionLoader("Changing visibility...");
@@ -488,89 +669,35 @@ async function toggleCategoryVisibility() {
         !appState.subjectData[appState.activeSubject].containerList[
           selectedCategoryId
         ].metaData.isVisible,
-    }
+    },
   );
   await showSectionLoader("Syncing data...");
   await syncDbData();
   hideSectionLoader();
   loadSubjectSection();
 }
-//
-///
-///
-///
-///
-///
-///
-///
-///
-///
-///
-///
-///
-
-// individual resource item related var and functions
 
 // individual item var and function
 let isItemEditing = false;
 let selectedItemId = null;
 let originalLink = "";
 let originalAttachmentId = "";
-const addItemPopup = document.querySelector(".add-item-popup-wrapper");
-const addItemPopupTitle = addItemPopup.querySelector(".popup-title");
-//popup buttons
-const addItemPopupCloseBtn = addItemPopup.querySelector(".close-popup-btn");
-const addItemPopupCreateBtn = addItemPopup.querySelector(".create-btn");
-const addItemPopupChangeAttachmentBtn = addItemPopup.querySelector(
-  ".change-attachment-btn"
-);
-// inputs
-const addItemPopupTitleInput = addItemPopup.querySelector(".title-input");
-const addItemPopupLinkInput = addItemPopup.querySelector(".link-input");
-const addItemPopupFileInput = addItemPopup.querySelector("#item-file-input");
-// error msgs
-const addItemPopupTitleError = addItemPopup.querySelector(".title-error");
-const addItemPopupLinkError = addItemPopup.querySelector(".link-error");
-// error popup
-const addItemPopupErrorPopup = addItemPopup.querySelector(
-  ".error-popup-wrapper "
-);
-const addItemPopupErrorPopupOkBtn = addItemPopup.querySelector(
-  ".error-popup-wrapper .okay-btn"
-);
-// editor icons
-const addItemPopupEditTools = addItemPopup.querySelector(".edit-tools");
-const addItemPopupHideIcon = addItemPopup.querySelector(".hide-icon");
-const addItemPopupUnhideIcon = addItemPopup.querySelector(".unhide-icon");
-const addItemPopupDeleteIcon = addItemPopup.querySelector(".delete-icon");
-// file attachment ui
-const addItemPopupFileAttachment =
-  addItemPopup.querySelector(".upload-attachment");
-const addItemPopupFileAttachmentText = addItemPopup.querySelector(
-  ".upload-attachment .upload-text"
-);
-const addItemPopupFileAttachmentIcon = addItemPopup.querySelector(
-  ".upload-attachment .upload-attachment-icon "
-);
-const addItemPopupOrLine = addItemPopup.querySelector(".or-line");
-const addItemPopupLinkInputLabel =
-  addItemPopup.querySelector(".link-input-label");
 function resetAddItemPopup() {
-  addItemPopupTitleInput.value = "";
-  addItemPopupLinkInput.value = "";
-  addItemPopupFileInput.value = "";
-  addItemPopupCreateBtn.textContent = "Create";
-  addItemPopupFileAttachmentText.textContent = "Upload (Optional)";
-  addItemPopupTitle.textContent = "Add Item";
-  fadeInEffect(addItemPopupLinkInputLabel);
-  fadeInEffect(addItemPopupLinkInput);
-  fadeInEffect(addItemPopupFileAttachmentIcon);
-  fadeInEffect(addItemPopupFileAttachment);
-  fadeInEffect(addItemPopupOrLine);
-  fadeOutEffect(addItemPopupTitleError);
-  fadeOutEffect(addItemPopupLinkError);
-  fadeOutEffect(addItemPopupChangeAttachmentBtn);
-  fadeOutEffect(addItemPopupEditTools);
+  showElement(DOM.itemPopup.linkInputWrapper);
+  showElement(DOM.itemPopup.fileAttachment.icon);
+  showElement(DOM.itemPopup.fileAttachment.inputWrapper);
+  showElement(DOM.itemPopup.orLine);
+  hideElement(DOM.itemPopup.errors.title);
+  hideElement(DOM.itemPopup.errors.file);
+  hideElement(DOM.itemPopup.errors.link);
+  hideElement(DOM.itemPopup.changeAttachmentBtn);
+  hideElement(DOM.itemPopup.editTools.wrapper);
+  DOM.itemPopup.inputs.title.value = "";
+  DOM.itemPopup.inputs.link.value = "";
+  DOM.itemPopup.inputs.file.value = "";
+  DOM.itemPopup.successBtn.textContent = "Create";
+  DOM.itemPopup.fileAttachment.text.textContent = "Upload File";
+  DOM.itemPopup.popupTitle.textContent = "Add Item";
   originalAttachmentId = "";
   originalLink = "";
   isItemEditing = false;
@@ -582,100 +709,95 @@ function editItem(itemId, categoryId, link, attachmentId, title, visible) {
   originalLink = link;
   originalAttachmentId = attachmentId || "custom-link";
   isItemEditing = true;
-  addItemPopupTitleInput.value = title;
-  addItemPopupLinkInput.value = link;
-  addItemPopupFileInput.value = "";
-  addItemPopupTitle.textContent = "Edit Item";
-  addItemPopupCreateBtn.textContent = "Update";
-  fadeOutEffect(addItemPopupLinkInputLabel);
-  fadeOutEffect(addItemPopupLinkInput);
-  fadeInEffect(addItemPopupEditTools);
-  fadeInEffect(addItemPopupDeleteIcon);
+  hideElement(DOM.itemPopup.linkInputWrapper);
+  showElement(DOM.itemPopup.editTools.wrapper);
+  showElement(DOM.itemPopup.changeAttachmentBtn);
+  hideElement(DOM.itemPopup.editTools.unhideBtn);
+  showElement(DOM.itemPopup.editTools.hideBtn);
+  hideElement(DOM.itemPopup.fileAttachment.inputWrapper);
+  hideElement(DOM.itemPopup.orLine);
+  DOM.itemPopup.inputs.title.value = title;
+  DOM.itemPopup.inputs.link.value = link;
+  DOM.itemPopup.inputs.file.value = "";
+  DOM.itemPopup.popupTitle.textContent = "Edit Item";
+  DOM.itemPopup.successBtn.textContent = "Edit";
   if (visible === false) {
-    fadeInEffect(addItemPopupUnhideIcon);
-    fadeOutEffect(addItemPopupHideIcon);
+    showElement(DOM.itemPopup.editTools.unhideBtn);
+    hideElement(DOM.itemPopup.editTools.hideBtn);
   } else {
-    fadeOutEffect(addItemPopupUnhideIcon);
-    fadeInEffect(addItemPopupHideIcon);
+    hideElement(DOM.itemPopup.editTools.unhideBtn);
+    showElement(DOM.itemPopup.editTools.hideBtn);
   }
-  fadeInEffect(addItemPopupChangeAttachmentBtn);
-  fadeOutEffect(addItemPopupFileAttachment);
-  fadeOutEffect(addItemPopupOrLine);
-  addItemPopupCreateBtn.textContent = "Edit";
-  fadeInEffect(addItemPopup);
+  fadeInEffect(DOM.itemPopup.popup);
 }
-addItemPopupChangeAttachmentBtn.addEventListener("click", () => {
-  fadeInEffect(addItemPopupCreateBtn);
-  fadeInEffect(addItemPopupFileAttachment);
-  fadeInEffect(addItemPopupLinkInput);
-  fadeInEffect(addItemPopupLinkInputLabel);
-  addItemPopupLinkInput.value = "";
-  fadeOutEffect(addItemPopupChangeAttachmentBtn);
+DOM.itemPopup.changeAttachmentBtn.addEventListener("click", () => {
+  DOM.itemPopup.inputs.link.value = "";
+  showElement(DOM.itemPopup.successBtn);
+  showElement(DOM.itemPopup.fileAttachment.inputWrapper);
+  showElement(DOM.itemPopup.linkInputWrapper);
+  showElement(DOM.itemPopup.orLine);
+  hideElement(DOM.itemPopup.changeAttachmentBtn);
 });
-addItemPopupFileAttachment.addEventListener("click", () => {
-  addItemPopupFileInput.click();
+DOM.itemPopup.fileAttachment.inputWrapper.addEventListener("click", () => {
+  DOM.itemPopup.inputs.file.click();
 });
-addItemPopupCloseBtn.addEventListener("click", async () => {
-  await fadeOutEffect(addItemPopup);
+DOM.itemPopup.closeBtn.addEventListener("click", async () => {
+  await fadeOutEffect(DOM.itemPopup.popup);
   resetAddItemPopup();
 });
-addItemPopupErrorPopupOkBtn.addEventListener("click", async () => {
-  fadeOutEffect(addItemPopup);
-  await fadeOutEffect(addItemPopupErrorPopup);
-  resetAddItemPopup();
-});
-addItemPopupFileInput.addEventListener("change", () => {
-  const file = addItemPopupFileInput.files[0];
+DOM.itemPopup.inputs.file.addEventListener("change", () => {
+  const file = DOM.itemPopup.inputs.file.files[0];
   if (file) {
     if (file.size > 20 * 1024 * 1024) {
-      addNoticefileInput.value = "";
-      addItemPopupLinkError.textContent = "File too large (max 20MB)";
-      fadeInEffect(addItemPopupLinkError);
+      DOM.itemPopup.inputs.file.value = "";
+      DOM.itemPopup.errors.file.textContent = "File too large (max 20MB)";
+      showElement(DOM.itemPopup.errors.file);
       return;
     }
-    fadeOutEffect(addItemPopupFileAttachmentIcon);
-    addItemPopupFileAttachmentText.textContent = "1 file attached";
+    hideElement(DOM.itemPopup.fileAttachment.icon);
+    DOM.itemPopup.fileAttachment.text.textContent = "1 file attached";
   } else {
-    resetAddItemPopup();
+    showElement(DOM.itemPopup.fileAttachment.icon);
+    DOM.itemPopup.fileAttachment.text.textContent = "Upload File";
   }
 });
-addItemPopupCreateBtn.addEventListener("click", async () => {
-  const title = addItemPopupTitleInput.value.trim();
-  const link = addItemPopupLinkInput.value.trim();
-  const file = addItemPopupFileInput.files[0];
-  fadeOutEffect(addItemPopupTitleError);
-  fadeOutEffect(addItemPopupLinkError);
-  let iserror = false;
+DOM.itemPopup.successBtn.addEventListener("click", async () => {
+  hideElement(DOM.itemPopup.errors.link);
+  hideElement(DOM.itemPopup.errors.title);
+  hideElement(DOM.itemPopup.errors.file);
+  const title = DOM.itemPopup.inputs.title.value.trim();
+  const link = DOM.itemPopup.inputs.link.value.trim();
+  const file = DOM.itemPopup.inputs.file.files[0];
+  let isError = false;
   if (!title) {
-    addItemPopupTitleError.textContent = "Title is required";
-    fadeInEffect(addItemPopupTitleError);
-    iserror = true;
+    DOM.itemPopup.errors.title.textContent = "Title is required";
+    showElement(DOM.itemPopup.errors.title);
+    isError = true;
   }
-
   if (!link && !file) {
-    addItemPopupLinkError.textContent = "Link or file is required";
-    fadeInEffect(addItemPopupLinkError);
-    iserror = true;
+    DOM.itemPopup.errors.link.textContent = "Link or file is required";
+    showElement(DOM.itemPopup.errors.link);
+    isError = true;
   }
   if (file && link) {
-    fadeInEffect(addItemPopupErrorPopup);
+    let flag = await showWarningPopup("Please upload either a file or a link.");
+    await fadeOutEffect(DOM.itemPopup.popup);
+    resetAddItemPopup();
     return;
   }
   if (link && !/^https?:\/\//.test(link)) {
-    addItemPopupLinkError.textContent =
-      "Enter a valid link starting with http:// or https://";
-    fadeInEffect(addItemPopupLinkError);
-    iserror = true;
+    DOM.itemPopup.errors.link.textContent = "Enter a valid link ";
+    showElement(DOM.itemPopup.errors.link);
+    isError = true;
   }
-  if (iserror) return;
+  if (isError) return;
   let attachmentURL = "";
   let attachmentId = "";
   if (file) {
     showSectionLoader("Uploading file...");
-
     let uploaded = await uploadDriveFile(
       file,
-      `${appState.activeSem}/divisionData/division${appState.activeDiv}/subjectData/${appState.activeSubject}/${selectedCategoryId}`
+      `${appState.activeSem}/divisionData/division${appState.activeDiv}/subjectData/${appState.activeSubject}/${selectedCategoryId}`,
     );
     if (!uploaded) return;
     attachmentURL = uploaded.webViewLink;
@@ -702,7 +824,7 @@ addItemPopupCreateBtn.addEventListener("click", async () => {
         name: title,
         link: attachmentURL,
         attachmentId,
-      }
+      },
     );
   } else {
     showSectionLoader("Adding item...");
@@ -714,62 +836,66 @@ addItemPopupCreateBtn.addEventListener("click", async () => {
         attachmentId,
         createdAt: Date.now(),
         isVisible: true,
-      }
+      },
     );
   }
-  fadeOutEffect(addItemPopup);
+  await fadeOutEffect(DOM.itemPopup.popup);
   showSectionLoader("Syncing data...");
   await syncDbData();
-  hideSectionLoader();
   resetAddItemPopup();
+  hideSectionLoader();
   loadSubjectSection();
 });
-addItemPopupUnhideIcon.addEventListener("click", async () => {
+DOM.itemPopup.editTools.unhideBtn.addEventListener("click", async () => {
   let confirm = await showConfirmationPopup(
-    "Are you sure you want to unhide this item?"
+    "Are you sure you want to unhide this item?",
   );
   if (!confirm) return;
   showSectionLoader("Unhiding item...");
   updateData(
     `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList/${selectedCategoryId}/itemList/${selectedItemId}`,
-    { isVisible: true }
+    { isVisible: true },
   );
-  fadeOutEffect(addItemPopup);
+  fadeOutEffect(DOM.itemPopup.popup);
   showSectionLoader("Syncing data...");
   await syncDbData();
-  hideSectionLoader();
   resetAddItemPopup();
+  hideSectionLoader();
   loadSubjectSection();
 });
-addItemPopupTitleInput.addEventListener("input", () => {
-  if (addItemPopupTitleInput.value.length == 12) {
-    addItemPopupTitleError.textContent =
-      "Max 12 characters reached (Use short words like Exp, Asign, etc)";
-    fadeInEffect(addItemPopupTitleError);
-  } else {
-    fadeOutEffect(addItemPopupTitleError);
-  }
-});
-addItemPopupHideIcon.addEventListener("click", async () => {
+DOM.itemPopup.editTools.hideBtn.addEventListener("click", async () => {
   let confirm = await showConfirmationPopup(
-    "Are you sure you want to hide this item?"
+    "Are you sure you want to hide this item?",
   );
   if (!confirm) return;
   showSectionLoader("Hiding item...");
   updateData(
     `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList/${selectedCategoryId}/itemList/${selectedItemId}`,
-    { isVisible: false }
+    { isVisible: false },
   );
-  fadeOutEffect(addItemPopup);
+  fadeOutEffect(DOM.itemPopup.popup);
   showSectionLoader("Syncing data...");
   await syncDbData();
-  hideSectionLoader();
   resetAddItemPopup();
+  hideSectionLoader();
   loadSubjectSection();
 });
-addItemPopupDeleteIcon.addEventListener("click", async () => {
+DOM.itemPopup.inputs.title.addEventListener("input", () => {
+  if (DOM.itemPopup.inputs.title.value.length == 13) {
+    DOM.itemPopup.inputs.title.value = DOM.itemPopup.inputs.title.value.slice(
+      0,
+      12,
+    );
+    DOM.itemPopup.errors.title.textContent =
+      "Max 12 characters reached (Use short words like Exp, Asign, etc)";
+    showElement(DOM.itemPopup.errors.title);
+  } else {
+    hideElement(DOM.itemPopup.errors.title);
+  }
+});
+DOM.itemPopup.editTools.deleteBtn.addEventListener("click", async () => {
   let confirm = await showConfirmationPopup(
-    "Are you sure you want to delete this item?"
+    "Are you sure you want to delete this item?",
   );
   if (!confirm) return;
   if (
@@ -782,13 +908,13 @@ addItemPopupDeleteIcon.addEventListener("click", async () => {
     showSectionLoader("Deleting item...");
   }
   deleteData(
-    `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList/${selectedCategoryId}/itemList/${selectedItemId}`
+    `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList/${selectedCategoryId}/itemList/${selectedItemId}`,
   );
-  fadeOutEffect(addItemPopup);
+  fadeOutEffect(DOM.itemPopup.popup);
   showSectionLoader("Syncing data...");
   await syncDbData();
-  hideSectionLoader();
   resetAddItemPopup();
+  hideSectionLoader();
   loadSubjectSection();
 });
 function renderResources() {
@@ -805,7 +931,9 @@ function renderResources() {
     const headingWrapper = document.createElement("div");
     headingWrapper.className = "gap-2 lg:gap-3 flex items-center w-full";
     const heading = document.createElement("p");
-    heading.textContent = category.metaData.name;
+    heading.textContent =
+      category.metaData.name.charAt(0).toUpperCase() +
+      category.metaData.name.slice(1);
     const plusIcon = document.createElement("div");
     plusIcon.className = "plus-icon hidden editor-tool";
     const plusIconInner = document.createElement("i");
@@ -825,7 +953,7 @@ function renderResources() {
     const visibilityIcon = document.createElement("div");
     visibilityIcon.className = "visibility-icon hidden editor-tool";
     const visibilityIconInner = document.createElement("i");
-    visibilityIconInner.className = category.metaData.visible
+    visibilityIconInner.className = category.metaData.isVisible
       ? "fa-solid fa-eye-slash text-xl cursor-pointer"
       : "fa-solid fa-eye text-xl cursor-pointer";
     visibilityIcon.appendChild(visibilityIconInner);
@@ -837,7 +965,6 @@ function renderResources() {
     container.appendChild(headingWrapper);
     const cardContainer = document.createElement("div");
     if (!category.metaData.isVisible) {
-      console.log("Category is not visible:", category.metaData.name);
       container.classList.add("editor-only-content");
       container.classList.add("hidden");
       heading.className = "text-2xl font-semibold opacity-50";
@@ -848,7 +975,7 @@ function renderResources() {
     }
     plusIcon.addEventListener("click", () => {
       selectedCategoryId = categoryId;
-      fadeInEffect(addItemPopup);
+      fadeInEffect(DOM.itemPopup.popup);
     });
     deleteIcon.addEventListener("click", () => {
       selectedCategoryId = categoryId;
@@ -862,7 +989,6 @@ function renderResources() {
       selectedCategoryId = categoryId;
       toggleCategoryVisibility();
     });
-
     const items = category?.itemList || {};
     for (const itemId in items) {
       const item = items[itemId];
@@ -873,27 +999,27 @@ function renderResources() {
       const card = document.createElement("div");
       if (!item.isVisible) {
         card.className =
-          "card p-4 w-full text-center t bg-surface-2 rounded-[20px] editor-only-content-card opacity-50";
+          "card p-4 w-full text-center  bg-surface-2 rounded-[1.25rem] editor-only-content-card opacity-50";
         link.classList.add("hidden");
       } else
         card.className =
-          "card p-4 w-full text-center t bg-surface-2 rounded-[20px]";
+          "card p-4 w-full text-center bg-surface-2 rounded-[1.25rem]";
 
-      card.textContent = item.name;
+      card.textContent = item.name.charAt(0).toUpperCase() + item.name.slice(1);
       link.appendChild(card);
       cardContainer.appendChild(link);
 
       // listner
       card.addEventListener("click", (e) => {
         if (appState.isEditing) {
-          e.preventDefault(); // Prevent navigation
+          e.preventDefault();
           editItem(
             itemId,
             categoryId,
             item.link,
             item.attachmentId,
             item.name,
-            item.isVisible
+            item.isVisible,
           );
         }
       });
@@ -902,124 +1028,48 @@ function renderResources() {
     subjectPageSection.appendChild(container);
   }
 }
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 // upcoming submission var and function
-const upcomingSubmission = subjectPageSection.querySelector(
-  ".upcoming-submissions"
-);
-const upcomingSubmissionCardContainer = upcomingSubmission.querySelector(
-  ".upcoming-submissions .card-container"
-);
-
 let isSubmissionEditing = false;
 let selectedSubmissionId = null;
-const addSubbmissionButton = upcomingSubmission.querySelector(
-  ".add-submission-btn"
-);
-const addSubmissionPopup = subjectPageSection.querySelector(
-  ".add-submission-popup-wrapper"
-);
-const addSubmissionPopupTitle =
-  addSubmissionPopup.querySelector(".popup-title");
-// popup buttons
-const addSubmissionPopupCreateBtn =
-  addSubmissionPopup.querySelector(".create-btn");
-const addSubmissionPopupDeleteIcon =
-  addSubmissionPopup.querySelector(".delete-icon");
-const addSubmissionPopupCloseIcon =
-  addSubmissionPopup.querySelector(".close-popup-btn");
-const addSubmissionPopupChangeDateBtn =
-  addSubmissionPopup.querySelector(".change-date-btn");
-// error messages
-const addSubmissionPopupTitleError = addSubmissionPopup.querySelector(
-  ".title-related-error"
-);
-const addSubmissionPopupDescriptionError = addSubmissionPopup.querySelector(
-  ".submission-description-related-error"
-);
-// inputs
-const addSubmissionPopupTitleInput = addSubmissionPopup.querySelector(
-  "#submission-title-input"
-);
-const addSubmissionPopupDescriptionInput = addSubmissionPopup.querySelector(
-  "#submission-description-input"
-);
-const addSubmissionPopupDateInput = document.querySelector(
-  "#submission-date-input"
-);
-// error popup
-const addSubmissionPopupErrorPopup = addSubmissionPopup.querySelector(
-  ".error-popup-wrapper "
-);
-const addSubmissionPopupErrorPopupOkBtn = addSubmissionPopup.querySelector(
-  ".error-popup-wrapper .okay-btn"
-);
-const fakePlaceHolder = document.querySelector(".fake-placeholder");
-const addSubmissionPopupDateInputWrapper = addSubmissionPopup.querySelector(
-  ".date-input-wrapper"
-);
-const addSubmissionPopupDescriptionInputWrapper =
-  addSubmissionPopup.querySelector(".description-input-wrapper");
-const addSubmissionPopupDateOrLine =
-  addSubmissionPopup.querySelector(".or-line");
-addSubbmissionButton.addEventListener("click", () => {
-  fadeInEffect(addSubmissionPopup);
+DOM.upcomingSubmissions.addContentBtn.addEventListener("click", () => {
+  fadeInEffect(DOM.submissionPopup.popup);
 });
-addSubmissionPopupCloseIcon.addEventListener("click", async () => {
-  await fadeOutEffect(addSubmissionPopup);
+DOM.submissionPopup.closeBtn.addEventListener("click", async () => {
+  await fadeOutEffect(DOM.submissionPopup.popup);
   resetAddUpcomingSubmissionPopup();
 });
-addSubmissionPopupDateInput.addEventListener("click", () => {
-  openDatePicker();
+DOM.submissionPopup.inputs.date.addEventListener("click", () => {
+  if (DOM.submissionPopup.inputs.date.showPicker) {
+    DOM.submissionPopup.inputs.date.showPicker();
+  } else {
+    DOM.submissionPopup.inputs.date.focus();
+  }
 });
-addSubmissionPopupErrorPopupOkBtn.addEventListener("click", () => {
-  fadeOutEffect(addSubmissionPopupErrorPopup);
-  fadeOutEffect(addSubmissionPopup);
-  resetAddUpcomingSubmissionPopup();
+DOM.submissionPopup.inputs.date.addEventListener("input", () => {
+  hideElement(DOM.submissionPopup.fakeDatePlaceholder);
 });
-addSubmissionPopupDateInput.addEventListener("input", () => {
-  fadeOutEffect(fakePlaceHolder);
-});
-addSubmissionPopupCreateBtn.addEventListener("click", async () => {
-  let title = addSubmissionPopupTitleInput.value;
-  let description = addSubmissionPopupDescriptionInput.value;
-  let date = addSubmissionPopupDateInput.value;
-  fadeOutEffect(addSubmissionPopupTitleError);
-  fadeOutEffect(addSubmissionPopupDescriptionError);
+DOM.submissionPopup.successBtn.addEventListener("click", async () => {
+  hideElement(DOM.submissionPopup.errors.description);
+  hideElement(DOM.submissionPopup.errors.title);
+  let title = DOM.submissionPopup.inputs.title.value;
+  let description = DOM.submissionPopup.inputs.description.value;
+  let date = DOM.submissionPopup.inputs.date.value;
   let isError = false;
   if (!title) {
     isError = true;
-    addSubmissionPopupTitleError.textContent = "Required";
-    fadeInEffect(addSubmissionPopupTitleError);
+    DOM.submissionPopup.errors.title.textContent = "Required";
+    showElement(DOM.submissionPopup.errors.title);
   }
   if (!description && !date) {
     isError = true;
-    addSubmissionPopupDescriptionError.textContent = "Required";
-    fadeInEffect(addSubmissionPopupDescriptionError);
+    DOM.submissionPopup.errors.description.textContent = "Required";
+    showElement(DOM.submissionPopup.errors.description);
   }
   if (description && date) {
-    isError = true;
-    fadeInEffect(addSubmissionPopupErrorPopup);
+    await showWarningPopup("Please enter either a description or a date.");
+    await fadeOutEffect(DOM.submissionPopup.popup);
+    resetAddUpcomingSubmissionPopup();
+    return;
   }
   if (isError) return;
   if (description) {
@@ -1032,7 +1082,7 @@ addSubmissionPopupCreateBtn.addEventListener("click", async () => {
       {
         name: title,
         dueDate: date,
-      }
+      },
     );
   } else {
     showSectionLoader("Creating submission...");
@@ -1041,105 +1091,109 @@ addSubmissionPopupCreateBtn.addEventListener("click", async () => {
       {
         name: title,
         dueDate: date,
-      }
+      },
     );
   }
-  await fadeOutEffect(addSubmissionPopup);
-  resetAddUpcomingSubmissionPopup();
+  await fadeOutEffect(DOM.submissionPopup.popup);
   showSectionLoader("Syncing data...");
   await syncDbData();
+  resetAddUpcomingSubmissionPopup();
   hideSectionLoader();
   loadSubjectSection();
 });
-addSubmissionPopupDeleteIcon.addEventListener("click", async () => {
+DOM.submissionPopup.deleteBtn.addEventListener("click", async () => {
   const confirm = await showConfirmationPopup(
-    "All the content in this category will be deleted forever"
+    "All the content in this category will be deleted forever",
   );
   if (!confirm) return;
   showSectionLoader("Deleting submission...");
   await deleteData(
-    `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/upcomingSubmissionData/${appState.activeSubject}/${selectedSubmissionId}`
+    `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/upcomingSubmissionData/${appState.activeSubject}/${selectedSubmissionId}`,
   );
-  await fadeOutEffect(addSubmissionPopup);
-  resetAddUpcomingSubmissionPopup();
+  await fadeOutEffect(DOM.submissionPopup.popup);
   showSectionLoader("Syncing data...");
   await syncDbData();
+  resetAddUpcomingSubmissionPopup();
   hideSectionLoader();
   loadSubjectSection();
 });
-addSubmissionPopupTitleInput.addEventListener("input", () => {
-  if (addSubmissionPopupTitleInput.value.length == 12) {
-    addSubmissionPopupTitleError.textContent =
+DOM.submissionPopup.inputs.title.addEventListener("input", () => {
+  if (DOM.submissionPopup.inputs.title.value.length == 13) {
+    DOM.submissionPopup.errors.title.textContent =
       "Max 12 characters reached (Use short words like Exp, Asign, etc)";
-    fadeInEffect(addSubmissionPopupTitleError);
+    DOM.submissionPopup.inputs.title.value =
+      DOM.submissionPopup.inputs.title.value.slice(0, 12);
+    showElement(DOM.submissionPopup.errors.title);
   } else {
-    fadeOutEffect(addSubmissionPopupTitleError);
+    hideElement(DOM.submissionPopup.errors.title);
   }
 });
+DOM.submissionPopup.inputs.description.addEventListener("input", () => {
+  if (DOM.submissionPopup.inputs.description.value.length == 21) {
+    DOM.submissionPopup.errors.description.textContent =
+      "Max 20 characters reached";
+    DOM.submissionPopup.inputs.description.value =
+      DOM.submissionPopup.inputs.description.value.slice(0, 20);
+    showElement(DOM.submissionPopup.errors.description);
+  } else {
+    hideElement(DOM.submissionPopup.errors.description);
+  }
+});
+
 function resetAddUpcomingSubmissionPopup() {
-  fadeInEffect(addSubmissionPopupDateInputWrapper);
-  fadeInEffect(addSubmissionPopupDescriptionInputWrapper);
-  fadeOutEffect(addSubmissionPopupChangeDateBtn);
-  addSubmissionPopupTitleInput.value = "";
-  addSubmissionPopupDescriptionInput.value = "";
-  addSubmissionPopupDateInput.value = "";
+  showElement(DOM.submissionPopup.dateInputWrapper);
+  showElement(DOM.submissionPopup.descriptionInputWrapper);
+  hideElement(DOM.submissionPopup.changeDateBtn);
+  showElement(DOM.submissionPopup.fakeDatePlaceholder);
+  hideElement(DOM.submissionPopup.deleteBtn);
+  DOM.submissionPopup.inputs.title.value = "";
+  DOM.submissionPopup.inputs.description.value = "";
+  DOM.submissionPopup.inputs.date.value = "";
   isSubmissionEditing = false;
   selectedSubmissionId = null;
-  addSubmissionPopupTitle.textContent = "Add Submission";
-  addSubmissionPopupCreateBtn.textContent = "Create";
-  fadeInEffect(fakePlaceHolder);
-  fadeOutEffect(addSubmissionPopupDeleteIcon);
+  DOM.submissionPopup.popupTitle.textContent = "Add Submission";
+  DOM.submissionPopup.successBtn.textContent = "Create";
 }
-addSubmissionPopupChangeDateBtn.addEventListener("click", () => {
-  fadeInEffect(addSubmissionPopupDateInputWrapper);
-  fadeInEffect(addSubmissionPopupDateOrLine);
-  fadeInEffect(addSubmissionPopupDescriptionInputWrapper);
-  addSubmissionPopupDescriptionInput.value = "";
-  fadeOutEffect(addSubmissionPopupChangeDateBtn);
+DOM.submissionPopup.changeDateBtn.addEventListener("click", () => {
+  showElement(DOM.submissionPopup.dateInputWrapper);
+  showElement(DOM.submissionPopup.orLine);
+  showElement(DOM.submissionPopup.descriptionInputWrapper);
+  DOM.submissionPopup.inputs.description.value = "";
+  hideElement(DOM.submissionPopup.changeDateBtn);
 });
-function openDatePicker() {
-  if (addSubmissionPopupDateInput.showPicker) {
-    addSubmissionPopupDateInput.showPicker();
-  } else {
-    addSubmissionPopupDateInput.focus();
-  }
-}
+
 function editUpcomingSubmission(submissionId) {
-  fadeInEffect(addSubmissionPopupChangeDateBtn);
-  fadeOutEffect(addSubmissionPopupDateInputWrapper);
-  fadeOutEffect(addSubmissionPopupDescriptionInputWrapper);
-  fadeOutEffect(addSubmissionPopupDateOrLine);
-  addSubmissionPopupCreateBtn.textContent = "Edit";
-  addSubmissionPopupTitleInput.value =
+  showElement(DOM.submissionPopup.changeDateBtn);
+  hideElement(DOM.submissionPopup.dateInputWrapper);
+  hideElement(DOM.submissionPopup.descriptionInputWrapper);
+  hideElement(DOM.submissionPopup.orLine);
+  DOM.submissionPopup.successBtn.textContent = "Edit";
+  DOM.submissionPopup.inputs.title.value =
     appState.divisionData.upcomingSubmissionData[appState.activeSubject][
       submissionId
     ].name;
-  addSubmissionPopupDescriptionInput.value =
-    appState.divisionData.upcomingSubmissionData[appState.activeSubject][
-      submissionId
-    ].dueDate;
   isSubmissionEditing = true;
   selectedSubmissionId = submissionId;
-  addSubmissionPopupTitle.textContent = "Edit Submission";
-  fadeInEffect(addSubmissionPopupDeleteIcon);
-  fadeInEffect(addSubmissionPopup);
+  DOM.submissionPopup.popupTitle.textContent = "Edit Submission";
+  showElement(DOM.submissionPopup.deleteBtn);
+  fadeInEffect(DOM.submissionPopup.popup);
 }
 async function renderUpcomingSubmissions() {
   const submissionData =
     (appState.divisionData?.upcomingSubmissionData || {})[
       appState.activeSubject
     ] || {};
-
   if (!submissionData || !Object.keys(submissionData).length) {
-    hideElement(upcomingSubmission);
+    hideElement(DOM.upcomingSubmissions.container);
     console.log("No upcoming found");
     return;
   }
-  fadeInEffect(upcomingSubmission);
+  showElement(DOM.upcomingSubmissions.container);
   const now = new Date();
   const deleteCutoffHour = 17;
   const deleteCutoffMinute = 30;
   for (const key in submissionData) {
+    console.log("entered here");
     let submission = submissionData[key];
     if (
       typeof submission.dueDate === "string" &&
@@ -1151,28 +1205,29 @@ async function renderUpcomingSubmissions() {
         month - 1,
         day,
         deleteCutoffHour,
-        deleteCutoffMinute
+        deleteCutoffMinute,
       );
       if (now > deleteTime) {
         console.log("this is old");
         await deleteData(
-          `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/upcomingSubmissionData/${appState.activeSubject}/${key}`
+          `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/upcomingSubmissionData/${appState.activeSubject}/${key}`,
         );
         delete submissionData[key];
         continue;
       }
     }
     const card = document.createElement("div");
-    card.className = "card p-4 bg-surface-2 rounded-[20px] text-center";
+    card.className = "card p-4 bg-surface-2 rounded-[1.25rem] text-center";
     const description = document.createElement("p");
     description.className = "description";
-    description.textContent = submission.name;
+    description.textContent =
+      submission.name.charAt(0).toUpperCase() + submission.name.slice(1);
     const submissionDate = document.createElement("p");
     submissionDate.className = "submission-date";
     submissionDate.textContent = formatDateBasedOnProximity(submission.dueDate);
     card.appendChild(description);
     card.appendChild(submissionDate);
-    upcomingSubmissionCardContainer.appendChild(card);
+    DOM.upcomingSubmissions.cardContainer.appendChild(card);
     card.addEventListener("click", () => {
       if (appState.isEditing) {
         editUpcomingSubmission(key);
@@ -1182,10 +1237,21 @@ async function renderUpcomingSubmissions() {
 }
 function formatDateBasedOnProximity(rawDate) {
   const dateObj = new Date(rawDate);
-  if (isNaN(dateObj)) return rawDate; //
+  if (isNaN(dateObj)) return rawDate.charAt(0).toUpperCase() + rawDate.slice(1);
+
   const now = new Date();
+
+  // Normalize both to YYYY-MM-DD (removing time portion)
+  const todayStr = now.toISOString().split("T")[0];
+  const dateStr = dateObj.toISOString().split("T")[0];
+
+  if (dateStr === todayStr) {
+    return "Today";
+  }
+
   const sevenDaysLater = new Date();
   sevenDaysLater.setDate(now.getDate() + 7);
+
   const day = dateObj.getDate().toString().padStart(2, "0");
 
   if (dateObj <= sevenDaysLater) {

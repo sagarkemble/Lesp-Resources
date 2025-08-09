@@ -12,6 +12,134 @@ import {
 import { hideSections, showSectionLoader, hideSectionLoader } from "./index.js";
 import { headerIcon, headerTitle } from "./navigation.js";
 import { appState, syncDbData } from "./appstate.js";
+const DOM = {
+  leaderboardSection: document.querySelector(".leaderboard-section"),
+  leaderboardCardContainer: document.querySelector(
+    ".leaderboard-section .leaderboard-card-container",
+  ),
+  studentSelectorPopup: {
+    popup: document.querySelector(".pick-leaderboard-student-popup-wrapper"),
+    closePopupBtn: document.querySelector(
+      ".pick-leaderboard-student-popup-wrapper .close-popup-btn",
+    ),
+    cardContainer: document.querySelector(
+      ".pick-leaderboard-student-popup-wrapper .card-container",
+    ),
+  },
+  previousTestWinner: {
+    first: {
+      container: document.querySelector(
+        ".previous-test-rank-container .first-winner-container",
+      ),
+      name: document.querySelector(
+        ".previous-test-rank-container .first-winner-container .name",
+      ),
+      pfp: document.querySelector(
+        ".previous-test-rank-container .first-winner-container .user-pfp",
+      ),
+    },
+    second: {
+      container: document.querySelector(
+        ".previous-test-rank-container .second-winner-container",
+      ),
+      name: document.querySelector(
+        ".previous-test-rank-container .second-winner-container .name",
+      ),
+      pfp: document.querySelector(
+        ".previous-test-rank-container .second-winner-container .user-pfp",
+      ),
+    },
+    third: {
+      container: document.querySelector(
+        ".previous-test-rank-container .third-winner-container",
+      ),
+      name: document.querySelector(
+        ".previous-test-rank-container .third-winner-container .name",
+      ),
+      pfp: document.querySelector(
+        ".previous-test-rank-container .third-winner-container .user-pfp",
+      ),
+    },
+  },
+  leaderboardTopper: {
+    first: {
+      swiper: new Swiper("#first-place-swiper", {
+        direction: "horizontal",
+        loop: true,
+        speed: 250,
+
+        effect: "fade",
+        autoplay: {
+          delay: 2000,
+        },
+        fadeEffect: {
+          crossFade: true,
+        },
+      }),
+      points: document.querySelector(
+        ".leaderboard-top-ranks-container .first-winner-container .points",
+      ),
+      podiumPoints: document.querySelector(
+        ".leaderboard-top-ranks-container .first-winner-container .podium-points",
+      ),
+    },
+    second: {
+      swiper: new Swiper("#second-place-swiper", {
+        direction: "horizontal",
+        loop: true,
+        speed: 250,
+        effect: "fade",
+        autoplay: {
+          delay: 2000,
+        },
+        fadeEffect: {
+          crossFade: true,
+        },
+      }),
+      points: document.querySelector(
+        ".leaderboard-top-ranks-container .second-winner-container .points",
+      ),
+      podiumPoints: document.querySelector(
+        ".leaderboard-top-ranks-container .second-winner-container .podium-points",
+      ),
+    },
+    third: {
+      swiper: new Swiper("#third-place-swiper", {
+        direction: "horizontal",
+        loop: true,
+        speed: 250,
+        effect: "fade",
+        autoplay: {
+          delay: 2000,
+        },
+        fadeEffect: {
+          crossFade: true,
+        },
+      }),
+      points: document.querySelector(
+        ".leaderboard-top-ranks-container .third-winner-container .points",
+      ),
+      podiumPoints: document.querySelector(
+        ".leaderboard-top-ranks-container .third-winner-container .podium-points",
+      ),
+    },
+  },
+  statsCard: {
+    rank: document.querySelectorAll(".leaderboard-section .stats-card .rank"),
+    totalStudents: document.querySelectorAll(
+      ".leaderboard-section .stats-card .total-student",
+    ),
+    name: document.querySelector(".leaderboard-section .stats-card .name"),
+    pfp: document.querySelector(".leaderboard-section .stats-card .user-pfp"),
+    points: document.querySelector(".leaderboard-section .stats-card .points"),
+    medals: {
+      gold: document.querySelector(".stats-card .gold-medal-wrapper .qty"),
+      silver: document.querySelector(".stats-card .silver-medal-wrapper .qty"),
+      bronze: document.querySelector(".stats-card .bronze-medal-wrapper .qty"),
+    },
+  },
+};
+//dom elements are targeted only the js is remainng cause due to the less students
 let studentRawData = null;
 let sortedRollNoWiseStudentData = null;
 let rankWiseSortedData = null;
@@ -19,25 +147,22 @@ export async function loadLeaderboardSection() {
   await unloadLeaderBoardSection();
   studentRawData = await getStudentRawData();
   sortedRollNoWiseStudentData = Object.entries(studentRawData)
-    .sort(([, a], [, b]) => a.rollNo - b.rollNo)
+    .sort(([, a], [, b]) => a.rollNumber - b.rollNumber)
     .reduce((acc, [key, val]) => {
       acc[key] = val;
       return acc;
     }, {});
-  const medalPoints = { bronz: 10, silver: 20, gold: 30 };
+  const medalPoints = { bronze: 10, silver: 20, gold: 30 };
   rankWiseSortedData = Object.entries(sortedRollNoWiseStudentData).reduce(
     (acc, [userId, user]) => {
       const { firstName, lastName, medalList, pfpLink } = user;
-
       const bronze = medalList.bronze || 0;
       const silver = medalList.silver || 0;
       const gold = medalList.gold || 0;
-
       const totalPoints =
-        bronze * medalPoints.bronz +
+        bronze * medalPoints.bronze +
         silver * medalPoints.silver +
         gold * medalPoints.gold;
-
       acc[userId] = {
         firstName,
         lastName,
@@ -47,294 +172,67 @@ export async function loadLeaderboardSection() {
         silver,
         gold,
         totalPoints,
+        userId,
       };
-
       return acc;
     },
-    {}
+    {},
   );
-
   initLeaderBoardTopper();
   renderLeaderboardCards();
-  // initStats(rankWiseSortedData);
   initPreviousTestWinner();
   renderStudentCardInPopup();
-  firstRankSwiper.update();
-  secondRankSwiper.update();
-  thirdRankSwiper.update();
-  firstRankSwiper.autoplay.start();
-  secondRankSwiper.autoplay.start();
-  thirdRankSwiper.autoplay.start();
+  initStats();
 }
 async function unloadLeaderBoardSection() {
   await fadeOutEffect(leaderboarSection);
-  leaderboardStudetCardContainer.innerHTML = "";
-  leaderboardCardContainer.innerHTML = "";
+  DOM.studentSelectorPopup.cardContainer.innerHTML = "";
+  DOM.leaderboardCardContainer.innerHTML = "";
 }
 export async function showLeaderboardSection() {
   headerIcon.src =
     "https://ik.imagekit.io/yn9gz2n2g/others/leaderboard.png?updatedAt=1751607436911";
   headerTitle.textContent = "Leaderboard";
   await hideSections();
-  fadeInEffect(leaderboarSection);
+  await fadeInEffect(leaderboarSection);
+  DOM.leaderboardTopper.first.swiper.update();
+  DOM.leaderboardTopper.second.swiper.update();
+  DOM.leaderboardTopper.third.swiper.update();
+  DOM.leaderboardTopper.first.swiper.autoplay.start();
+  DOM.leaderboardTopper.second.swiper.autoplay.start();
+  DOM.leaderboardTopper.third.swiper.autoplay.start();
 }
-const leaderboardCardContainer = document.querySelector(
-  ".leaderboard-card-container"
-);
-const previousTestRankContainer = document.querySelector(
-  ".previous-test-rank-container"
-);
-// First Place
-const previousFirstContainer =
-  previousTestRankContainer.querySelector(".first");
-const previousFirstName = previousTestRankContainer.querySelector(
-  ".first .winner-name"
-);
-const previousFirstPfp = previousTestRankContainer.querySelector(".first .pfp");
-const previousFirstMedal =
-  previousTestRankContainer.querySelector(".first .medal");
-const previousFirstMedalText =
-  previousTestRankContainer.querySelector(".first .rank-text");
-const previousFirstPoint =
-  previousTestRankContainer.querySelector(".first .points");
-// Second Place
-const previousSecondContainer =
-  previousTestRankContainer.querySelector(".second");
-const previousSecondName = previousTestRankContainer.querySelector(
-  ".second .winner-name"
-);
-const previousSecondPfp =
-  previousTestRankContainer.querySelector(".second .pfp");
-const previousSecondMedal =
-  previousTestRankContainer.querySelector(".second .medal");
-const previousSecondMedalText =
-  previousTestRankContainer.querySelector(".second .rank-text");
-const previousSecondPoint =
-  previousTestRankContainer.querySelector(".second .points");
-// Third Place
-const previousThirdContainer =
-  previousTestRankContainer.querySelector(".third");
-const previousThirdName = previousTestRankContainer.querySelector(
-  ".third .winner-name"
-);
-const previousThirdPfp = previousTestRankContainer.querySelector(".third .pfp");
-const previousThirdMedal =
-  previousTestRankContainer.querySelector(".third .medal");
-const previousThirdMedalText =
-  previousTestRankContainer.querySelector(".third .rank-text");
-const previousThirdPoint =
-  previousTestRankContainer.querySelector(".third .points");
-
-const firstRankSwiper = new Swiper("#first-place-swiper", {
-  direction: "horizontal",
-  loop: true,
-  speed: 250,
-  effect: "fade",
-  autoplay: {
-    delay: 2000,
-  },
-  fadeEffect: {
-    crossFade: true,
-  },
-});
-const secondRankSwiper = new Swiper("#second-place-swiper", {
-  direction: "horizontal",
-  loop: true,
-  speed: 250,
-  effect: "fade",
-  autoplay: {
-    delay: 2000,
-  },
-  fadeEffect: {
-    crossFade: true,
-  },
-});
-const thirdRankSwiper = new Swiper("#third-place-swiper", {
-  direction: "horizontal",
-  loop: true,
-  speed: 250,
-  effect: "fade",
-  autoplay: {
-    delay: 2000,
-  },
-  fadeEffect: {
-    crossFade: true,
-  },
-});
-// function renderLeaderboardCards(rankWiseSortedData) {
-//   let previousPts = null;
-//   let rank = 0;
-
-//   rankWiseSortedData.forEach((student, index) => {
-//     const gold = student.medals?.gold || 0;
-//     const silver = student.medals?.silver || 0;
-//     const bronz = student.medals?.bronz || 0;
-//     const firstName = student.firstName || "";
-//     const lastName = student.lastName || "";
-//     if (previousPts !== student.points) {
-//       rank++;
-//     }
-//     if (student.points === 0) {
-//       rank = "--";
-//     }
-//     previousPts = student.points;
-//     const card = document.createElement("div");
-//     card.className =
-//       "card bg-surface-2 px-3 py-4 md:px-4 flex justify-between rounded-lg";
-
-//     card.innerHTML = `
-//       <div class="name-pfp-rank-wrapper w-[180px] md:w-[340px] gap-1.5 md:gap-4 flex items-center">
-// <p class="rank ${
-//       rank === "--" ? "text-sm" : "md:text-xl"
-//     } w-[21px] md-[26px] text-center">${rank}</p>
-//         <div class="name-pfp-wrapper flex items-center gap-1 md:gap-2">
-//           <img
-//             src="${student.pfp}"
-//             alt=""
-//             class="pfp h-10 w-10"
-//           />
-//          <div class="flex flex-col leading-tight md:gap-1.5 text-sm md:text-base md:flex-row md:flex-wrap">
-//   <p class="w-full md:w-auto">${firstName}</p>
-//   <p class="w-full md:w-auto">${lastName}</p>
-// </div>
-
-//         </div>
-//       </div>
-//       <div class="medals-wrapper flex gap-3 md:gap-8">
-//         <div class="medal flex flex-col md:flex-row md:gap-2 items-center">
-//           <img
-//             src="https://ik.imagekit.io/yn9gz2n2g/others/gold.png?updatedAt=1751607550552"
-//             alt=""
-//             class="h-6 w-fit"
-//           />
-//           <div class="wrapper flex items-center">
-//             <p class="text-xs">x</p>
-//             <p class="text-xs md:text-base">${gold}</p>
-//           </div>
-//         </div>
-//         <div class="medal flex flex-col md:flex-row md:gap-2 items-center">
-//           <img
-//             src="https://ik.imagekit.io/yn9gz2n2g/others/silver.png?updatedAt=1751607529476"
-//             alt=""
-//             class="h-6 w-fit"
-//           />
-//           <div class="wrapper flex items-center">
-//             <p class="text-xs">x</p>
-//             <p class="text-xs md:text-base">${silver}</p>
-//           </div>
-//         </div>
-//         <div class="medal flex flex-col md:flex-row md:gap-2 items-center">
-//           <img
-//             src="https://ik.imagekit.io/yn9gz2n2g/others/bronze.png?updatedAt=1751607503968"
-//             alt=""
-//             class="h-6 w-fit"
-//           />
-//           <div class="wrapper flex items-center">
-//             <p class="text-xs">x</p>
-//             <p class="text-xs md:text-base">${bronz}</p>
-//           </div>
-//         </div>
-//       </div>
-//       <div class="points w-14 md:w-20 flex items-center gap-1 md:gap-3">
-//         <img
-//           src="https://ik.imagekit.io/yn9gz2n2g/others/coin.png?updatedAt=1751607575051"
-//           alt=""
-//           class="h-5 w-5 md:h-[30px] md:w-[30px]"
-//         />
-//         <p class="font-semibold">${student.points}</p>
-//       </div>
-//     `;
-
-//     leaderboardCardContainer.appendChild(card);
-//   });
-// }
-// function initLeaderBoardTopper() {
-//   if (rankWiseSortedData.length === 0) return;
-//   if (rankWiseSortedData[0].points === 0) {
-//     firstRankSwiper.disable();
-//     return;
-//   }
-//   const topRanks = [];
-//   let currentPoints = rankWiseSortedData[0].points;
-//   let group = [];
-
-//   for (const student of rankWiseSortedData) {
-//     if (student.points === currentPoints) {
-//       group.push(student);
-//     } else {
-//       topRanks.push(group);
-//       if (topRanks.length === 3) break;
-//       group = [student];
-//       currentPoints = student.points;
-//     }
-//   }
-
-//   if (group.length && topRanks.length < 3) {
-//     topRanks.push(group);
-//   }
-
-//   const swiperInstances = [firstRankSwiper, secondRankSwiper, thirdRankSwiper];
-
-//   topRanks.forEach((group, index) => {
-//     const slides = group.map((student) => {
-//       return `
-//         <div class="swiper-slide">
-//           <div class="winner-profile flex flex-col items-center gap-2">
-//             <img src="${student.pfp}" alt="" class="pfp w-[50px] h-[50px]" />
-//             <p class="winner-name font-semibold truncate w-[100px] lg:w-32 xl:w-40 text-center">
-//               ${student.firstName} <br /> ${student.lastName}
-//             </p>
-//           </div>
-//         </div>
-//       `;
-//     });
-//     if (group.length === 1) {
-//       swiper.disable();
-//     } else {
-//       swiperInstances[index].removeAllSlides();
-//       swiperInstances[index].appendSlide(slides);
-//       swiperInstances[index].update();
-//       swiperInstances[index].enable();
-//     }
-//   });
-// }
 function renderLeaderboardCards() {
-  leaderboardCardContainer.innerHTML = "";
-
+  DOM.leaderboardCardContainer.innerHTML = "";
   const students = Object.values(rankWiseSortedData);
+  console.log("this is form the render leaderboard cards", students);
 
-  // Sort descending by totalPoints
   students.sort((a, b) => b.totalPoints - a.totalPoints);
-
   let previousPts = null;
   let rank = 0;
-
   students.forEach((student, index) => {
     const gold = student.gold || 0;
     const silver = student.silver || 0;
-    const bronz = student.bronze || 0;
+    const bronze = student.bronze || 0;
     const firstName = student.firstName || "";
     const lastName = student.lastName || "";
     const points = student.totalPoints || 0;
-
+    const pfp = student.pfpLink || "";
     if (previousPts !== points && points > 0) {
       rank++;
     }
-
     const displayRank = points === 0 ? "--" : rank;
     previousPts = points;
-
     const card = document.createElement("div");
     card.className =
       "card bg-surface-2 px-3 py-4 md:px-4 flex justify-between rounded-lg";
-
     card.innerHTML = `
       <div class="name-pfp-rank-wrapper w-[180px] md:w-[340px] gap-1.5 md:gap-4 flex items-center">
         <p class="rank ${
           displayRank === "--" ? "text-sm" : "md:text-xl"
         } w-[21px] md-[26px] text-center">${displayRank}</p>
         <div class="name-pfp-wrapper flex items-center gap-1 md:gap-2">
-          <img src="${student.pfp}" alt="" class="pfp h-10 w-10" />
+          <img src="${pfp}" alt="" class="pfp h-10 w-10" />
           <div class="flex flex-col leading-tight md:gap-1.5 text-sm md:text-base md:flex-row md:flex-wrap">
             <p class="w-full md:w-auto">${firstName}</p>
             <p class="w-full md:w-auto">${lastName}</p>
@@ -361,7 +259,7 @@ function renderLeaderboardCards() {
           <img src="https://ik.imagekit.io/yn9gz2n2g/others/bronze.png?updatedAt=1751607503968" alt="" class="h-6 w-fit" />
           <div class="wrapper flex items-center">
             <p class="text-xs">x</p>
-            <p class="text-xs md:text-base">${bronz}</p>
+            <p class="text-xs md:text-base">${bronze}</p>
           </div>
         </div>
       </div>
@@ -371,18 +269,21 @@ function renderLeaderboardCards() {
         <p class="font-semibold">${points}</p>
       </div>
     `;
-
-    leaderboardCardContainer.appendChild(card);
+    DOM.leaderboardCardContainer.appendChild(card);
   });
 }
-
 function initLeaderBoardTopper() {
-  const swipers = [firstRankSwiper, secondRankSwiper, thirdRankSwiper];
-
-  // Convert object to array for sorting
+  const swipers = [
+    DOM.leaderboardTopper.first.swiper,
+    DOM.leaderboardTopper.second.swiper,
+    DOM.leaderboardTopper.third.swiper,
+  ];
+  const podiumPoints = [
+    DOM.leaderboardTopper.first.podiumPoints,
+    DOM.leaderboardTopper.second.podiumPoints,
+    DOM.leaderboardTopper.third.podiumPoints,
+  ];
   const students = Object.values(rankWiseSortedData);
-
-  // Sort descending by totalPoints
   students.sort((a, b) => b.totalPoints - a.totalPoints);
 
   // Get top 3 unique non-zero point values
@@ -392,18 +293,20 @@ function initLeaderBoardTopper() {
 
   // Group students by their rank based on point
   const top3Groups = uniquePoints.map((points) =>
-    students.filter((s) => s.totalPoints === points)
+    students.filter((s) => s.totalPoints === points),
   );
 
   // Loop over top 3 ranks
   top3Groups.forEach((group, i) => {
     const swiper = swipers[i];
     if (!swiper) return;
+    podiumPoints[i].textContent = group[0].totalPoints;
     if (group.length === 1) {
       const student = group[0];
       const slide = createWinnerSlide(student);
       swiper.removeAllSlides();
       swiper.appendSlide(slide);
+      swiper.autoplay.stop();
       swiper.allowTouchMove = false;
     } else {
       swiper.removeAllSlides();
@@ -414,95 +317,78 @@ function initLeaderBoardTopper() {
     }
   });
 }
-
-// 🔧 Helper to create a single winner slide
 function createWinnerSlide(student) {
   return `
     <div class="swiper-slide">
       <div class="winner-profile flex flex-col items-center gap-2">
-        <img src="${student.pfp}" alt="" class="pfp w-12 h-12" />
+        <img src="${student.pfpLink}" alt="" class="pfp w-12 h-12" />
         <p class="winner-name font-semibold truncate w-[100px] lg:w-32 xl:w-40 text-center">
           ${student.name.split(" ")[0]} <br /> ${
-    student.name.split(" ")[1] || ""
-  }
+            student.name.split(" ")[1] || ""
+          }
         </p>
       </div>
     </div>
   `;
 }
-
-///stats
-const statsCard = document.querySelector(".stats-card");
-const statsCardRank = statsCard.querySelectorAll(".rank");
-const statsCardTotalStudents = statsCard.querySelectorAll(".total-student");
-const statsCardName = statsCard.querySelector(".name");
-const statsCardPfp = statsCard.querySelector(".image-name-wrapper img");
-const statsCardPoints = statsCard.querySelector(".points");
-const statsGoldCount = statsCard.querySelector(".gold-medal-wrapper p");
-const statsSilverCount = statsCard.querySelector(".silver-medal-wrapper p");
-const statsBronzeCount = statsCard.querySelector(".bronz-medal-wrapper p");
-const leaderboardStudetPopup = document.querySelector(
-  ".pick-leaderboard-studet-popup-wrapper"
-);
-const leaderboardStudetPopupClose =
-  leaderboardStudetPopup.querySelector(".close-popup-btn");
-const leaderboardStudetCardContainer =
-  leaderboardStudetPopup.querySelector(".card-container");
 function initStats() {
-  const user = rankWiseSortedData[appState.userId];
+  DOM.statsCard.name.textContent = `${appState.userData.firstName} ${appState.userData.lastName}`;
+  DOM.statsCard.pfp.src = appState.userData.pfpLink;
+  let userRank = 0;
+  let student = null;
+  console.log("this is rank wise sorted data", rankWiseSortedData);
 
-  statsCardName.textContent = `${user.firstName} ${user.lastName}`;
-  statsCardPfp.src = user.pfp;
+  for (const key in rankWiseSortedData) {
+    if (rankWiseSortedData[key].userId === appState.userId) {
+      student = rankWiseSortedData[key];
+      userRank = userRank + 1;
+      console.log("this is user rank", userRank);
 
-  // Find user's data in ranked list
-  const index = rankWiseSortedData.findIndex((s) => s.userId === user.userId);
-  if (index === -1) return;
-
-  const userRank = index + 1;
-  const student = rankWiseSortedData[index];
-  const medals = student.medals || {};
-
-  // Set rank in both locations (desktop + mobile)
-  statsCardRank.forEach(
-    (el) => (el.textContent = userRank.toString().padStart(2, "0"))
-  );
-
-  // Set total student count
-  statsCardTotalStudents.forEach(
-    (el) => (el.innerHTML = `Rank <br /> out of ${rankWiseSortedData.length}`)
-  );
-
-  // Set points
-  statsCardPoints.textContent = student.points;
-
-  // Set medals
-  statsGoldCount.textContent = `x ${medals.gold || 0}`;
-  statsSilverCount.textContent = `x ${medals.silver || 0}`;
-  statsBronzeCount.textContent = `x ${medals.bronz || 0}`;
+      break;
+    }
+  }
+  if (userRank === 0) return;
+  const points = student.totalPoints || 0;
+  DOM.statsCard.rank.textContent = userRank.toString().padStart(2, "0");
+  const totalStudents = Object.keys(rankWiseSortedData).length;
+  DOM.statsCard.totalStudents.forEach((el) => {
+    el.innerHTML = `Rank <br /> out of ${totalStudents}`;
+  });
+  DOM.statsCard.points.textContent = points;
+  DOM.statsCard.medals.gold.textContent = `x ${student.gold || 0}`;
+  DOM.statsCard.medals.silver.textContent = `x ${student.silver || 0}`;
+  DOM.statsCard.medals.bronze.textContent = `x ${student.bronze || 0}`;
+  appState.userData.rank = userRank;
+  appState.userData.points = points;
+  appState.totalStudents = totalStudents;
 }
 let currentEditingRank = null;
-previousFirstContainer.addEventListener("click", () => {
+DOM.previousTestWinner.first.container.addEventListener("click", () => {
+  if (!appState.isEditing) return;
   currentEditingRank = "first";
-  fadeInEffect(leaderboardStudetPopup);
+  fadeInEffect(DOM.studentSelectorPopup.popup);
 });
-previousSecondContainer.addEventListener("click", () => {
+DOM.previousTestWinner.second.container.addEventListener("click", () => {
+  if (!appState.isEditing) return;
   currentEditingRank = "second";
-  fadeInEffect(leaderboardStudetPopup);
+  fadeInEffect(DOM.studentSelectorPopup.popup);
 });
-previousThirdContainer.addEventListener("click", () => {
+DOM.previousTestWinner.third.container.addEventListener("click", () => {
+  if (!appState.isEditing) return;
   currentEditingRank = "third";
-  fadeInEffect(leaderboardStudetPopup);
+  fadeInEffect(DOM.studentSelectorPopup.popup);
 });
-leaderboardStudetPopupClose.addEventListener("click", () => {
-  fadeOutEffect(leaderboardStudetPopup);
+DOM.studentSelectorPopup.closePopupBtn.addEventListener("click", () => {
+  fadeOutEffect(DOM.studentSelectorPopup.popup);
 });
+
 function renderStudentCardInPopup() {
   for (const key in sortedRollNoWiseStudentData) {
     const student = sortedRollNoWiseStudentData[key];
     const userId = student.userId;
     const card = document.createElement("div");
     card.className =
-      "card bg-surface-2 items-center border border-surface-3 p-3 md:px-4 flex justify-between rounded-xl";
+      "card bg-surface-2 items-center border border-surface-3 p-3 md:px-4 flex justify-between rounded-xl cursor-pointer";
     const wrapper = document.createElement("div");
     wrapper.className =
       "wrapper w-[180px] md:w-[340px] gap-1.5 md:gap-4 flex items-center justify-between";
@@ -511,7 +397,7 @@ function renderStudentCardInPopup() {
     namePfpWrapper.className = "name-pfp-wrapper flex items-center gap-2";
 
     const img = document.createElement("img");
-    img.src = student.pfp;
+    img.src = student.pfpLink;
     img.alt = "";
     img.className = "pfp h-10 w-10";
 
@@ -536,19 +422,20 @@ function renderStudentCardInPopup() {
     wrapper.appendChild(namePfpWrapper);
     card.appendChild(wrapper);
     const rollNo = document.createElement("p");
-    rollNo.textContent = student.rollNo;
+    rollNo.textContent = student.rollNumber;
 
     card.appendChild(rollNo);
 
-    leaderboardStudetCardContainer.appendChild(card);
+    DOM.studentSelectorPopup.cardContainer.appendChild(card);
     card.addEventListener("click", () => {
       updateRanks(userId);
     });
   }
   const wrapper = document.createElement("div");
-  wrapper.className = "p-4 text-center border border-surface-3 rounded-xl";
+  wrapper.className =
+    "p-4 text-center border border-surface-3 rounded-xl cursor-pointer";
   wrapper.innerHTML = "Remove rank";
-  leaderboardStudetCardContainer.appendChild(wrapper);
+  DOM.studentSelectorPopup.cardContainer.appendChild(wrapper);
   wrapper.addEventListener("click", () => {
     updateRanks(null);
   });
@@ -556,59 +443,42 @@ function renderStudentCardInPopup() {
 async function updateRanks(key) {
   if (key === null) {
     await updateData(
-      `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/previousTestWinners`,
-      { [currentEditingRank]: null }
+      `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/testData/previousTestWinnerList`,
+      { [currentEditingRank]: null },
     );
   }
   await updateData(
-    `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/previousTestWinners`,
-    { [currentEditingRank]: key }
+    `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/testData/previousTestWinnerList`,
+    { [currentEditingRank]: key },
   );
-  fadeOutEffect(leaderboardStudetPopup);
+  fadeOutEffect(DOM.studentSelectorPopup.popup);
   showSectionLoader("Syncing data...");
   await syncDbData();
   hideSectionLoader();
   await loadLeaderboardSection();
   showLeaderboardSection();
 }
-function calculateRank() {
-  const ranked = Object.values(sortedRollNoWiseStudentData).map((student) => {
-    const medals = student.medals || {};
-    const gold = medals.gold || 0;
-    const silver = medals.silver || 0;
-    const bronz = medals.bronz || 0;
-
-    const points = gold * 30 + silver * 20 + bronz * 10;
-
-    return {
-      ...student,
-      points,
-    };
-  });
-
-  ranked.sort((a, b) => b.points - a.points);
-
-  return ranked;
-}
 function initPreviousTestWinner() {
-  if (!appState.divisionData.previousTestWinners) return;
-  const previousTestWinners = appState.divisionData.previousTestWinners;
+  const previousTestWinners =
+    appState?.divisionData?.testData?.previousTestWinnerList || {};
+  if (!previousTestWinners || Object.keys(previousTestWinners).length === 0)
+    return;
   for (const key in previousTestWinners) {
     const name = `${studentRawData[previousTestWinners[key]].firstName}<br>${
       studentRawData[previousTestWinners[key]].lastName
     }`;
-    const pfp = studentRawData[previousTestWinners[key]].pfp;
+    const pfp = studentRawData[previousTestWinners[key]].pfpLink;
     if (key === "first") {
-      previousFirstName.innerHTML = name;
-      previousFirstPfp.src = pfp;
+      DOM.previousTestWinner.first.name.innerHTML = name;
+      DOM.previousTestWinner.first.pfp.src = pfp;
     }
     if (key === "second") {
-      previousSecondName.innerHTML = name;
-      previousSecondPfp.src = pfp;
+      DOM.previousTestWinner.second.name.innerHTML = name;
+      DOM.previousTestWinner.second.pfp.src = pfp;
     }
     if (key === "third") {
-      previousThirdName.innerHTML = name;
-      previousThirdPfp.src = pfp;
+      DOM.previousTestWinner.third.name.innerHTML = name;
+      DOM.previousTestWinner.third.pfp.src = pfp;
     }
   }
 }
@@ -617,7 +487,7 @@ function getStudentRawData() {
   const q = query(
     usersRef,
     orderByChild("division"),
-    equalTo(appState.activeDiv)
+    equalTo(appState.activeDiv),
   );
 
   return get(q).then((snapshot) => {
@@ -628,5 +498,3 @@ function getStudentRawData() {
     }
   });
 }
-function sortStudentDataByRollNo() {}
-function sortStudentDataByPoints() {}
