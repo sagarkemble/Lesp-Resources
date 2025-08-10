@@ -30,10 +30,7 @@ export default defineConfig({
     }),
   ],
   server: {
-    allowedHosts: "5fdc182a0d2f.ngrok-free.app",
-  },
-  preview: {
-    allowedHosts: "5fdc182a0d2f.ngrok-free.app",
+    allowedHosts: ["e9e19ea1f9c6.ngrok-free.app"],
   },
   build: {
     rollupOptions: {

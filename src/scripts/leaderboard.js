@@ -227,36 +227,37 @@ function renderLeaderboardCards() {
     card.className =
       "card bg-surface-2 px-3 py-4 md:px-4 flex justify-between rounded-lg";
     card.innerHTML = `
-      <div class="name-pfp-rank-wrapper w-[180px] md:w-[340px] gap-1.5 md:gap-4 flex items-center">
+      <div class="name-pfp-rank-wrapper min-w-0 w-[11rem] md:w-[22rem] gap-1.5 md:gap-4 flex items-center">
         <p class="rank ${
           displayRank === "--" ? "text-sm" : "md:text-xl"
-        } w-[21px] md-[26px] text-center">${displayRank}</p>
-        <div class="name-pfp-wrapper flex items-center gap-1 md:gap-2">
+        } w-[1.125rem] md:w-[1.625rem] text-center">${displayRank}</p>
+        <div class="name-pfp-wrapper min-w-0 flex items-center gap-1 md:gap-2">
           <img src="${pfp}" alt="" class="pfp h-10 w-10" />
           <div class="flex flex-col leading-tight md:gap-1.5 text-sm md:text-base md:flex-row md:flex-wrap">
-            <p class="w-full md:w-auto">${firstName}</p>
-            <p class="w-full md:w-auto">${lastName}</p>
+           <p class="md:w-full w-[6rem] min-w-0  truncate">${firstName}</p>
+          <p class="md:w-full w-[6rem] min-w-0  truncate">${lastName}</p>
+          </div>
           </div>
         </div>
       </div>
 
-      <div class="medals-wrapper flex gap-3 md:gap-8">
-        <div class="medal flex flex-col md:flex-row md:gap-2 items-center">
-          <img src="https://ik.imagekit.io/yn9gz2n2g/others/gold.png?updatedAt=1751607550552" alt="" class="h-6 w-fit" />
+      <div class="medals-wrapper flex gap-3 md:w-[12rem] md:justify-between">
+        <div class="medal flex flex-col shrink-0 md:flex-row md:gap-2 items-center">
+          <img src="https://ik.imagekit.io/yn9gz2n2g/others/gold.png?updatedAt=1751607550552" alt="" class="h-6 w-auto " />
           <div class="wrapper flex items-center">
             <p class="text-xs">x</p>
             <p class="text-xs md:text-base">${gold}</p>
           </div>
         </div>
-        <div class="medal flex flex-col md:flex-row md:gap-2 items-center">
-          <img src="https://ik.imagekit.io/yn9gz2n2g/others/silver.png?updatedAt=1751607529476" alt="" class="h-6 w-fit" />
+        <div class="medal flex flex-col shrink-0 md:flex-row md:gap-2 items-center">
+          <img src="https://ik.imagekit.io/yn9gz2n2g/others/silver.png?updatedAt=1751607529476" alt="" class="h-6 w-auto " />
           <div class="wrapper flex items-center">
             <p class="text-xs">x</p>
             <p class="text-xs md:text-base">${silver}</p>
           </div>
         </div>
-        <div class="medal flex flex-col md:flex-row md:gap-2 items-center">
-          <img src="https://ik.imagekit.io/yn9gz2n2g/others/bronze.png?updatedAt=1751607503968" alt="" class="h-6 w-fit" />
+        <div class="medal flex flex-col shrink-0 md:flex-row md:gap-2 items-center">
+          <img src="https://ik.imagekit.io/yn9gz2n2g/others/bronze.png?updatedAt=1751607503968" alt="" class="h-6 w-auto " />
           <div class="wrapper flex items-center">
             <p class="text-xs">x</p>
             <p class="text-xs md:text-base">${bronze}</p>
@@ -264,8 +265,8 @@ function renderLeaderboardCards() {
         </div>
       </div>
 
-      <div class="points w-14 md:w-20 flex items-center gap-1 md:gap-3">
-        <img src="https://ik.imagekit.io/yn9gz2n2g/others/coin.png?updatedAt=1751607575051" alt="" class="h-5 w-5 md:h-[30px] md:w-[30px]" />
+      <div class="points w-14 ml-4 md:w-20 flex items-center gap-1 md:gap-3">
+        <img src="https://ik.imagekit.io/yn9gz2n2g/others/coin.png?updatedAt=1751607575051" alt="" class="h-5 w-5 md:h-[1.9rem] md:w-[1.9rem]" />
         <p class="font-semibold">${points}</p>
       </div>
     `;
@@ -322,7 +323,7 @@ function createWinnerSlide(student) {
     <div class="swiper-slide">
       <div class="winner-profile flex flex-col items-center gap-2">
         <img src="${student.pfpLink}" alt="" class="pfp w-12 h-12" />
-        <p class="winner-name font-semibold truncate w-[100px] lg:w-32 xl:w-40 text-center">
+        <p class="winner-name font-semibold truncate w-[6.25rem] lg:w-32 xl:w-40 text-center">
           ${student.name.split(" ")[0]} <br /> ${
             student.name.split(" ")[1] || ""
           }
@@ -391,7 +392,7 @@ function renderStudentCardInPopup() {
       "card bg-surface-2 items-center border border-surface-3 p-3 md:px-4 flex justify-between rounded-xl cursor-pointer";
     const wrapper = document.createElement("div");
     wrapper.className =
-      "wrapper w-[180px] md:w-[340px] gap-1.5 md:gap-4 flex items-center justify-between";
+      "wrapper w-[12rem] md:w-[22rem] gap-1.5 md:gap-4 flex items-center justify-between";
 
     const namePfpWrapper = document.createElement("div");
     namePfpWrapper.className = "name-pfp-wrapper flex items-center gap-2";
