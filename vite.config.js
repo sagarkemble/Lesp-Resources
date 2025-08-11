@@ -9,12 +9,11 @@ export default defineConfig({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "robots.txt", "apple-touch-icon.png"],
       manifest: {
-        name: "Lesp Resources",
+        name: "Lesp resources",
         short_name: "Lesp",
-        description: "Lesp Resources PWA",
+        description: "Lesp resources PWA",
         theme_color: "#000000",
         background_color: "#000000",
-        display: "standalone",
         icons: [
           { src: "logo-48.png", sizes: "48x48", type: "image/png" },
           { src: "logo-72.png", sizes: "72x72", type: "image/png" },
