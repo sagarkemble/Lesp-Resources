@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import tailwindcss from "@tailwindcss/vite";
 import { resolve } from "path";
 import { VitePWA } from "vite-plugin-pwa";
+import pwaAssetsGenerator from "vite-plugin-pwa-assets-generator";
 export default defineConfig({
   plugins: [
     tailwindcss(),
