@@ -125,7 +125,8 @@ const DOM = {
     },
   },
   statsCard: {
-    rank: document.querySelectorAll(".leaderboard-section .stats-card .rank"),
+    rank: document.querySelector(".leaderboard-section .stats-card .rank"),
+    rankSm: document.querySelector(".leaderboard-section .stats-card .rank-sm"),
     totalStudents: document.querySelectorAll(
       ".leaderboard-section .stats-card .total-student",
     ),
@@ -198,9 +199,15 @@ export async function showLeaderboardSection() {
   DOM.leaderboardTopper.first.swiper.update();
   DOM.leaderboardTopper.second.swiper.update();
   DOM.leaderboardTopper.third.swiper.update();
-  DOM.leaderboardTopper.first.swiper.autoplay.start();
-  DOM.leaderboardTopper.second.swiper.autoplay.start();
-  DOM.leaderboardTopper.third.swiper.autoplay.start();
+  if (!DOM.leaderboardTopper.first.isSingleFlag) {
+    DOM.leaderboardTopper.first.swiper.autoplay.start();
+  }
+  if (!DOM.leaderboardTopper.second.isSingleFlag) {
+    DOM.leaderboardTopper.second.swiper.autoplay.start();
+  }
+  if (!DOM.leaderboardTopper.third.isSingleFlag) {
+    DOM.leaderboardTopper.third.swiper.autoplay.start();
+  }
 }
 function renderLeaderboardCards() {
   DOM.leaderboardCardContainer.innerHTML = "";
@@ -307,7 +314,8 @@ function initLeaderBoardTopper() {
       const slide = createWinnerSlide(student);
       swiper.removeAllSlides();
       swiper.appendSlide(slide);
-      swiper.autoplay.stop();
+      swiper.params.autoplay.delay = 500000; // 500 seconds
+      swiper.autoplay.start(); // apply new delay
       swiper.allowTouchMove = false;
     } else {
       swiper.removeAllSlides();
@@ -338,19 +346,24 @@ function initStats() {
   let userRank = 0;
   let student = null;
   console.log("this is rank wise sorted data", rankWiseSortedData);
-
   for (const key in rankWiseSortedData) {
     if (rankWiseSortedData[key].userId === appState.userId) {
       student = rankWiseSortedData[key];
       userRank = userRank + 1;
-      console.log("this is user rank", userRank);
-
+      console.log("this is user rank", student);
       break;
     }
   }
-  if (userRank === 0) return;
   const points = student.totalPoints || 0;
-  DOM.statsCard.rank.textContent = userRank.toString().padStart(2, "0");
+  if (points === 0) {
+    DOM.statsCard.rank.textContent = "--";
+    DOM.statsCard.rankSm.textContent = "--";
+    console.log("this is usiusuiuis uiui suiu ", DOM.statsCard.rank);
+    console.log("this is usiusuiuis uiui suiu ", DOM.statsCard.rankSm);
+  } else {
+    DOM.statsCard.rank.textContent = userRank.toString().padStart(2, "0");
+    DOM.statsCard.rankSm.textContent = userRank.toString().padStart(2, "0");
+  }
   const totalStudents = Object.keys(rankWiseSortedData).length;
   DOM.statsCard.totalStudents.forEach((el) => {
     el.innerHTML = `Rank <br /> out of ${totalStudents}`;
@@ -462,8 +475,10 @@ async function updateRanks(key) {
 function initPreviousTestWinner() {
   const previousTestWinners =
     appState?.divisionData?.testData?.previousTestWinnerList || {};
-  if (!previousTestWinners || Object.keys(previousTestWinners).length === 0)
+  console.log(previousTestWinners);
+  if (!previousTestWinners || Object.keys(previousTestWinners).length === 0) {
     return;
+  }
   for (const key in previousTestWinners) {
     const name = `${studentRawData[previousTestWinners[key]].firstName}<br>${
       studentRawData[previousTestWinners[key]].lastName

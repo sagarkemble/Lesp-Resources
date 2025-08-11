@@ -83,20 +83,10 @@ const DOM = {
         prevEl: ".swiper-button-prev",
       },
     }),
-    popupSwiper: new Swiper("#time-table-popup-swiper", {
-      direction: "horizontal",
-      loop: true,
-      slidesPerView: 1,
-      spaceBetween: 30,
-      effect: "fade",
-      fadeEffect: {
-        crossFade: true,
-      },
-      navigation: {
-        nextEl: ".swiper-button-next",
-        prevEl: ".swiper-button-prev",
-      },
-    }),
+
+    batchToggleBtn: document.querySelector(
+      ".dashboard-section .batchToggleBtn",
+    ),
   },
   upcomingSessions: {
     swiper: new Swiper("#dashboard-upcoming-sessions-swiper", {
@@ -128,6 +118,9 @@ const DOM = {
     popup: document.querySelector(".time-table-popup-wrapper"),
     closeBtn: document.querySelector(
       ".time-table-popup-wrapper .close-popup-btn",
+    ),
+    batchToggleBtn: document.querySelector(
+      ".time-table-popup-wrapper .batchToggleBtn",
     ),
   },
   timeTablePopup: {
@@ -379,13 +372,23 @@ const DOM = {
     },
   },
 };
+let batchList;
 export async function loadDashboard() {
+  loadTypeSelectorTimetablePopup();
   await unloadDashboard();
   await renderNoticeSlider();
   await renderUpcomingSubmissions();
   await renderTimeTableSlides(DOM.timeTableSwiper.swiper);
   await renderTimeTableSlides(timeTablePopupSwiper);
   await renderUpcomingSessions();
+  batchList = Object.values(appState.divisionData.batchList);
+  DOM.timeTableSwiper.batchToggleBtn.textContent =
+    batchList[currentBatchIndex].charAt(0).toUpperCase() +
+    batchList[currentBatchIndex].slice(1);
+  DOM.timeTablePopupSwiper.batchToggleBtn.textContent =
+    batchList[currentBatchIndex].charAt(0).toUpperCase() +
+    batchList[currentBatchIndex].slice(1);
+
   initStatsCard();
   initUserInfo();
   DOM.noticeSwiper.swiper.update();
@@ -421,7 +424,7 @@ export async function unloadDashboard() {
 function renderUpcomingSubmissions() {
   const upcomingSubmissions = appState?.divisionData?.upcomingSubmissionData;
   if (!upcomingSubmissions || Object.keys(upcomingSubmissions).length === 0) {
-    console.log("No upcoming submissions found from dashboard.");
+    hideElement(DOM.upcomingSubmissions.container);
     return;
   }
   const subjectMetaData = appState.subjectMetaData;
@@ -436,24 +439,26 @@ function renderUpcomingSubmissions() {
         "card",
         "p-4",
         "bg-surface-2",
-        "rounded-[20px]",
+        "rounded-[1.125rem]",
         "flex",
         "flex-col",
+
         "lg:gap-3",
         "py-5",
       );
+      const date = formatDateBasedOnProximity(submission.dueDate);
       card.innerHTML = `
        <div class="wrapper flex items-center gap-1 lg:gap-3 pt-1 ">
                 <img
                   src="${subjectIcon}"
                   alt=""
-                  class="w-[1.5rem] h-[1.5rem] lg:w-[2.5rem] lg:h-[2.5rem]"
+                  class="w-[1.5rem] h-[1.5rem] lg:w-[2.5rem] lg:h-[2.5rem] mb-1 lg:mb-0"
                 />
                 <p class="subject-name font-semibold text-text-primary">${subjectName.charAt(0).toUpperCase() + subjectName.slice(1)}</p>
               </div>
               <div class="wrapper flex flex-col lg:gap-1 text-text-secondary">
                 <p class="description">${submission.name.charAt(0).toUpperCase() + submission.name.slice(1)}</p>
-                <p class="submission-date">${submission.dueDate.charAt(0).toUpperCase() + submission.dueDate.slice(1)}</p>
+                <p class="submission-date">${date.charAt(0).toUpperCase() + date.slice(1)}</p>
               </div>
       `;
       DOM.upcomingSubmissions.cardContainer.appendChild(card);
@@ -469,6 +474,39 @@ function showWarningPopup(message) {
       resolve(true);
     });
   });
+}
+function formatDateBasedOnProximity(rawDate) {
+  const dateObj = new Date(rawDate);
+  if (isNaN(dateObj)) return rawDate.charAt(0).toUpperCase() + rawDate.slice(1);
+
+  const now = new Date();
+
+  // Normalize both to YYYY-MM-DD (removing time portion)
+  const todayStr = now.toISOString().split("T")[0];
+  const dateStr = dateObj.toISOString().split("T")[0];
+
+  if (dateStr === todayStr) {
+    return "Today";
+  }
+
+  const sevenDaysLater = new Date();
+  sevenDaysLater.setDate(now.getDate() + 7);
+
+  const day = dateObj.getDate().toString().padStart(2, "0");
+
+  if (dateObj <= sevenDaysLater) {
+    // Format: DD-Wed (within next 7 days)
+    const weekday = dateObj.toLocaleDateString("en-US", {
+      weekday: "short",
+    });
+    return `${day}-${weekday}`;
+  } else {
+    // Format: DD-Aug (more than 7 days away)
+    const month = dateObj.toLocaleDateString("en-US", {
+      month: "short",
+    });
+    return `${day}-${month}`;
+  }
 }
 // notice section
 DOM.addNoticeBtn.addEventListener("click", () => {
@@ -619,6 +657,27 @@ function loadTypeSelectorSubjects() {
     DOM.noticePopup.inputs.scope.appendChild(option);
   }
 }
+function loadTypeSelectorTimetablePopup() {
+  DOM.timeTablePopup.inputs.type.innerHTML = "";
+  DOM.timeTablePopup.inputs.type.innerHTML = "";
+  const option = document.createElement("option");
+  option.value = "lecture";
+  option.textContent = "Lecture";
+  DOM.timeTablePopup.inputs.type.appendChild(option);
+  for (const key in appState.divisionData.batchList) {
+    const element = appState.divisionData.batchList[key];
+    const option = document.createElement("option");
+    option.value = `${element}Practical`;
+    option.textContent = `${element.charAt(0).toUpperCase() + element.slice(1)} Practical`;
+    const element2 = appState.divisionData.batchList[key];
+    const option2 = document.createElement("option");
+    option2.value = `${element2}Tutorial`;
+    option2.textContent = `${element2.charAt(0).toUpperCase() + element2.slice(1)} Tutorial`;
+    DOM.timeTablePopup.inputs.type.appendChild(option);
+    DOM.timeTablePopup.inputs.type.appendChild(option2);
+  }
+}
+
 async function renderNoticeSlider() {
   const noticeEntries = getFlatNoticeOrdered();
   if (!noticeEntries || Object.keys(noticeEntries).length === 0) {
@@ -1223,7 +1282,7 @@ async function renderTimeTableSlides(swiperInstance) {
     }
     const cardDiv = document.createElement("div");
     cardDiv.className =
-      "card flex flex-col gap-4 border border-neutral-500 rounded-xl p-4 overflow-y-auto scrollbar-hide h-full";
+      "card flex flex-col gap-4 border-2 border-surface-3 rounded-xl p-4 overflow-y-auto scrollbar-hide h-full";
     for (const key2 in day.slotList) {
       const singleEntry = day.slotList[key2];
       console.log("this is singleEntry:", singleEntry);
@@ -1261,17 +1320,33 @@ async function renderTimeTableSlides(swiperInstance) {
       subjectNameP.textContent = subjectName;
       nameIconWrapper.appendChild(img);
       nameIconWrapper.appendChild(subjectNameP);
-      const typeMap = {
-        Practical: "Prac",
-        Lecture: "Lec",
-        Tutorial: "Tut",
-      };
       const typeP = document.createElement("p");
       typeP.className = "type w-10";
-      typeP.textContent = typeMap[type] || type;
       const timeP = document.createElement("p");
       timeP.className = "time text-text-tertiary w-25";
       timeP.textContent = time;
+      const typeLower = type.toLowerCase();
+
+      // Extract batch if present
+      let batchName = "all"; // default for lectures
+      if (typeLower.includes("tutorial") || typeLower.includes("practical")) {
+        const batchMatch = typeLower.match(/(co\d+)/);
+        batchName = batchMatch ? batchMatch[1] : "all";
+      }
+
+      wrapper.setAttribute("data-batch", batchName);
+
+      // Type text display
+      if (typeLower.includes("tutorial")) {
+        typeP.textContent = "Tut";
+      } else if (typeLower.includes("practical")) {
+        typeP.textContent = "Prac";
+      } else if (typeLower.includes("lecture")) {
+        typeP.textContent = "Lec";
+      } else {
+        typeP.textContent = type;
+      }
+
       wrapper.appendChild(nameIconWrapper);
       wrapper.appendChild(typeP);
       wrapper.appendChild(timeP);
@@ -1292,6 +1367,46 @@ async function renderTimeTableSlides(swiperInstance) {
     swiperInstance.slideTo(0, 0);
   }
 }
+
+let currentBatchIndex = 0;
+DOM.timeTableSwiper.batchToggleBtn.addEventListener("click", () => {
+  currentBatchIndex = (currentBatchIndex + 1) % batchList.length;
+  const selectedBatch = batchList[currentBatchIndex];
+  DOM.timeTableSwiper.batchToggleBtn.textContent =
+    selectedBatch.charAt(0).toUpperCase() + selectedBatch.slice(1);
+  DOM.timeTablePopupSwiper.batchToggleBtn.textContent =
+    selectedBatch.charAt(0).toUpperCase() + selectedBatch.slice(1);
+  document.querySelectorAll(".wrapper[data-batch]").forEach((wrapper) => {
+    if (
+      wrapper.dataset.batch === "all" ||
+      wrapper.dataset.batch === selectedBatch
+    ) {
+      wrapper.style.display = "";
+    } else {
+      wrapper.style.display = "none";
+    }
+  });
+});
+DOM.timeTablePopupSwiper.batchToggleBtn.addEventListener("click", () => {
+  currentBatchIndex = (currentBatchIndex + 1) % batchList.length;
+  console.log("Current batch index:", currentBatchIndex);
+
+  const selectedBatch = batchList[currentBatchIndex];
+  DOM.timeTablePopupSwiper.batchToggleBtn.textContent =
+    selectedBatch.charAt(0).toUpperCase() + selectedBatch.slice(1);
+  DOM.timeTableSwiper.batchToggleBtn.textContent =
+    selectedBatch.charAt(0).toUpperCase() + selectedBatch.slice(1);
+  document.querySelectorAll(".wrapper[data-batch]").forEach((wrapper) => {
+    if (
+      wrapper.dataset.batch === "all" ||
+      wrapper.dataset.batch === selectedBatch
+    ) {
+      showElement(wrapper);
+    } else {
+      hideElement(wrapper);
+    }
+  });
+});
 
 // upcoming test card
 function initUpcomingTestCard() {
@@ -1426,26 +1541,30 @@ function initUserInfo() {
   DOM.menuPopup.points.textContent = totalPoints;
   DOM.accountDetailsPopup.userPfp.src = appState.userData.pfpLink;
   DOM.accountDetailsPopup.userName.textContent = `${appState.userData.firstName} ${appState.userData.lastName}`;
-  DOM.accountDetailsPopup.details.rollNo.textContent = `Roll No : ${appState.userData.rollNo}`;
-  DOM.accountDetailsPopup.details.firstName.textContent = `First name : ${appState.userData.firstName}`;
-  DOM.accountDetailsPopup.details.lastName.textContent = `Last name : ${appState.userData.lastName}`;
-  DOM.accountDetailsPopup.details.email.textContent = `Email : ${appState.userData.email}`;
-  DOM.accountDetailsPopup.details.semester.textContent = `Semester : ${appState.userData.semester}`;
-  DOM.accountDetailsPopup.details.division.textContent = `Division : ${appState.userData.division}`;
-  DOM.accountDetailsPopup.medals.gold.textContent = gold;
-  DOM.accountDetailsPopup.medals.silver.textContent = silver;
-  DOM.accountDetailsPopup.medals.bronze.textContent = bronze;
-  DOM.accountDetailsPopup.points.textContent = totalPoints;
+  DOM.accountDetailsPopup.details.rollNo.innerHTML = `Roll No : <span class="text-text-secondary">${appState.userData.rollNumber}</span>`;
+  DOM.accountDetailsPopup.details.firstName.innerHTML = `First name : <span class="text-text-secondary">${appState.userData.firstName}</span>`;
+  DOM.accountDetailsPopup.details.lastName.innerHTML = `Last name : <span class="text-text-secondary">${appState.userData.lastName}</span>`;
+  DOM.accountDetailsPopup.details.email.innerHTML = `Email : <span class="text-text-secondary">${appState.userData.email}</span>`;
+  DOM.accountDetailsPopup.details.semester.innerHTML = `Semester : <span class="text-text-secondary">${appState.userData.semester}</span>`;
+  DOM.accountDetailsPopup.details.division.innerHTML = `Division : <span class="text-text-secondary">${appState.userData.division}</span>`;
+  DOM.accountDetailsPopup.medals.gold.innerHTML = gold;
+  DOM.accountDetailsPopup.medals.silver.innerHTML = silver;
+  DOM.accountDetailsPopup.medals.bronze.innerHTML = bronze;
+  DOM.accountDetailsPopup.points.innerHTML = totalPoints;
 }
 //stats card
 function initStatsCard() {
-  DOM.statsCard.rank.textContent = appState.userData.rank
-    .toString()
-    .padStart(2, "0");
+  if (appState.userData.points === 0) {
+    DOM.statsCard.rank.textContent = "--";
+  } else {
+    DOM.statsCard.rank.textContent = appState.userData.rank
+      .toString()
+      .padStart(2, "0");
+  }
   console.log("stats card:", appState.userData.rank);
   DOM.statsCard.totalStudents.textContent = appState.totalStudents;
   DOM.statsCard.points.textContent = appState.userData.points;
-  DOM.statsCard.medals.gold.textContent = `x ${appState.userData.medalList.gold}`;
-  DOM.statsCard.medals.silver.textContent = `x ${appState.userData.medalList.silver}`;
-  DOM.statsCard.medals.bronze.textContent = `x ${appState.userData.medalList.bronze}`;
+  DOM.statsCard.medals.gold.textContent = `x ${appState.userData.medalList.gold || 0}`;
+  DOM.statsCard.medals.silver.textContent = `x ${appState.userData.medalList.silver || 0}`;
+  DOM.statsCard.medals.bronze.textContent = `x ${appState.userData.medalList.bronze || 0}`;
 }

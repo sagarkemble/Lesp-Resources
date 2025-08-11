@@ -142,7 +142,6 @@ export async function initRouting() {
       appState.activeDiv,
       appState.activeSubject,
     );
-
     setActiveNavIcon(subjectIcon);
     await fadeOutEffect(lottieLoadingScreen);
     loadSubjectSection();
@@ -266,7 +265,6 @@ function trackPageView(pageName, sem, div, subject) {
   });
 }
 import { registerSW } from "virtual:pwa-register";
-
 const updateSW = registerSW({
   onNeedRefresh() {
     if (confirm("New version available. Refresh?")) {
