@@ -16,12 +16,12 @@ export default defineConfig({
         background_color: "#000000",
         icons: [
           {
-            src: "manifest-icon-192.maskable.png",
+            src: "logo.png",
             sizes: "192x192",
             type: "image/png",
           },
           {
-            src: "manifest-icon-512.maskable.png",
+            src: "logo.png",
             sizes: "512x512",
             type: "image/png",
           },
