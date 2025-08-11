@@ -7,21 +7,20 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "robots.txt", "apple-touch-icon.png"],
+      includeAssets: ["favicon.ico", "robots.txt"],
       manifest: {
         name: "Lesp resources",
         short_name: "Lesp",
         description: "Lesp resources PWA",
         theme_color: "#000000",
         background_color: "#000000",
-        icons: [
-          {
-            src: "/icon-1024.png",
-            sizes: "1024x1024",
-            type: "image/png",
-          },
-        ],
+        display: "standalone",
       },
+    }),
+    pwaAssetsGenerator({
+      image: "public/logo.png", // your master icon
+      resizeOptions: { fit: "contain" },
+      sizes: [192, 256, 384, 512], // will be generated automatically
     }),
   ],
   server: {
