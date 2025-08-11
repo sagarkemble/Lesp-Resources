@@ -15,6 +15,7 @@ export default defineConfig({
         theme_color: "#000000",
         background_color: "#000000",
         display: "standalone",
+
         icons: [
           {
             src: "android/android-launchericon-512-512.png",
