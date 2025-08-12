@@ -16,10 +16,141 @@ import {
   equalTo,
 } from "firebase/database";
 import * as Sentry from "@sentry/browser";
+import { format } from "prettier";
 Sentry.init({
   dsn: "https://9f9da5737a2f44249457aa7e774fe3d2@o4509828633788416.ingest.us.sentry.io/4509828649189376",
   sendDefaultPii: true,
 });
+const DOM = {
+  intro: {
+    section: document.querySelector(".intro-section"),
+    images: {
+      1: document.querySelector(".intro-1"),
+      2: document.querySelector(".intro-2"),
+      3: document.querySelector(".intro-3"),
+      4: document.querySelector(".intro-4"),
+    },
+    nextBtns: {
+      1: document.querySelector("#intro-1-next-btn"),
+      2: document.querySelector("#intro-2-next-btn"),
+      3: document.querySelector("#intro-3-next-btn"),
+      4: document.querySelector("#intro-4-next-btn"),
+    },
+    previousBtns: {
+      2: document.querySelector("#intro-2-prev-btn"),
+      3: document.querySelector("#intro-3-prev-btn"),
+      4: document.querySelector("#intro-4-prev-btn"),
+    },
+  },
+  userDetails: {
+    section: document.querySelector(".student-details-section"),
+    form: document.querySelector("#student-details-form"),
+    nextBtn: document.querySelector(".student-details-section .next-btn"),
+    previousBtn: document.querySelector(".student-details-section .prev-btn"),
+    btnLoader: document.querySelector(
+      ".student-details-section .next-btn .btn-loader",
+    ),
+    btnText: document.querySelector(
+      ".student-details-section .next-btn .btn-text",
+    ),
+    rollNoWrapper: document.querySelector(".roll-no-input-wrapper"),
+    inputs: {
+      firstName: document.querySelector("#first-name-input"),
+      lastName: document.querySelector("#last-name-input"),
+      rollNumber: document.querySelector("#roll-no-input"),
+    },
+    errors: {
+      firstName: document.querySelector(".first-name-related-error"),
+      lastName: document.querySelector(".last-name-related-error"),
+      rollNumber: document.querySelector(".roll-no-related-error"),
+    },
+  },
+  userCredentials: {
+    section: document.querySelector(".student-credentials-section"),
+    form: document.querySelector("#student-credentials-form"),
+    nextBtn: document.querySelector(".student-credentials-section .next-btn"),
+    previousBtn: document.querySelector(
+      ".student-credentials-section .prev-btn",
+    ),
+    btnLoader: document.querySelector(
+      ".student-credentials-section .next-btn .btn-loader",
+    ),
+    btnText: document.querySelector(
+      ".student-credentials-section .next-btn .btn-text",
+    ),
+    inputs: {
+      email: document.querySelector("#email-input"),
+      password: document.querySelector("#password-input"),
+      confirmPassword: document.querySelector("#confirm-password-input"),
+    },
+    errors: {
+      email: document.querySelector(".email-related-error"),
+      password: document.querySelector(".password-related-error"),
+      confirmPassword: document.querySelector(
+        ".confirm-password-related-error",
+      ),
+    },
+  },
+  pfpSelection: {
+    section: document.querySelector(".pfp-selection-section"),
+    form: document.querySelector("#pfp-selection-form"),
+    nextBtn: document.querySelector(".pfp-selection-section .next-btn"),
+    previousBtn: document.querySelector(".pfp-selection-section .prev-btn"),
+    maleToggleBtn: document.querySelector(
+      ".pfp-selection-section .male-pfp-toggle-btn",
+    ),
+    femaleToggleBtn: document.querySelector(
+      ".pfp-selection-section .female-pfp-toggle-btn",
+    ),
+    selectedPfpWrapper: document.querySelector(
+      ".pfp-selection-section .selected-pfp-wrapper",
+    ),
+    selectedPfp: document.querySelector(
+      ".pfp-selection-section .selected-pfp-wrapper img",
+    ),
+    pfpContainer: document.querySelector(
+      ".pfp-selection-section .pfp-container",
+    ),
+    pfpArr: {
+      male: [],
+      female: [],
+      common: [],
+    },
+  },
+  summaryForm: {
+    section: document.querySelector(".summary-section"),
+    form: document.querySelector("#summary-form"),
+    nextBtn: document.querySelector(".summary-section .next-btn"),
+    previousBtn: document.querySelector(".summary-section .prev-btn"),
+    btnLoader: document.querySelector(".summary-section .next-btn .btn-loader"),
+    btnText: document.querySelector(".summary-section .next-btn .btn-text"),
+    rollNoWrapper: document.querySelector(".final-roll-no-wrapper"),
+    details: {
+      name: document.querySelector("#final-name"),
+      rollNo: document.querySelector("#final-roll-no"),
+      email: document.querySelector("#final-email"),
+      pfp: document.querySelector("#final-pfp"),
+      semester: document.querySelector("#final-sem"),
+      division: document.querySelector("#final-div"),
+    },
+  },
+};
+let userObj = {
+  firstName: "",
+  lastName: "",
+  rollNumber: "",
+  email: "",
+  pfpLink: "",
+  semester: "1",
+  division: "a",
+  theme: "default",
+  userId: "",
+  medalList: {
+    gold: "",
+    silver: "",
+    bronze: "",
+  },
+};
 const firebaseConfig = {
   apiKey: "AIzaSyDM6R7E9NRG1FjBsu8v_T9QdKth0LUeLDU",
   authDomain: "lesp-resources-350d1.firebaseapp.com",
@@ -55,16 +186,16 @@ window.addEventListener("load", async () => {
     const result = decryptLink(encrypted);
     if (result) {
       userObj.division = result.division;
-      userObj.semester = Number(result.semester.replace("semester", "").trim()); ///change the semester eto the
+      userObj.semester = Number(result.semester.replace("semester", "").trim());
       userObj.role = result.role;
       if (result.role === "teacher") {
-        hideElement(rollNoInputWrapper);
-        hideElement(finalRollNoWrapper);
+        hideElement(DOM.userDetails.rollNoWrapper);
+        hideElement(DOM.summaryForm.rollNoWrapper);
       }
       isValid = true;
       await preloadIntroImages();
       await fadeOutEffect(loadingScreen);
-      await fadeInEffect(introSection);
+      await fadeInEffect(DOM.intro.section);
     } else {
       hideElement(wentWrongMessage);
       showElement(notFoundMessage);
@@ -89,7 +220,7 @@ function decryptLink(dataStr) {
     return JSON.parse(original);
   } catch (e) {
     console.error("Failed to decode data:", e);
-    showErrorScreen();
+    showErrorScreen("not-found");
     Sentry.captureException(e);
     return null;
   }
@@ -112,130 +243,83 @@ async function preloadIntroImages() {
     }),
   );
 }
-const introSection = document.querySelector(".intro-section");
-const intro1 = document.querySelector(".intro-1");
-const intro2 = document.querySelector(".intro-2");
-const intro3 = document.querySelector(".intro-3");
-const intro4 = document.querySelector(".intro-4");
-const intro1NextBtn = document.querySelector("#intro-1-next-btn");
-const intro2NextBtn = document.querySelector("#intro-2-next-btn");
-const intro3NextBtn = document.querySelector("#intro-3-next-btn");
-const intro4NextBtn = document.querySelector("#intro-4-next-btn");
-const intro2PrevBtn = document.querySelector("#intro-2-prev-btn");
-const intro3PrevBtn = document.querySelector("#intro-3-prev-btn");
-const intro4PrevBtn = document.querySelector("#intro-4-prev-btn");
-intro1NextBtn.addEventListener("click", async () => {
-  await fadeOutEffect(intro1);
-  await fadeInEffect(intro2);
+DOM.intro.nextBtns[1].addEventListener("click", async () => {
+  await fadeOutEffect(DOM.intro.images[1]);
+  await fadeInEffect(DOM.intro.images[2]);
 });
-intro2NextBtn.addEventListener("click", async () => {
-  await fadeOutEffect(intro2);
-  await fadeInEffect(intro3);
+DOM.intro.nextBtns[2].addEventListener("click", async () => {
+  await fadeOutEffect(DOM.intro.images[2]);
+  await fadeInEffect(DOM.intro.images[3]);
 });
-intro3NextBtn.addEventListener("click", async () => {
-  await fadeOutEffect(intro3);
-  await fadeInEffect(intro4);
+DOM.intro.nextBtns[3].addEventListener("click", async () => {
+  await fadeOutEffect(DOM.intro.images[3]);
+  await fadeInEffect(DOM.intro.images[4]);
 });
-intro4NextBtn.addEventListener("click", async () => {
-  await fadeOutEffect(intro4);
-  await fadeInEffect(studentDetailsSection);
+DOM.intro.nextBtns[4].addEventListener("click", async () => {
+  await fadeOutEffect(DOM.intro.images[4]);
+  await fadeInEffect(DOM.userDetails.section);
 });
-intro2PrevBtn.addEventListener("click", async () => {
-  await fadeOutEffect(intro2);
-  await fadeInEffect(intro1);
+DOM.intro.previousBtns[2].addEventListener("click", async () => {
+  await fadeOutEffect(DOM.intro.images[2]);
+  await fadeInEffect(DOM.intro.images[1]);
 });
-intro3PrevBtn.addEventListener("click", async () => {
-  await fadeOutEffect(intro3);
-  await fadeInEffect(intro2);
+DOM.intro.previousBtns[3].addEventListener("click", async () => {
+  await fadeOutEffect(DOM.intro.images[3]);
+  await fadeInEffect(DOM.intro.images[2]);
 });
-intro4PrevBtn.addEventListener("click", async () => {
-  await fadeOutEffect(intro4);
-  await fadeInEffect(intro3);
+DOM.intro.previousBtns[4].addEventListener("click", async () => {
+  await fadeOutEffect(DOM.intro.images[4]);
+  await fadeInEffect(DOM.intro.images[3]);
 });
-let userObj = {
-  firstName: "",
-  lastName: "",
-  rollNumber: "",
-  email: "",
-  pfpLink: "",
-  semester: "1",
-  division: "a",
-  theme: "default",
-  userId: "",
-  medalList: {
-    gold: "",
-    silver: "",
-    bronze: "",
-  },
-};
 // student details form
-const studentDetailsSection = document.querySelector(
-  ".student-details-section",
-);
-const studentDetailsForm = document.querySelector("#student-details-form");
-const studentDetailNextBtn = studentDetailsForm.querySelector(".next-btn");
-const studentDetailNextBtnLoader =
-  studentDetailNextBtn.querySelector(".btn-loader");
-const studentDetailNextBtnText = studentDetailNextBtn.querySelector(".text");
-const firstNameInput = studentDetailsForm.querySelector("#first-name-input");
-const lastNameInput = studentDetailsForm.querySelector("#last-name-input");
-const rollNoInputWrapper = studentDetailsForm.querySelector(
-  ".roll-no-input-wrapper",
-);
-const rollNoInput = studentDetailsForm.querySelector("#roll-no-input");
-const firstNameError = studentDetailsForm.querySelector(
-  ".first-name-related-error",
-);
-const lastNameError = studentDetailsForm.querySelector(
-  ".last-name-related-error",
-);
-const rollNoError = studentDetailsForm.querySelector(".roll-no-related-error");
-rollNoInput.addEventListener("input", (e) => {
+DOM.userDetails.inputs.rollNumber.addEventListener("input", (e) => {
   if (e.target.value.length > 6) {
-    rollNoError.textContent = "Roll no must be 6 characters";
+    DOM.userDetails.errors.rollNumber.textContent =
+      "Roll no must be 6 characters";
     e.target.value = e.target.value.slice(0, 6);
-    showElement(rollNoError);
+    showElement(DOM.userDetails.errors.rollNumber);
   } else if (e.target.value.length < 6) {
-    rollNoError.textContent = "";
-    hideElement(rollNoError);
+    DOM.userDetails.errors.rollNumber.textContent = "";
+    hideElement(DOM.userDetails.errors.rollNumber);
   }
 });
-studentDetailsForm.addEventListener("submit", async (e) => {
+DOM.userDetails.form.addEventListener("submit", async (e) => {
   e.preventDefault();
-  hideElement(firstNameError);
-  hideElement(lastNameError);
-  hideElement(rollNoError);
-  const firstName = firstNameInput.value.trim();
-  const lastName = lastNameInput.value.trim();
-  const rollNoStr = rollNoInput.value.trim();
+  hideElement(DOM.userDetails.errors.firstName);
+  hideElement(DOM.userDetails.errors.lastName);
+  hideElement(DOM.userDetails.errors.rollNumber);
+  const firstName = DOM.userDetails.inputs.firstName.value.trim();
+  const lastName = DOM.userDetails.inputs.lastName.value.trim();
+  const rollNoStr = DOM.userDetails.inputs.rollNumber.value.trim();
   const rollNo = Number(rollNoStr);
   let isError = false;
   if (!firstName) {
-    firstNameError.textContent = "First Name is required";
-    showElement(firstNameError);
+    DOM.userDetails.errors.firstName.textContent = "First Name is required";
+    showElement(DOM.userDetails.errors.firstName);
     isError = true;
   }
   if (!lastName) {
-    lastNameError.textContent = "Last Name is required";
-    showElement(lastNameError);
+    DOM.userDetails.errors.lastName.textContent = "Last Name is required";
+    showElement(DOM.userDetails.errors.lastName);
     isError = true;
   }
   if (!rollNoStr && userObj.role !== "teacher") {
-    rollNoError.textContent = "Roll No is required";
-    showElement(rollNoError);
+    DOM.userDetails.errors.rollNumber.textContent = "Roll No is required";
+    showElement(DOM.userDetails.errors.rollNumber);
     isError = true;
   }
   if (isError) return;
   if (rollNoStr.length < 6 && userObj.role !== "teacher") {
-    rollNoError.textContent = "Roll No must be at least 6 characters";
-    showElement(rollNoError);
+    DOM.userDetails.errors.rollNumber.textContent =
+      "Roll No must be at least 6 characters";
+    showElement(DOM.userDetails.errors.rollNumber);
     isError = true;
   }
   if (isError) return;
   if (rollNoStr && userObj.role !== "teacher") {
-    studentDetailNextBtn.disabled = true;
-    await fadeOutEffectOpacity(studentDetailNextBtnText);
-    fadeInEffect(studentDetailNextBtnLoader);
+    DOM.userDetails.nextBtn.disabled = true;
+    await fadeOutEffectOpacity(DOM.userDetails.btnText);
+    fadeInEffect(DOM.userDetails.btnLoader);
     const q = query(
       ref(db, "userData"),
       orderByChild("rollNumber"),
@@ -244,8 +328,9 @@ studentDetailsForm.addEventListener("submit", async (e) => {
     await get(q)
       .then(async (snapshot) => {
         if (snapshot.exists()) {
-          rollNoError.textContent = "Roll No already exists";
-          showElement(rollNoError);
+          DOM.userDetails.errors.rollNumber.textContent =
+            "Roll No already exists";
+          showElement(DOM.userDetails.errors.rollNumber);
           isError = true;
         }
       })
@@ -257,13 +342,13 @@ studentDetailsForm.addEventListener("submit", async (e) => {
       });
   }
   if (isError) {
-    await fadeOutEffect(studentDetailNextBtnLoader);
-    await fadeInEffectOpacity(studentDetailNextBtnText);
-    studentDetailNextBtn.disabled = false;
+    await fadeOutEffect(DOM.userDetails.btnLoader);
+    await fadeInEffectOpacity(DOM.userDetails.btnText);
+    DOM.userDetails.nextBtn.disabled = false;
     return;
   } else {
-    await fadeOutEffect(studentDetailNextBtnLoader);
-    await fadeInEffectOpacity(studentDetailNextBtnText);
+    await fadeOutEffect(DOM.userDetails.btnLoader);
+    await fadeInEffectOpacity(DOM.userDetails.btnText);
     userObj.firstName = firstName;
     userObj.lastName = lastName;
     userObj.rollNumber = rollNo;
@@ -271,96 +356,74 @@ studentDetailsForm.addEventListener("submit", async (e) => {
       userObj.rollNumber = null;
       userObj.medalList = null;
     }
-    await fadeOutEffect(studentDetailsSection);
-    fadeInEffect(studentCredentialsSection);
-    studentDetailNextBtn.disabled = false;
+    await fadeOutEffect(DOM.userDetails.section);
+    fadeInEffect(DOM.userCredentials.section);
+    DOM.userDetails.nextBtn.disabled = false;
   }
 });
 // students credentials
-const studentCredentialsSection = document.querySelector(
-  ".student-credentials-section",
-);
-const studentCredentialsForm = document.querySelector(
-  "#student-credentials-form",
-);
-const studentCredentialsPrevBtn =
-  studentCredentialsForm.querySelector(".prev-btn");
-const studentCredentialNextBtn =
-  studentCredentialsForm.querySelector(".next-btn");
-const studentCredentialNextBtnLoader =
-  studentCredentialNextBtn.querySelector(".btn-loader");
-const studentCredentialNextBtnText =
-  studentCredentialNextBtn.querySelector(".text");
-const emailInput = studentCredentialsForm.querySelector("#email-input");
-const passwordInput = studentCredentialsForm.querySelector("#password-input");
-const confirmPasswordInput = studentCredentialsForm.querySelector(
-  "#confirm-password-input",
-);
-const emailError = studentCredentialsForm.querySelector(".email-related-error");
-const passwordError = studentCredentialsForm.querySelector(
-  ".password-related-error",
-);
-const confirmPasswordError = studentCredentialsForm.querySelector(
-  ".confirm-password-related-error",
-);
-studentCredentialsPrevBtn.addEventListener("click", async () => {
-  await fadeOutEffect(studentCredentialsSection);
-  fadeInEffect(studentDetailsSection);
-  hideElement(emailError);
-  hideElement(passwordError);
-  hideElement(confirmPasswordError);
+DOM.userCredentials.previousBtn.addEventListener("click", async () => {
+  await fadeOutEffect(DOM.userCredentials.section);
+  fadeInEffect(DOM.userDetails.section);
+  hideElement(DOM.userCredentials.errors.email);
+  hideElement(DOM.userCredentials.errors.password);
+  hideElement(DOM.userCredentials.errors.confirmPassword);
 });
-studentCredentialsForm.addEventListener("submit", async (e) => {
+DOM.userCredentials.form.addEventListener("submit", async (e) => {
   e.preventDefault();
-  hideElement(emailError);
-  hideElement(passwordError);
-  hideElement(confirmPasswordError);
-  const email = emailInput.value.trim();
-  const password = passwordInput.value.trim();
-  const confirmPassword = confirmPasswordInput.value.trim();
+  hideElement(DOM.userCredentials.errors.email);
+  hideElement(DOM.userCredentials.errors.password);
+  hideElement(DOM.userCredentials.errors.confirmPassword);
+  const email = DOM.userCredentials.inputs.email.value.trim();
+  const password = DOM.userCredentials.inputs.password.value.trim();
+  const confirmPassword =
+    DOM.userCredentials.inputs.confirmPassword.value.trim();
   let isError = false;
   if (!email) {
-    emailError.textContent = "Email is required";
-    showElement(emailError);
+    DOM.userCredentials.errors.email.textContent = "Email is required";
+    showElement(DOM.userCredentials.errors.email);
     isError = true;
   }
   if (!password) {
-    passwordError.textContent = "Password is required";
-    showElement(passwordError);
+    DOM.userCredentials.errors.password.textContent = "Password is required";
+    showElement(DOM.userCredentials.errors.password);
     isError = true;
   }
   if (!confirmPassword) {
-    confirmPasswordError.textContent = "Confirm Password is required";
-    showElement(confirmPasswordError);
+    DOM.userCredentials.errors.confirmPassword.textContent =
+      "Confirm Password is required";
+    showElement(DOM.userCredentials.errors.confirmPassword);
     isError = true;
   }
   if (isError) return;
   if (password.length < 6) {
-    passwordError.textContent = "Password must be at least 6 characters";
-    showElement(passwordError);
+    DOM.userCredentials.errors.password.textContent =
+      "Password must be at least 6 characters";
+    showElement(DOM.userCredentials.errors.password);
     isError = true;
   }
   if (email && !email.includes("@gmail.com")) {
-    emailError.textContent = "Enter a valid email";
-    showElement(emailError);
+    DOM.userCredentials.errors.email.textContent = "Enter a valid email";
+    showElement(DOM.userCredentials.errors.email);
     isError = true;
   }
   if (password !== confirmPassword) {
-    confirmPasswordError.textContent = "Passwords do not match";
-    showElement(confirmPasswordError);
+    DOM.userCredentials.errors.confirmPassword.textContent =
+      "Passwords do not match";
+    showElement(DOM.userCredentials.errors.confirmPassword);
     isError = true;
   }
   if (isError) return;
-  studentCredentialNextBtn.disabled = true;
-  studentCredentialsPrevBtn.disabled = true;
-  await fadeOutEffectOpacity(studentCredentialNextBtnText);
-  fadeInEffect(studentCredentialNextBtnLoader);
+  DOM.userCredentials.nextBtn.disabled = true;
+  DOM.userCredentials.previousBtn.disabled = true;
+  await fadeOutEffectOpacity(DOM.userCredentials.btnText);
+  fadeInEffect(DOM.userCredentials.btnLoader);
   const q = query(ref(db, "userData"), orderByChild("email"), equalTo(email));
   await get(q)
     .then(async (snapshot) => {
       if (snapshot.exists()) {
-        emailError.textContent = "Email already exists";
-        showElement(emailError);
+        DOM.userCredentials.errors.email.textContent = "Email already exists";
+        showElement(DOM.userCredentials.errors.email);
         isError = true;
       }
     })
@@ -371,169 +434,150 @@ studentCredentialsForm.addEventListener("submit", async (e) => {
     });
 
   if (isError) {
-    await fadeOutEffect(studentCredentialNextBtnLoader);
-    await fadeInEffectOpacity(studentCredentialNextBtnText);
-    studentCredentialNextBtn.disabled = false;
-    studentCredentialsPrevBtn.disabled = false;
+    await fadeOutEffect(DOM.userCredentials.btnLoader);
+    await fadeInEffectOpacity(DOM.userCredentials.btnText);
+    DOM.userCredentials.nextBtn.disabled = false;
+    DOM.userCredentials.previousBtn.disabled = false;
     return;
   } else {
-    await fadeOutEffect(studentCredentialNextBtnLoader);
-    await fadeInEffectOpacity(studentCredentialNextBtnText);
+    await fadeOutEffect(DOM.userCredentials.btnLoader);
+    await fadeInEffectOpacity(DOM.userCredentials.btnText);
     userObj.email = email;
-    await fadeOutEffect(studentCredentialsSection);
-    fadeInEffect(pfpSelectionSection);
+    await fadeOutEffect(DOM.userCredentials.section);
+    fadeInEffect(DOM.pfpSelection.section);
   }
-  studentCredentialNextBtn.disabled = false;
-  studentCredentialsPrevBtn.disabled = false;
+  DOM.userCredentials.nextBtn.disabled = false;
+  DOM.userCredentials.previousBtn.disabled = false;
 });
 
 //pfp selection section
-const pfpSelectionSection = document.querySelector(".pfp-selection-section");
-const pfpSelectionForm = document.querySelector("#pfp-selection-form");
-const pfpSelectionPrevBtn = pfpSelectionForm.querySelector(".prev-btn");
-const pfpSelectionNextBtn = pfpSelectionForm.querySelector(".next-btn");
-const selectedPfpWrapper = pfpSelectionForm.querySelector(
-  ".selected-pfp-wrapper",
-);
-const selectedPfp = pfpSelectionForm.querySelector(".selected-pfp-wrapper img");
-const pfpContainer = pfpSelectionForm.querySelector(".pfp-container");
-const malePfpArr = [];
-const femalePfpArr = [];
-const commonPfpArr = [];
-const malePfpToggleBtn = pfpSelectionForm.querySelector(".male-pfp-toggle-btn");
-const femalePfpToggleBtn = pfpSelectionForm.querySelector(
-  ".female-pfp-toggle-btn",
-);
-femalePfpToggleBtn.addEventListener("click", async () => {
-  femalePfpToggleBtn.classList.add("bg-surface-3");
-  malePfpToggleBtn.classList.remove("bg-surface-3");
+DOM.pfpSelection.femaleToggleBtn.addEventListener("click", async () => {
+  DOM.pfpSelection.femaleToggleBtn.classList.add("bg-surface-3");
+  DOM.pfpSelection.maleToggleBtn.classList.remove("bg-surface-3");
   if (
-    femalePfpArr[0].classList.contains("hidden") &&
-    pfpContainer.scrollTop === 0
+    DOM.pfpSelection.pfpArr.female[0].classList.contains("hidden") &&
+    DOM.pfpSelection.pfpContainer.scrollTop === 0
   ) {
-    await fadeOutEffectOpacity(pfpContainer);
-    malePfpArr.forEach((pfp) => {
+    await fadeOutEffectOpacity(DOM.pfpSelection.pfpContainer);
+    DOM.pfpSelection.pfpArr.male.forEach((pfp) => {
       pfp.classList.add("hidden");
     });
-    femalePfpArr.forEach((pfp) => {
+    DOM.pfpSelection.pfpArr.female.forEach((pfp) => {
       pfp.classList.remove("hidden");
     });
-    await fadeInEffectOpacity(pfpContainer);
+    await fadeInEffectOpacity(DOM.pfpSelection.pfpContainer);
   } else if (
-    femalePfpArr[0].classList.contains("hidden") &&
-    pfpContainer.scrollTop > 0
+    DOM.pfpSelection.pfpArr.female[0].classList.contains("hidden") &&
+    DOM.pfpSelection.pfpContainer.scrollTop > 0
   ) {
-    malePfpArr.forEach((pfp) => {
+    DOM.pfpSelection.pfpArr.male.forEach((pfp) => {
       pfp.classList.add("hidden");
     });
-    femalePfpArr.forEach((pfp) => {
+    DOM.pfpSelection.pfpArr.female.forEach((pfp) => {
       pfp.classList.remove("hidden");
     });
-    pfpContainer.scrollTo({
+    DOM.pfpSelection.pfpContainer.scrollTo({
       top: 0,
       behavior: "smooth",
     });
   }
 });
-malePfpToggleBtn.addEventListener("click", async () => {
-  malePfpToggleBtn.classList.add("bg-surface-3");
-  femalePfpToggleBtn.classList.remove("bg-surface-3");
+DOM.pfpSelection.maleToggleBtn.addEventListener("click", async () => {
+  DOM.pfpSelection.maleToggleBtn.classList.add("bg-surface-3");
+  DOM.pfpSelection.femaleToggleBtn.classList.remove("bg-surface-3");
   if (
-    malePfpArr[0].classList.contains("hidden") &&
-    pfpContainer.scrollTop === 0
+    DOM.pfpSelection.pfpArr.male[0].classList.contains("hidden") &&
+    DOM.pfpSelection.pfpContainer.scrollTop === 0
   ) {
-    await fadeOutEffectOpacity(pfpContainer);
-    malePfpArr.forEach((pfp) => {
+    await fadeOutEffectOpacity(DOM.pfpSelection.pfpContainer);
+    DOM.pfpSelection.pfpArr.male.forEach((pfp) => {
       pfp.classList.remove("hidden");
     });
-    femalePfpArr.forEach((pfp) => {
+    DOM.pfpSelection.pfpArr.female.forEach((pfp) => {
       pfp.classList.add("hidden");
     });
-    await fadeInEffectOpacity(pfpContainer);
+    await fadeInEffectOpacity(DOM.pfpSelection.pfpContainer);
   } else if (
-    malePfpArr[0].classList.contains("hidden") &&
-    pfpContainer.scrollTop > 0
+    DOM.pfpSelection.pfpArr.male[0].classList.contains("hidden") &&
+    DOM.pfpSelection.pfpContainer.scrollTop > 0
   ) {
-    malePfpArr.forEach((pfp) => {
+    DOM.pfpSelection.pfpArr.male.forEach((pfp) => {
       pfp.classList.remove("hidden");
     });
-    femalePfpArr.forEach((pfp) => {
+    DOM.pfpSelection.pfpArr.female.forEach((pfp) => {
       pfp.classList.add("hidden");
     });
-    pfpContainer.scrollTo({
+    DOM.pfpSelection.pfpContainer.scrollTo({
       top: 0,
       behavior: "smooth",
     });
   }
 });
-pfpContainer.addEventListener("click", async (e) => {
+DOM.pfpSelection.pfpContainer.addEventListener("click", async (e) => {
   const target = e.target;
   if (target.classList.contains("pfp")) {
-    await fadeOutEffectOpacity(selectedPfpWrapper);
-    selectedPfp.src = target.getAttribute("src");
-    await fadeInEffectOpacity(selectedPfpWrapper);
+    await fadeOutEffectOpacity(DOM.pfpSelection.selectedPfpWrapper);
+    DOM.pfpSelection.selectedPfp.src = target.getAttribute("src");
+    await fadeInEffectOpacity(DOM.pfpSelection.selectedPfpWrapper);
   }
 });
-pfpSelectionPrevBtn.addEventListener("click", async () => {
-  await fadeOutEffect(pfpSelectionSection);
-  await fadeInEffect(studentCredentialsSection);
+DOM.pfpSelection.previousBtn.addEventListener("click", async () => {
+  await fadeOutEffect(DOM.pfpSelection.section);
+  await fadeInEffect(DOM.userCredentials.section);
 });
-pfpSelectionForm.addEventListener("submit", async (e) => {
+DOM.pfpSelection.form.addEventListener("submit", async (e) => {
   e.preventDefault();
-  userObj.pfpLink = selectedPfp.src;
-  await fadeOutEffect(pfpSelectionSection);
+  userObj.pfpLink = DOM.pfpSelection.selectedPfp.src;
+  await fadeOutEffect(DOM.pfpSelection.section);
   initSummaryForm();
-  await fadeInEffect(summarySection);
+  await fadeInEffect(DOM.summaryForm.section);
 });
 
 //summary form
-const summarySection = document.querySelector(".summary-section");
-const summaryForm = document.querySelector("#summary-form");
-const summaryPrevBtn = summaryForm.querySelector(".prev-btn");
-const summaryNextBtn = summaryForm.querySelector(".next-btn");
-const summaryNextBtnLoader = summaryNextBtn.querySelector(".btn-loader");
-const summaryNextBtnText = summaryNextBtn.querySelector(".text");
-const finalName = summaryForm.querySelector("#final-name");
-const finalPfp = summaryForm.querySelector("#final-pfp");
-const finalRollNoWrapper = summaryForm.querySelector(".final-roll-no-wrapper");
-const finalRollNo = summaryForm.querySelector("#final-roll-no");
-const finalEmail = summaryForm.querySelector("#final-email");
-const finalSem = summaryForm.querySelector("#final-sem");
-const finalDiv = summaryForm.querySelector("#final-div");
 function initSummaryForm() {
   const userFullName = `${
     userObj.firstName.charAt(0).toUpperCase() + userObj.firstName.slice(1)
   } ${userObj.lastName.charAt(0).toUpperCase() + userObj.lastName.slice(1)}`;
-  finalName.textContent = userFullName;
-  finalPfp.src = userObj.pfpLink;
-  finalRollNo.textContent = userObj.rollNumber;
-  finalEmail.textContent = userObj.email;
-  finalSem.textContent = userObj.semester;
-  finalDiv.textContent = userObj.division;
+  DOM.summaryForm.details.name.textContent = userFullName;
+  DOM.summaryForm.details.pfp.src = userObj.pfpLink;
+  DOM.summaryForm.details.rollNo.textContent = userObj.rollNumber;
+  DOM.summaryForm.details.email.textContent = userObj.email;
+  DOM.summaryForm.details.semester.textContent = userObj.semester;
+  DOM.summaryForm.details.division.textContent = userObj.division;
 }
-summaryPrevBtn.addEventListener("click", async () => {
-  await fadeOutEffect(summarySection);
-  await fadeInEffect(pfpSelectionSection);
+DOM.summaryForm.previousBtn.addEventListener("click", async () => {
+  await fadeOutEffect(DOM.summaryForm.section);
+  await fadeInEffect(DOM.pfpSelection.section);
 });
-summaryForm.addEventListener("submit", async (e) => {
+DOM.summaryForm.form.addEventListener("submit", async (e) => {
   e.preventDefault();
-  summaryNextBtn.disabled = true;
-  summaryPrevBtn.disabled = true;
-  await fadeOutEffectOpacity(summaryNextBtnText);
-  fadeInEffect(summaryNextBtnLoader);
+  DOM.summaryForm.nextBtn.disabled = true;
+  DOM.summaryForm.previousBtn.disabled = true;
+  await fadeOutEffectOpacity(DOM.summaryForm.btnText);
+  fadeInEffect(DOM.summaryForm.btnLoader);
   try {
     const userCredential = await createUserWithEmailAndPassword(
       auth,
       userObj.email,
-      passwordInput.value,
+      DOM.userCredentials.inputs.password.value,
     );
     const user = userCredential.user;
     userObj.userId = user.uid;
     await writeUserData();
-    await fadeOutEffect(summaryNextBtnLoader);
-    await fadeInEffectOpacity(summaryNextBtnText);
-    await fadeOutEffect(summarySection);
+    await fadeOutEffect(DOM.summaryForm.btnLoader);
+    await fadeInEffectOpacity(DOM.summaryForm.btnText);
+    await fadeOutEffect(DOM.summaryForm.section);
     await fadeInEffect(successScreen);
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(
+        `User ${outcome === "accepted" ? "accepted" : "dismissed"} the install prompt`,
+      );
+
+      deferredPrompt = null;
+    }
     try {
       await signOut(auth);
       successLottiePlayer.play();
@@ -541,7 +585,7 @@ summaryForm.addEventListener("submit", async (e) => {
       Sentry.captureException(error);
       hideElement(notFoundMessage);
       showElement(wentWrongMessage);
-      await fadeOutEffect(summarySection);
+      await fadeOutEffect(DOM.summaryForm.section);
       fadeInEffect(errorScreen);
     }
   } catch (error) {
@@ -549,11 +593,11 @@ summaryForm.addEventListener("submit", async (e) => {
     Sentry.captureException(error);
     hideElement(notFoundMessage);
     showElement(wentWrongMessage);
-    await fadeOutEffect(summarySection);
+    await fadeOutEffect(DOM.summaryForm.section);
     fadeInEffect(errorScreen);
   }
-  summaryNextBtn.disabled = false;
-  summaryPrevBtn.disabled = false;
+  DOM.summaryForm.nextBtn.disabled = false;
+  DOM.summaryForm.previousBtn.disabled = false;
 });
 
 async function writeUserData() {
@@ -630,6 +674,9 @@ async function fadeOutEffectOpacity(element) {
   await new Promise((resolve) => setTimeout(resolve, ms));
 }
 const commonPfpLinks = [
+  "https://ik.imagekit.io/yn9gz2n2g/Avatars/Common/common153.png?updatedAt=1754971040747",
+  "https://ik.imagekit.io/yn9gz2n2g/Avatars/Common/common154.png?updatedAt=1754971126428",
+  "https://ik.imagekit.io/yn9gz2n2g/Avatars/Common/common155.png?updatedAt=1754971178634",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Common/common1.png?updatedAt=1750989714229",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Common/common2.png?updatedAt=1750989746594",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Common/common3.png?updatedAt=1750989769389",
@@ -747,9 +794,6 @@ const commonPfpLinks = [
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Common/common145.png?updatedAt=1754489019575",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Common/common146.png?updatedAt=1754489035374",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Common/common147.png?updatedAt=1754489056973",
-  "https://ik.imagekit.io/yn9gz2n2g/Avatars/Common/common148.png?updatedAt=1754489069974",
-  "https://ik.imagekit.io/yn9gz2n2g/Avatars/Common/common149.png?updatedAt=1754489083654",
-  "https://ik.imagekit.io/yn9gz2n2g/Avatars/Common/common150.png?updatedAt=1754489104143",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Common/common151.png?updatedAt=1754489120469",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Common/common152.png?updatedAt=1754491995646",
 ];
@@ -760,7 +804,6 @@ const malePfpLinks = [
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m4.png?updatedAt=1750951073482",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m5.png?updatedAt=1750951106853",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m7.png?updatedAt=1750951173704",
-  "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m9.png?updatedAt=1750951225291",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m10.png?updatedAt=1750951251957",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m11.png?updatedAt=1750951276570",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m12.png?updatedAt=1750951301644",
@@ -786,9 +829,6 @@ const malePfpLinks = [
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m37.png?updatedAt=1750952367758",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m39.png?updatedAt=1750952424973",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m41.png?updatedAt=1750952471413",
-  "https://ik.imagekit.io/yn9gz2n2g/Avatars/Common/m48.png?updatedAt=1754471409721",
-  "https://ik.imagekit.io/yn9gz2n2g/Avatars/Common/m49.png?updatedAt=1754471408893",
-  "https://ik.imagekit.io/yn9gz2n2g/Avatars/Common/m50.png?updatedAt=1754471407992",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m51.png?updatedAt=1750952706527",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m52.png?updatedAt=1750952729005",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m54.png?updatedAt=1751608964260",
@@ -1044,7 +1084,6 @@ const femalePfpLinks = [
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Female/female174.png?updatedAt=1754487087995",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Female/female175.png?updatedAt=1754894768522",
 ];
-
 function renderPfpWrapper() {
   renderImage("malePfp", malePfpLinks);
   renderImage("femalePfp", femalePfpLinks);
@@ -1062,18 +1101,18 @@ function renderImage(className, link) {
       "cursor-pointer",
       `${className}`,
     );
-    if (className === "malePfp") malePfpArr.push(pfp);
+    if (className === "malePfp") DOM.pfpSelection.pfpArr.male.push(pfp);
     if (className === "femalePfp") {
       pfp.classList.add("hidden");
-      femalePfpArr.push(pfp);
+      DOM.pfpSelection.pfpArr.female.push(pfp);
     }
     if (
       className === "commonfp" ||
       className === "memePfp" ||
       className === "cartoonPfp"
     )
-      commonPfpArr.push(pfp);
-    pfpContainer.appendChild(pfp);
+      DOM.pfpSelection.pfpArr.common.push(pfp);
+    DOM.pfpSelection.pfpContainer.appendChild(pfp);
   });
 }
 renderPfpWrapper();
@@ -1093,9 +1132,16 @@ successLottiePlayer.addEventListener("complete", async () => {
     window.location.href = "https://0dab1116c1b7.ngrok-free.app/";
   }, 2000);
 });
-export function hideElement(element) {
+function hideElement(element) {
   element.classList.add("hidden");
 }
-export function showElement(element) {
+function showElement(element) {
   element.classList.remove("hidden");
 }
+
+// pwa popup
+let deferredPrompt;
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+});
