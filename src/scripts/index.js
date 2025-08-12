@@ -147,8 +147,8 @@ export async function initRouting() {
   const sessions = params.get("sessions");
   if (dashboard) {
     setActiveNavIcon(dashboardIcon);
+    await showDashboard();
     await fadeOutEffect(lottieLoadingScreen);
-    showDashboard();
   } else if (activeSubject) {
     appState.activeSubject = activeSubject;
     trackPageView(
@@ -158,12 +158,12 @@ export async function initRouting() {
       appState.activeSubject,
     );
     setActiveNavIcon(subjectIcon);
+    await loadSubjectSection();
     await fadeOutEffect(lottieLoadingScreen);
-    loadSubjectSection();
   } else if (leaderboard) {
     setActiveNavIcon(leaderboardIcon);
+    await showLeaderboardSection();
     await fadeOutEffect(lottieLoadingScreen);
-    showLeaderboardSection();
   } else if (tests) {
     setActiveNavIcon(testsIcon);
     await fadeOutEffect(lottieLoadingScreen);
@@ -177,8 +177,8 @@ export async function initRouting() {
     showPyq();
   } else {
     setActiveNavIcon(dashboardIcon);
+    await showDashboard();
     await fadeOutEffect(lottieLoadingScreen);
-    showDashboard();
   }
 }
 export async function hideSections(
