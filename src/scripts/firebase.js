@@ -44,7 +44,7 @@ const analytics = getAnalytics(app);
 const db = getDatabase(app);
 // functions
 export function deleteData(path) {
-  return remove(ref(dbb, path))
+  return remove(ref(db, path))
     .then(() => {
       console.log("Data deleted successfully.");
     })
