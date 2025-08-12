@@ -97,6 +97,15 @@ export async function showConfirmationPopup(
   });
 }
 document.addEventListener("DOMContentLoaded", async () => {
+  const currentUrl = window.location.href;
+
+  if (currentUrl.includes("/signup.html?")) {
+    // Extract the query part
+    const query = window.location.search;
+    // Redirect to the same page with query intact
+    window.location.href = `/signup.html${query}`;
+  }
+
   try {
     await fadeInEffect(lottieLoadingScreen);
     onAuthStateChanged(auth, async (userCredential) => {
