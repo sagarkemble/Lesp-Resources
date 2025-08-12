@@ -97,8 +97,6 @@ export async function showConfirmationPopup(
   });
 }
 document.addEventListener("DOMContentLoaded", async () => {
-  checkAndPromptPWA();
-
   try {
     await fadeInEffect(lottieLoadingScreen);
     onAuthStateChanged(auth, async (userCredential) => {
@@ -288,31 +286,29 @@ const updateSW = registerSW({
 // pwa popup
 let deferredPrompt;
 
+// Save install prompt event
 window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
   deferredPrompt = e;
+  // Automatically show popup when available
+  showInstallPromptIfNotPWA();
 });
 
-function checkAndPromptPWA() {
+// Check if running in PWA and show popup if not
+function showInstallPromptIfNotPWA() {
   const isPWA =
     window.matchMedia("(display-mode: standalone)").matches ||
     window.navigator.standalone === true; // iOS Safari
 
-  if (!isPWA) {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then((choiceResult) => {
-        console.log(
-          choiceResult.outcome === "accepted"
-            ? "User accepted install"
-            : "User dismissed install",
-        );
-        deferredPrompt = null;
-      });
-    } else {
-      alert("For the best experience, install and open this site as an app.");
-    }
-  } else {
-    console.log("Running in PWA mode");
+  if (!isPWA && deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult) => {
+      console.log(
+        choiceResult.outcome === "accepted"
+          ? "User accepted install"
+          : "User dismissed install",
+      );
+      deferredPrompt = null;
+    });
   }
 }
