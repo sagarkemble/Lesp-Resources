@@ -101,6 +101,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     await fadeInEffect(lottieLoadingScreen);
     onAuthStateChanged(auth, async (userCredential) => {
       try {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+
+          const { outcome } = await deferredPrompt.userChoice;
+          console.log(
+            `User ${outcome === "accepted" ? "accepted" : "dismissed"} the install prompt`,
+          );
+
+          deferredPrompt = null;
+          return;
+        }
         if (userCredential) {
           setUserId(analytics, userCredential.uid);
           logEvent(analytics, "login", { method: "firebase" });
@@ -145,13 +156,10 @@ export async function initRouting() {
   const tests = params.get("tests");
   const pyq = params.get("pyq");
   const sessions = params.get("sessions");
-  const signUp = params.get("data");
   if (dashboard) {
     setActiveNavIcon(dashboardIcon);
     await showDashboard();
     await fadeOutEffect(lottieLoadingScreen);
-  } else if (signUp) {
-    window.location.href = `/signup?data=${signUp}`;
   } else if (activeSubject) {
     appState.activeSubject = activeSubject;
     trackPageView(
@@ -285,4 +293,10 @@ const updateSW = registerSW({
     }
   },
   onOfflineReady() {},
+});
+// pwa popup
+let deferredPrompt;
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
 });

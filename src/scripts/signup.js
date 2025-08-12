@@ -568,16 +568,7 @@ DOM.summaryForm.form.addEventListener("submit", async (e) => {
     await fadeInEffectOpacity(DOM.summaryForm.btnText);
     await fadeOutEffect(DOM.summaryForm.section);
     await fadeInEffect(successScreen);
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
 
-      const { outcome } = await deferredPrompt.userChoice;
-      console.log(
-        `User ${outcome === "accepted" ? "accepted" : "dismissed"} the install prompt`,
-      );
-
-      deferredPrompt = null;
-    }
     try {
       await signOut(auth);
       successLottiePlayer.play();
@@ -1138,10 +1129,3 @@ function hideElement(element) {
 function showElement(element) {
   element.classList.remove("hidden");
 }
-
-// pwa popup
-let deferredPrompt;
-window.addEventListener("beforeinstallprompt", (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-});
