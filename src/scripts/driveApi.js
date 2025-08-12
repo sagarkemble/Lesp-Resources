@@ -1,10 +1,8 @@
 import { showSectionLoader, hideSectionLoader } from "./index.js";
 import { showErrorSection } from "./error.js";
+import * as Sentry from "@sentry/browser";
 export async function deleteDriveFile(attachmentId) {
   if (!attachmentId) return false;
-
-  //   showSectionLoader("Deleting attachment...");
-
   try {
     const res = await fetch(
       "https://lesp-resources-gdrive-api.onrender.com/delete",
@@ -12,7 +10,7 @@ export async function deleteDriveFile(attachmentId) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: attachmentId }),
-      }
+      },
     );
 
     const data = await res.json();
@@ -21,7 +19,7 @@ export async function deleteDriveFile(attachmentId) {
     if (!res.ok || data.success === false) {
       console.error(
         "Attachment deletion failed:",
-        data.error || "Unknown error"
+        data.error || "Unknown error",
       );
       showErrorSection();
       return false;
@@ -30,6 +28,7 @@ export async function deleteDriveFile(attachmentId) {
     return true;
   } catch (err) {
     console.error("Error deleting attachment from Drive:", err.message);
+    Sentry.captureException(err);
     showErrorSection();
     return false;
   }
@@ -49,7 +48,7 @@ export async function uploadDriveFile(file, path) {
       {
         method: "POST",
         body: formData,
-      }
+      },
     );
 
     const result = await response.json();
@@ -69,6 +68,7 @@ export async function uploadDriveFile(file, path) {
   } catch (err) {
     showErrorSection();
     console.error("Upload error:", err.message);
+    Sentry.captureException(err);
     return null;
   }
 }

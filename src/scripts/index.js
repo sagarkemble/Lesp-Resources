@@ -45,7 +45,14 @@ import {
   adminAppState,
 } from "./appstate.js";
 import { showErrorSection } from "./error.js";
-const lottieLoadingScreen = document.querySelector(".lottie-loading-screen");
+import * as Sentry from "@sentry/browser";
+Sentry.init({
+  dsn: "https://9f9da5737a2f44249457aa7e774fe3d2@o4509828633788416.ingest.us.sentry.io/4509828649189376",
+  sendDefaultPii: true,
+});
+export const lottieLoadingScreen = document.querySelector(
+  ".lottie-loading-screen",
+);
 const lottieLoader = document.querySelector("#lottie-loader");
 const sectionLoader = document.querySelector(".task-loader-wrapper");
 const sectionLoaderMessage = sectionLoader.querySelector(".loader-status");
@@ -90,37 +97,45 @@ export async function showConfirmationPopup(
   });
 }
 document.addEventListener("DOMContentLoaded", async () => {
-  await fadeInEffect(lottieLoadingScreen);
-  onAuthStateChanged(auth, async (userCredential) => {
-    if (userCredential) {
-      setUserId(analytics, userCredential.uid);
-      logEvent(analytics, "login", { method: "firebase" });
-      // Just to test Analytics works at all
-      logEvent(analytics, "test_event", { debug: true });
-
-      console.log("event logged");
-      const user = await getUserData(userCredential.uid);
-
-      console.log("this is user data ", user);
-      if (user.role === "admin") {
-        localUserData = user;
-        await fadeOutEffect(lottieLoadingScreen);
-        initAdminRouting(user);
-        return;
+  try {
+    await fadeInEffect(lottieLoadingScreen);
+    onAuthStateChanged(auth, async (userCredential) => {
+      try {
+        if (userCredential) {
+          setUserId(analytics, userCredential.uid);
+          logEvent(analytics, "login", { method: "firebase" });
+          const user = await getUserData(userCredential.uid);
+          if (user.role === "admin") {
+            localUserData = user;
+            await fadeOutEffect(lottieLoadingScreen);
+            initAdminRouting(user);
+            return;
+          }
+          const userPfp = document.querySelectorAll(".user-pfp");
+          userPfp.forEach((pfp) => {
+            pfp.src = user.pfpLink;
+          });
+          await initAppState(user, user.semester, user.division);
+          await fadeInEffect(lottieLoadingScreen);
+          await hideSections();
+          await loadContent();
+          await applyEditModeUI();
+          initRouting();
+        } else {
+          await fadeOutEffect(lottieLoadingScreen);
+          await showLoginSection();
+        }
+      } catch (error) {
+        showErrorSection();
+        console.error("Error during authentication state change.", error);
+        Sentry.captureException(error);
       }
-      await initAppState(user, user.semester, user.division);
-      console.log("App state initialized", appState);
-      await fadeInEffect(lottieLoadingScreen);
-      await hideSections();
-      await loadContent();
-      await applyEditModeUI();
-      lgUserPfp.src = user.pfpLink;
-      initRouting();
-    } else {
-      await fadeOutEffect(lottieLoadingScreen);
-      await showLoginSection();
-    }
-  });
+    });
+  } catch (error) {
+    showErrorSection();
+    console.error("Error during initialization.", error);
+    Sentry.captureException(error);
+  }
 });
 export async function initRouting() {
   const params = new URLSearchParams(window.location.search);
@@ -189,7 +204,6 @@ export async function hideSections(
 }
 editModeToggleButton.addEventListener("click", () => {
   appState.isEditing = !appState.isEditing;
-  // console.log(appState.isEditing);
   if (appState.isEditing) {
     editModeToggleButton.textContent = "Exit mode";
     applyEditModeUI();
@@ -232,7 +246,6 @@ export async function applyEditModeUI() {
         appState.activeSubject
       ] || {};
     if (!submissions || !Object.keys(submissions).length) {
-      console.log("No upcoming submissions found from index.");
       hideElement(subjectSectionUpcomingSubmissions);
     }
     editorOnlyContent.forEach((content) => hideElement(content));
@@ -254,7 +267,6 @@ window.addEventListener("popstate", () => {
   } else {
     initRouting();
   }
-  // initRouting();
 });
 function trackPageView(pageName, sem, div, subject) {
   logEvent(analytics, "page_view_custom", {
@@ -271,7 +283,5 @@ const updateSW = registerSW({
       updateSW();
     }
   },
-  onOfflineReady() {
-    console.log("App ready to work offline");
-  },
+  onOfflineReady() {},
 });

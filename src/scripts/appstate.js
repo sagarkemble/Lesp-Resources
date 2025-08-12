@@ -1,4 +1,6 @@
+import { showErrorSection } from "./error.js";
 import { get, ref, db, child } from "./firebase.js";
+import * as Sentry from "@sentry/browser";
 export let appState = {
   userData: null,
   userId: null,
@@ -22,32 +24,35 @@ export let adminAppState = {
   activeDiv: null,
 };
 export async function initAppState(userData, semester, division) {
-  semester = `semester${semester}`;
-  const globalData = await getGlobalData();
-  const semesterGlobalData = await getSemesterGlobalData(semester);
-  const divisionData = await getDivisionData(semester, division);
-  appState.userData = userData;
-  appState.userId = userData.userId;
-  appState.semesterGlobalData = semesterGlobalData || {};
-  appState.globalData = globalData || {};
-  appState.divisionData = divisionData;
-  appState.subjectData = divisionData.subjectList;
-  appState.activeSem = semester;
-  appState.activeDiv = division;
-  appState.isEditing = false;
-  appState.activeSubject = null;
-  appState.activeNavIcon = null;
-  appState.subjectMetaData = appState.divisionData.subjectMetaDataList;
+  try {
+    semester = `semester${semester}`;
+    const globalData = await getGlobalData();
+    const semesterGlobalData = await getSemesterGlobalData(semester);
+    const divisionData = await getDivisionData(semester, division);
+    appState.userData = userData;
+    appState.userId = userData.userId;
+    appState.semesterGlobalData = semesterGlobalData || {};
+    appState.globalData = globalData || {};
+    appState.divisionData = divisionData;
+    appState.subjectData = divisionData.subjectList;
+    appState.activeSem = semester;
+    appState.activeDiv = division;
+    appState.isEditing = false;
+    appState.activeSubject = null;
+    appState.activeNavIcon = null;
+    appState.subjectMetaData = appState.divisionData.subjectMetaDataList;
+  } catch (error) {
+    showErrorSection();
+    console.error("Error initializing app state:", error);
+    Sentry.captureException(error);
+  }
 }
-async function initAdminAppState() {}
-// all data fetching functions based on userId
 export function getUserData(userId) {
   return get(child(ref(db), `userData/${userId}`))
     .then((snapshot) => {
       if (snapshot.exists()) {
         return snapshot.val();
       } else {
-        console.log("No data available");
         return null;
       }
     })
@@ -62,7 +67,6 @@ function getSemesterGlobalData(semester) {
       if (snapshot.exists()) {
         return snapshot.val();
       } else {
-        console.log("No data available");
         return null;
       }
     })
@@ -77,7 +81,6 @@ function getGlobalData() {
       if (snapshot.exists()) {
         return snapshot.val();
       } else {
-        console.log("No data available");
         return null;
       }
     })
@@ -94,7 +97,6 @@ function getDivisionData(semester, division) {
       if (snapshot.exists()) {
         return snapshot.val();
       } else {
-        console.log("No data available");
         return null;
       }
     })
@@ -109,7 +111,6 @@ export function getWholeSemesterData() {
       if (snapshot.exists()) {
         return snapshot.val();
       } else {
-        console.log("No data available");
         return null;
       }
     })

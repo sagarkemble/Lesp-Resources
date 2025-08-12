@@ -15,6 +15,11 @@ import {
   orderByChild,
   equalTo,
 } from "firebase/database";
+import * as Sentry from "@sentry/browser";
+Sentry.init({
+  dsn: "https://9f9da5737a2f44249457aa7e774fe3d2@o4509828633788416.ingest.us.sentry.io/4509828649189376",
+  sendDefaultPii: true,
+});
 const firebaseConfig = {
   apiKey: "AIzaSyDM6R7E9NRG1FjBsu8v_T9QdKth0LUeLDU",
   authDomain: "lesp-resources-350d1.firebaseapp.com",
@@ -33,6 +38,15 @@ const loadingScreen = document.querySelector(".loading-screen");
 const errorScreen = document.querySelector(".error-screen");
 const notFoundMessage = errorScreen.querySelector(".page-not-found-content");
 const wentWrongMessage = errorScreen.querySelector(".went-wrong-content");
+function showErrorScreen(type = "went-wrong") {
+  hideElement(notFoundMessage);
+  hideElement(wentWrongMessage);
+  if (type === "not-found") {
+    showElement(notFoundMessage);
+  } else {
+    showElement(wentWrongMessage);
+  }
+}
 window.addEventListener("load", async () => {
   const params = new URLSearchParams(window.location.search);
   const encrypted = params.get("data");
@@ -40,13 +54,8 @@ window.addEventListener("load", async () => {
   if (encrypted) {
     const result = decryptLink(encrypted);
     if (result) {
-      console.log("Decrypted division:", result.division);
-      console.log("Decrypted semester:", result.semester);
-      console.log("Decrypted role:", result.role);
       userObj.division = result.division;
       userObj.semester = Number(result.semester.replace("semester", "").trim()); ///change the semester eto the
-      console.log(userObj.semester);
-
       userObj.role = result.role;
       if (result.role === "teacher") {
         hideElement(rollNoInputWrapper);
@@ -80,6 +89,8 @@ function decryptLink(dataStr) {
     return JSON.parse(original);
   } catch (e) {
     console.error("Failed to decode data:", e);
+    showErrorScreen();
+    Sentry.captureException(e);
     return null;
   }
 }
@@ -194,14 +205,12 @@ studentDetailsForm.addEventListener("submit", async (e) => {
   hideElement(firstNameError);
   hideElement(lastNameError);
   hideElement(rollNoError);
-  console.log(userObj);
   const firstName = firstNameInput.value.trim();
   const lastName = lastNameInput.value.trim();
   const rollNoStr = rollNoInput.value.trim();
   const rollNo = Number(rollNoStr);
   let isError = false;
   if (!firstName) {
-    console.log("error");
     firstNameError.textContent = "First Name is required";
     showElement(firstNameError);
     isError = true;
@@ -241,7 +250,8 @@ studentDetailsForm.addEventListener("submit", async (e) => {
         }
       })
       .catch((error) => {
-        fadeOutEffect(errorScreen);
+        showErrorScreen();
+        Sentry.captureException(error);
         console.error("Error checking roll number:", error);
         isError = true;
       });
@@ -355,6 +365,8 @@ studentCredentialsForm.addEventListener("submit", async (e) => {
       }
     })
     .catch((error) => {
+      showErrorScreen();
+      Sentry.captureException(error);
       console.error("Error checking email:", error);
     });
 
@@ -460,7 +472,6 @@ pfpContainer.addEventListener("click", async (e) => {
     await fadeOutEffectOpacity(selectedPfpWrapper);
     selectedPfp.src = target.getAttribute("src");
     await fadeInEffectOpacity(selectedPfpWrapper);
-    console.log("Selected PFP:", selectedPfp);
   }
 });
 pfpSelectionPrevBtn.addEventListener("click", async () => {
@@ -525,17 +536,17 @@ summaryForm.addEventListener("submit", async (e) => {
     await fadeInEffect(successScreen);
     try {
       await signOut(auth);
-      console.log("Signed out successfully.");
       successLottiePlayer.play();
-    } catch (signOutError) {
-      console.error("Sign-out error:", signOutError);
+    } catch (error) {
+      Sentry.captureException(error);
       hideElement(notFoundMessage);
       showElement(wentWrongMessage);
       await fadeOutEffect(summarySection);
       fadeInEffect(errorScreen);
     }
-  } catch (creationError) {
-    console.error("Account creation error:", creationError.message);
+  } catch (error) {
+    showErrorScreen();
+    Sentry.captureException(error);
     hideElement(notFoundMessage);
     showElement(wentWrongMessage);
     await fadeOutEffect(summarySection);
@@ -548,11 +559,10 @@ summaryForm.addEventListener("submit", async (e) => {
 async function writeUserData() {
   const path = ref(db, `userData/${userObj.userId}`);
   return await set(path, userObj)
-    .then(() => {
-      console.log("User data written successfully");
-    })
+    .then(() => {})
     .catch((error) => {
-      console.error("Error writing user data:", error);
+      Sentry.captureException(error);
+      showErrorScreen();
     });
 }
 async function fadeInEffect(element) {
@@ -1072,7 +1082,6 @@ const successLottiePlayer = document.getElementById("success-lottie-animation");
 const successText = document.querySelector(".success-text");
 const successWrapper = successScreen.querySelector(".success-wrapper");
 successLottiePlayer.addEventListener("complete", async () => {
-  console.log("Lottie animation completed");
   successWrapper.style.gap = "8px";
   await setTimeout(() => {
     successText.classList.add("show");
@@ -1081,8 +1090,8 @@ successLottiePlayer.addEventListener("complete", async () => {
     fadeOutEffect(successScreen);
   }, 1000);
   setTimeout(() => {
-    window.location.href = "  https://0dab1116c1b7.ngrok-free.app/";
-  }, 1000);
+    window.location.href = "https://0dab1116c1b7.ngrok-free.app/";
+  }, 2000);
 });
 export function hideElement(element) {
   element.classList.add("hidden");

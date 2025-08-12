@@ -388,7 +388,6 @@ export async function loadDashboard() {
   DOM.timeTablePopupSwiper.batchToggleBtn.textContent =
     batchList[currentBatchIndex].charAt(0).toUpperCase() +
     batchList[currentBatchIndex].slice(1);
-
   initStatsCard();
   initUserInfo();
   DOM.noticeSwiper.swiper.update();
@@ -584,7 +583,6 @@ DOM.noticePopup.successBtn.addEventListener("click", async () => {
   if (file) {
     let uploaded;
     if (type === "department") {
-      console.log("Uploading file to Drive...");
       uploaded = await uploadDriveFile(file, `resources/globalData/notices`);
     } else if (type === "division") {
       uploaded = await uploadDriveFile(
@@ -636,7 +634,6 @@ DOM.noticePopup.successBtn.addEventListener("click", async () => {
       `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/noticeData/subjectNoticeData/${type}`,
       obj,
     );
-    console.log("nothing added");
   }
   await fadeOutEffect(DOM.noticePopup.popup);
   resetNoticePopup();
@@ -653,7 +650,6 @@ function loadTypeSelectorSubjects() {
     const option = document.createElement("option");
     option.value = key;
     option.textContent = `${element.name} notice`;
-    console.log("this is called", DOM.noticePopup.inputs.scope);
     DOM.noticePopup.inputs.scope.appendChild(option);
   }
 }
@@ -677,7 +673,6 @@ function loadTypeSelectorTimetablePopup() {
     DOM.timeTablePopup.inputs.type.appendChild(option2);
   }
 }
-
 async function renderNoticeSlider() {
   const noticeEntries = getFlatNoticeOrdered();
   if (!noticeEntries || Object.keys(noticeEntries).length === 0) {
@@ -755,7 +750,6 @@ async function renderNoticeSlider() {
     attachment.className = "cursor-pointer hidden";
     attachment.target = "_blank";
     deleteIcon.addEventListener("click", async () => {
-      console.log("this is gonna delete");
       deleteNotice(key, noticeData.attachmentId, noticeData.scope);
     });
 
@@ -924,9 +918,7 @@ function resetNoticePopup() {
 // upcoming session
 async function renderUpcomingSessions() {
   const data = appState?.globalData?.sessionData?.upcomingSessionList || {};
-  console.log("Upcoming sessions data from dashboard:", data);
   if (!data || Object.keys(data).length === 0) {
-    console.log("No upcoming sessions found from dashboard.");
     return;
   }
 
@@ -1012,7 +1004,6 @@ function getFormattedClass(sem, div) {
   return `${formattedSem}-${div}`;
 }
 function formatTime(dateObj) {
-  console.log("Formatting time: from session", dateObj);
   return dateObj
     .toLocaleTimeString("en-US", {
       hour: "2-digit",
@@ -1235,12 +1226,10 @@ async function renderTimeTableSlides(swiperInstance) {
     return daysOfWeek[(todayIndex + i) % 7];
   });
   const timetableData = appState.divisionData.timetableDayList;
-  console.log("Timetable Data:", timetableData);
   const sortedTimetable = {};
   dayOrder.forEach((day) => {
     sortedTimetable[day] = timetableData[day.toLowerCase()];
   });
-  console.log("Sorted Timetable:", sortedTimetable);
   for (const key in sortedTimetable) {
     const day = sortedTimetable[key];
     const daySlide = document.createElement("div");
@@ -1285,7 +1274,6 @@ async function renderTimeTableSlides(swiperInstance) {
       "card flex flex-col gap-4 border-2 border-surface-3 rounded-xl p-4 overflow-y-auto scrollbar-hide h-full";
     for (const key2 in day.slotList) {
       const singleEntry = day.slotList[key2];
-      console.log("this is singleEntry:", singleEntry);
       const subjectName = singleEntry.subject;
       const icon = appState.subjectMetaData[subjectName].iconLink;
       const type = singleEntry.type;
@@ -1327,13 +1315,11 @@ async function renderTimeTableSlides(swiperInstance) {
       timeP.textContent = time;
       const typeLower = type.toLowerCase();
 
-      // Extract batch if present
       let batchName = "all"; // default for lectures
       if (typeLower.includes("tutorial") || typeLower.includes("practical")) {
-        const batchMatch = typeLower.match(/(co\d+)/);
+        const batchMatch = typeLower.match(/^(.*?)\s*(tutorial|practical)/i);
         batchName = batchMatch ? batchMatch[1] : "all";
       }
-
       wrapper.setAttribute("data-batch", batchName);
 
       // Type text display
@@ -1356,8 +1342,6 @@ async function renderTimeTableSlides(swiperInstance) {
         if (!appState.isEditing) return;
         selectedDay = key;
         selectedEntry = key2;
-        console.log("clicked");
-
         editSlot(subjectName, type, timeFrom, timeTo, key2);
       });
     }
@@ -1367,7 +1351,6 @@ async function renderTimeTableSlides(swiperInstance) {
     swiperInstance.slideTo(0, 0);
   }
 }
-
 let currentBatchIndex = 0;
 DOM.timeTableSwiper.batchToggleBtn.addEventListener("click", () => {
   currentBatchIndex = (currentBatchIndex + 1) % batchList.length;
@@ -1389,7 +1372,6 @@ DOM.timeTableSwiper.batchToggleBtn.addEventListener("click", () => {
 });
 DOM.timeTablePopupSwiper.batchToggleBtn.addEventListener("click", () => {
   currentBatchIndex = (currentBatchIndex + 1) % batchList.length;
-  console.log("Current batch index:", currentBatchIndex);
 
   const selectedBatch = batchList[currentBatchIndex];
   DOM.timeTablePopupSwiper.batchToggleBtn.textContent =
@@ -1418,7 +1400,6 @@ function initUpcomingTestCard() {
     showElement(DOM.upcomingTest.card);
     hideElement(DOM.upcomingTest.noUpcomingTest);
     const data = appState.divisionData.testData.upcomingTest;
-    console.log(data);
     DOM.upcomingTest.cardTitle.textContent =
       data.title.charAt(0).toUpperCase() + data.title.slice(1);
     DOM.upcomingTest.cardDescription.textContent =
@@ -1561,7 +1542,6 @@ function initStatsCard() {
       .toString()
       .padStart(2, "0");
   }
-  console.log("stats card:", appState.userData.rank);
   DOM.statsCard.totalStudents.textContent = appState.totalStudents;
   DOM.statsCard.points.textContent = appState.userData.points;
   DOM.statsCard.medals.gold.textContent = `x ${appState.userData.medalList.gold || 0}`;
