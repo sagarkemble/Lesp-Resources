@@ -27,6 +27,8 @@ import {
   signOutUser,
   set,
 } from "./firebase.js";
+import * as Sentry from "@sentry/browser";
+import { showErrorSection } from "./error.js";
 const dashboardSection = document.querySelector(".dashboard-section");
 export const timeTablePopupSwiper = new Swiper("#time-table-popup-swiper", {
   direction: "horizontal",
@@ -374,26 +376,32 @@ const DOM = {
 };
 let batchList;
 export async function loadDashboard() {
-  loadTypeSelectorTimetablePopup();
-  await unloadDashboard();
-  await renderNoticeSlider();
-  await renderUpcomingSubmissions();
-  await renderTimeTableSlides(DOM.timeTableSwiper.swiper);
-  await renderTimeTableSlides(timeTablePopupSwiper);
-  await renderUpcomingSessions();
-  batchList = Object.values(appState.divisionData.batchList);
-  DOM.timeTableSwiper.batchToggleBtn.textContent =
-    batchList[currentBatchIndex].charAt(0).toUpperCase() +
-    batchList[currentBatchIndex].slice(1);
-  DOM.timeTablePopupSwiper.batchToggleBtn.textContent =
-    batchList[currentBatchIndex].charAt(0).toUpperCase() +
-    batchList[currentBatchIndex].slice(1);
-  initStatsCard();
-  initUserInfo();
-  DOM.noticeSwiper.swiper.update();
-  await initUpcomingTestCard();
-  await loadTypeSelectorSubjects();
-  renderTimeTablePopupSubjects();
+  try {
+    loadTypeSelectorTimetablePopup();
+    await unloadDashboard();
+    await renderNoticeSlider();
+    await renderUpcomingSubmissions();
+    await renderTimeTableSlides(DOM.timeTableSwiper.swiper);
+    await renderTimeTableSlides(timeTablePopupSwiper);
+    await renderUpcomingSessions();
+    batchList = Object.values(appState.divisionData.batchList);
+    DOM.timeTableSwiper.batchToggleBtn.textContent =
+      batchList[currentBatchIndex].charAt(0).toUpperCase() +
+      batchList[currentBatchIndex].slice(1);
+    DOM.timeTablePopupSwiper.batchToggleBtn.textContent =
+      batchList[currentBatchIndex].charAt(0).toUpperCase() +
+      batchList[currentBatchIndex].slice(1);
+    initStatsCard();
+    initUserInfo();
+    DOM.noticeSwiper.swiper.update();
+    await initUpcomingTestCard();
+    await loadTypeSelectorSubjects();
+    renderTimeTablePopupSubjects();
+  } catch (error) {
+    console.error("Error loading dashboard:", error);
+    showErrorSection();
+    Sentry.captureException(error);
+  }
 }
 export async function showDashboard() {
   headerTitle.textContent = `Hello ${appState.userData.firstName}`;

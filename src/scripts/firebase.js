@@ -27,6 +27,7 @@ import {
 } from "firebase/database";
 import { getAnalytics, logEvent, setUserId } from "firebase/analytics";
 import { showErrorSection } from "./error";
+import * as Sentry from "@sentry/browser";
 const firebaseConfig = {
   apiKey: "AIzaSyDM6R7E9NRG1FjBsu8v_T9QdKth0LUeLDU",
   authDomain: "lesp-resources-350d1.firebaseapp.com",
@@ -40,25 +41,16 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const analytics = getAnalytics(app);
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    setUserId(analytics, user.uid);
-    logEvent(analytics, "login", { method: "firebase" });
-    // Just to test Analytics works at all
-    logEvent(analytics, "test_event", { debug: true });
-
-    console.log("event logged");
-  }
-});
 const db = getDatabase(app);
 // functions
 export function deleteData(path) {
-  return remove(ref(db, path))
+  return remove(ref(dbb, path))
     .then(() => {
       console.log("Data deleted successfully.");
     })
     .catch((error) => {
       showErrorSection();
+      Sentry.captureException(error);
       console.error("Error deleting data:", error);
       return;
     });
@@ -69,8 +61,9 @@ export function pushData(path, data) {
       console.log("Data pushed successfully.");
     })
     .catch((error) => {
-      console.error("Error pushing data:", error);
       showErrorSection();
+      console.error("Error pushing data:", error);
+      Sentry.captureException(error);
       return;
     });
 }
@@ -80,8 +73,9 @@ export function updateData(path, data) {
       console.log("Data updated successfully.");
     })
     .catch((error) => {
-      console.error("Error pushing data:", error);
       showErrorSection();
+      console.error("Error pushing data:", error);
+      Sentry.captureException(error);
       return;
     });
 }
@@ -92,6 +86,7 @@ export function signOutUser() {
     })
     .catch((error) => {
       showErrorSection();
+      Sentry.captureException(error);
       console.error("Sign-out error:", error);
     });
 }

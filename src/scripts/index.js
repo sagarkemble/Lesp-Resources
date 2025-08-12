@@ -190,16 +190,14 @@ export async function hideSections(
   if (!showSidebar)
     document.querySelector("main").classList.remove("lg:ml-[4.375rem]");
   else document.querySelector("main").classList.add("lg:ml-[4.375rem]");
-  await (showHeaderIcon ? fadeInEffect(headerIcon) : fadeOutEffect(headerIcon));
-  await (showHeaderTitle
-    ? fadeInEffect(headerTitle)
-    : fadeOutEffect(headerTitle));
-  await (showSidebar ? fadeInEffect(sideBar) : fadeOutEffect(sideBar));
-  await (showHeader ? fadeInEffect(header) : fadeOutEffect(header));
+  await (showHeaderIcon ? showElement(headerIcon) : hideElement(headerIcon));
+  await (showHeaderTitle ? showElement(headerTitle) : hideElement(headerTitle));
+  await (showSidebar ? showElement(sideBar) : hideElement(sideBar));
+  await (showHeader ? showElement(header) : hideElement(header));
   const allSections = document.querySelectorAll("section");
-  fadeOutEffect(subjectSelectorPopup);
+  hideElement(subjectSelectorPopup);
   for (const section of allSections) {
-    await fadeOutEffect(section);
+    await hideElement(section);
   }
 }
 editModeToggleButton.addEventListener("click", () => {
