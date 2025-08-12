@@ -127,9 +127,6 @@ export const commonPfpLinks = [
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Common/common145.png?updatedAt=1754489019575",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Common/common146.png?updatedAt=1754489035374",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Common/common147.png?updatedAt=1754489056973",
-  "https://ik.imagekit.io/yn9gz2n2g/Avatars/Common/common148.png?updatedAt=1754489069974",
-  "https://ik.imagekit.io/yn9gz2n2g/Avatars/Common/common149.png?updatedAt=1754489083654",
-  "https://ik.imagekit.io/yn9gz2n2g/Avatars/Common/common150.png?updatedAt=1754489104143",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Common/common151.png?updatedAt=1754489120469",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Common/common152.png?updatedAt=1754491995646",
 ];
