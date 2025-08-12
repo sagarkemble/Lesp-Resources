@@ -97,21 +97,20 @@ export async function showConfirmationPopup(
   });
 }
 document.addEventListener("DOMContentLoaded", async () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(
+      `User ${outcome === "accepted" ? "accepted" : "dismissed"} the install prompt`,
+    );
+
+    deferredPrompt = null;
+  }
   try {
     await fadeInEffect(lottieLoadingScreen);
     onAuthStateChanged(auth, async (userCredential) => {
       try {
-        if (deferredPrompt) {
-          deferredPrompt.prompt();
-
-          const { outcome } = await deferredPrompt.userChoice;
-          console.log(
-            `User ${outcome === "accepted" ? "accepted" : "dismissed"} the install prompt`,
-          );
-
-          deferredPrompt = null;
-          return;
-        }
         if (userCredential) {
           setUserId(analytics, userCredential.uid);
           logEvent(analytics, "login", { method: "firebase" });
