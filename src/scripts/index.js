@@ -145,10 +145,13 @@ export async function initRouting() {
   const tests = params.get("tests");
   const pyq = params.get("pyq");
   const sessions = params.get("sessions");
+  const signUp = params.get("data");
   if (dashboard) {
     setActiveNavIcon(dashboardIcon);
     await showDashboard();
     await fadeOutEffect(lottieLoadingScreen);
+  } else if (signUp) {
+    window.location.href = `/signup?data=${signUp}`;
   } else if (activeSubject) {
     appState.activeSubject = activeSubject;
     trackPageView(
