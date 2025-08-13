@@ -23,7 +23,12 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from "./firebase.js";
-import { showSectionLoader, hideSectionLoader, hideSections } from "./index.js";
+import {
+  isNewUser,
+  showSectionLoader,
+  hideSectionLoader,
+  hideSections,
+} from "./index.js";
 import * as Sentry from "@sentry/browser";
 import { showErrorSection } from "./error";
 const DOM = {
@@ -208,8 +213,7 @@ DOM.classCodePopup.successBtn.addEventListener("click", async () => {
   hideSectionLoader();
   fadeOutEffect(DOM.classCodePopup.popup);
   await hideSections(false, false, false, false);
-  //   await fadeInEffect(DOM.successScreen);
-  fadeInEffect(DOM.pfpSelection.section);
+  fadeInEffect(DOM.intro.section);
 });
 DOM.classCodePopup.closeBtn.addEventListener("click", () => {
   fadeOutEffect(DOM.classCodePopup.popup);
@@ -334,7 +338,7 @@ DOM.userDetails.form.addEventListener("submit", async (e) => {
         }
       })
       .catch((error) => {
-        showErrorScreen();
+        showErrorSection();
         Sentry.captureException(error);
         console.error("Error checking roll number:", error);
         isError = true;
@@ -428,7 +432,7 @@ DOM.userCredentials.form.addEventListener("submit", async (e) => {
       }
     })
     .catch((error) => {
-      showErrorScreen();
+      showErrorSection();
       Sentry.captureException(error);
       console.error("Error checking email:", error);
     });
@@ -554,6 +558,7 @@ DOM.summaryForm.form.addEventListener("submit", async (e) => {
   await fadeOutEffectOpacity(DOM.summaryForm.btnText);
   fadeInEffect(DOM.summaryForm.btnLoader);
   try {
+    isNewUser.flag = true;
     const userCredential = await createUserWithEmailAndPassword(
       auth,
       userObj.email,
@@ -570,15 +575,14 @@ DOM.summaryForm.form.addEventListener("submit", async (e) => {
       await signOut(auth);
       DOM.successLottiePlayer.play();
     } catch (error) {
+      showErrorSection();
       Sentry.captureException(error);
       await fadeOutEffect(DOM.summaryForm.section);
-      showErrorSection();
     }
   } catch (error) {
     showErrorSection();
     Sentry.captureException(error);
     console.error(error);
-    await fadeOutEffect(DOM.summaryForm.section);
   }
   DOM.summaryForm.nextBtn.disabled = false;
   DOM.summaryForm.previousBtn.disabled = false;
@@ -620,8 +624,8 @@ async function writeUserData() {
   return await set(path, userObj)
     .then(() => {})
     .catch((error) => {
+      showErrorSection();
       Sentry.captureException(error);
-      showErrorScreen();
     });
 }
 DOM.successLottiePlayer.addEventListener("complete", async () => {

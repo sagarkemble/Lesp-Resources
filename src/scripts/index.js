@@ -65,6 +65,7 @@ const cancelButton = confirmationPopup.querySelector(".cancel-btn");
 const lgUserPfp = document.querySelector(".navigation-user-pfp");
 let localUserData;
 let isSignupWithQueryParams = false;
+export let isNewUser = { flag: false };
 export async function showSectionLoader(message = "Loading...") {
   sectionLoaderMessage.textContent = message;
   await fadeInEffect(sectionLoader);
@@ -102,7 +103,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     await fadeInEffect(lottieLoadingScreen);
     onAuthStateChanged(auth, async (userCredential) => {
       try {
+        if (isNewUser.flag) return;
         if (userCredential) {
+          console.log(userCredential);
           setUserId(analytics, userCredential.uid);
           logEvent(analytics, "login", { method: "firebase" });
           const user = await getUserData(userCredential.uid);
