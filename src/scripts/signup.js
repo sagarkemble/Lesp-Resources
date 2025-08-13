@@ -636,5 +636,6 @@ DOM.successLottiePlayer.addEventListener("complete", async () => {
   await setTimeout(() => {
     fadeOutEffect(DOM.successScreen);
   }, 1000);
+  isNewUser.flag = true;
   await fadeInEffect(DOM.loginSection);
 });
