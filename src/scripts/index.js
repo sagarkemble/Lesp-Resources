@@ -64,6 +64,7 @@ const confirmButton = confirmationPopup.querySelector(".confirm-btn");
 const cancelButton = confirmationPopup.querySelector(".cancel-btn");
 const lgUserPfp = document.querySelector(".navigation-user-pfp");
 let localUserData;
+let isSignupWithQueryParams = false;
 export async function showSectionLoader(message = "Loading...") {
   sectionLoaderMessage.textContent = message;
   await fadeInEffect(sectionLoader);
@@ -97,15 +98,6 @@ export async function showConfirmationPopup(
   });
 }
 document.addEventListener("DOMContentLoaded", async () => {
-  const currentUrl = window.location.href;
-
-  if (currentUrl.includes("/signup.html?")) {
-    // Extract the query part
-    const query = window.location.search;
-    // Redirect to the same page with query intact
-    window.location.href = `/signup.html${query}`;
-  }
-
   try {
     await fadeInEffect(lottieLoadingScreen);
     onAuthStateChanged(auth, async (userCredential) => {
@@ -292,32 +284,3 @@ const updateSW = registerSW({
   },
   onOfflineReady() {},
 });
-// pwa popup
-let deferredPrompt;
-
-// Save install prompt event
-window.addEventListener("beforeinstallprompt", (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  // Automatically show popup when available
-  showInstallPromptIfNotPWA();
-});
-
-// Check if running in PWA and show popup if not
-function showInstallPromptIfNotPWA() {
-  const isPWA =
-    window.matchMedia("(display-mode: standalone)").matches ||
-    window.navigator.standalone === true; // iOS Safari
-
-  if (!isPWA && deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then((choiceResult) => {
-      console.log(
-        choiceResult.outcome === "accepted"
-          ? "User accepted install"
-          : "User dismissed install",
-      );
-      deferredPrompt = null;
-    });
-  }
-}

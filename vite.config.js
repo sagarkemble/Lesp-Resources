@@ -1,7 +1,9 @@
 import { defineConfig } from "vite";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import tailwindcss from "@tailwindcss/vite";
-import { resolve } from "path";
 import { VitePWA } from "vite-plugin-pwa";
+const __dirname = dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
   plugins: [
     tailwindcss(),
@@ -153,11 +155,12 @@ export default defineConfig({
   server: {
     allowedHosts: ["486822b4d06f.ngrok-free.app"],
   },
-  // build: {
-  //   rollupOptions: {
-  //     input: {
-  //       main: resolve(__dirname, "index.html"),
-  //     },
-  //   },
-  // },
+  build: {
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, "index.html"),
+        signup: resolve(__dirname, "nested/signup.html"), // Add this line
+      },
+    },
+  },
 });

@@ -176,6 +176,29 @@ const DOM = {
     popup: document.querySelector(".edit-medal-popup-wrapper"),
   },
 };
+export async function initAdminRouting(userData) {
+  if (userData) {
+    adminAppState.userData = userData;
+    adminAppState.userId = userData.id;
+  }
+  adminAppState.semesterData = await getWholeSemesterData();
+  await hideSections(true, true, false, true);
+  await fadeInEffect(adminSection);
+  const urlParams = new URLSearchParams(window.location.search);
+  const sem = urlParams.get("sem");
+  const div = urlParams.get("div");
+  if (div) {
+    console.log("Div found");
+    adminAppState.activeSem = sem;
+    adminAppState.activeDiv = div;
+    await showClassRoom();
+  } else if (sem) {
+    adminAppState.activeSem = sem;
+    await showDivisionList();
+  } else {
+    await showSemesterList();
+  }
+}
 //semester section
 async function showSemesterList() {
   await hideAdminDivisions();
@@ -284,29 +307,7 @@ async function unloadClassRoom() {
   DOM.studentCardContainer.innerHTML = "";
   fadeOutEffect(DOM.classRoom);
 }
-export async function initAdminRouting(userData) {
-  if (userData) {
-    adminAppState.userData = userData;
-    adminAppState.userId = userData.id;
-  }
-  adminAppState.semesterData = await getWholeSemesterData();
-  await hideSections(true, true, false, true);
-  await fadeInEffect(adminSection);
-  const urlParams = new URLSearchParams(window.location.search);
-  const sem = urlParams.get("sem");
-  const div = urlParams.get("div");
-  if (div) {
-    console.log("Div found");
-    adminAppState.activeSem = sem;
-    adminAppState.activeDiv = div;
-    await showClassRoom();
-  } else if (sem) {
-    adminAppState.activeSem = sem;
-    await showDivisionList();
-  } else {
-    await showSemesterList();
-  }
-}
+
 viewClassRoomButton.addEventListener("click", async () => {
   await showClassRoom();
 });
@@ -373,16 +374,13 @@ function renderIndividualStudentCard() {
 //add student link
 let encryptedLink = "";
 DOM.addStudentBtn.addEventListener("click", () => {
-  const encryptedData = encryptLink({
+  const encryptedData = encryptObj({
     division: `${adminAppState.activeDiv}`,
     semester: `${adminAppState.activeSem.replace("semester- ", "")}`,
     role: "student",
   });
-  encryptedLink = encryptedData;
-  const signupUrl = `http://localhost:5173/signup?data=${encodeURIComponent(
-    encryptedData,
-  )}`;
-  DOM.addUserPopup.link.textContent = signupUrl;
+
+  DOM.addUserPopup.link.textContent = encryptedData;
   fadeInEffect(DOM.addUserPopup.popup);
 });
 DOM.addTeacherBtn.addEventListener("click", () => {
@@ -409,10 +407,11 @@ DOM.addUserPopup.link.addEventListener("click", (e) => {
     DOM.addUserPopup.link.textContent = encryptedLink;
   }, 2000);
 });
-function encryptLink(obj) {
+function encryptObj(obj) {
   const str = JSON.stringify(obj);
-  const reversed = str.split("").reverse().join("");
-  return btoa(reversed);
+  let encoded = btoa(str);
+  encoded = encoded.match(/.{1,4}/g).join("-");
+  return encoded;
 }
 // individual student related
 DOM.individualUserPopup.closePopupBtn.addEventListener("click", () => {
