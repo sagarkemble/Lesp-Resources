@@ -109,6 +109,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           setUserId(analytics, userCredential.uid);
           logEvent(analytics, "login", { method: "firebase" });
           const user = await getUserData(userCredential.uid);
+          console.log(user);
+
           if (user.role === "admin") {
             localUserData = user;
             await fadeOutEffect(lottieLoadingScreen);
