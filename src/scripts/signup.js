@@ -567,12 +567,12 @@ DOM.summaryForm.form.addEventListener("submit", async (e) => {
     const user = userCredential.user;
     userObj.userId = user.uid;
     await writeUserData();
-    await fadeOutEffect(DOM.summaryForm.btnLoader);
-    await fadeInEffectOpacity(DOM.summaryForm.btnText);
-    await fadeOutEffect(DOM.summaryForm.section);
-    await fadeInEffect(DOM.successScreen);
     try {
       await signOut(auth);
+      await fadeOutEffect(DOM.summaryForm.btnLoader);
+      await fadeInEffectOpacity(DOM.summaryForm.btnText);
+      await fadeOutEffect(DOM.summaryForm.section);
+      await fadeInEffect(DOM.successScreen);
       DOM.successLottiePlayer.play();
     } catch (error) {
       showErrorSection();
@@ -637,6 +637,7 @@ DOM.successLottiePlayer.addEventListener("complete", async () => {
     fadeOutEffect(DOM.successScreen);
   }, 1000);
   setTimeout(() => {
-    window.location.reload();
-  }, 2500);
+    fadeInEffect(DOM.loginSection);
+  }, 1500);
+  isNewUser.flag = false;
 });
