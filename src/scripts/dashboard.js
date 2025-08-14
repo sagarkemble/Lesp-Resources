@@ -391,8 +391,8 @@ export async function loadDashboard() {
     DOM.timeTablePopupSwiper.batchToggleBtn.textContent =
       batchList[currentBatchIndex].charAt(0).toUpperCase() +
       batchList[currentBatchIndex].slice(1);
-    initStatsCard();
-    initUserInfo();
+    // initStatsCard();
+    // initUserInfo();
     DOM.noticeSwiper.swiper.update();
     await initUpcomingTestCard();
     await loadTypeSelectorSubjects();

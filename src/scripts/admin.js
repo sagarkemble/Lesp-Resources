@@ -316,7 +316,6 @@ async function hideAdminDivisions() {
   await unloadDivisionList();
   await unloadClassRoom();
 }
-
 // other function
 function getStudentRawData() {
   const usersRef = ref(db, "userData");
@@ -370,9 +369,8 @@ function renderIndividualStudentCard() {
     DOM.studentCardContainer.appendChild(card);
   }
 }
-
 //add student link
-let encryptedLink = "";
+let encryptedCode = "";
 DOM.addStudentBtn.addEventListener("click", () => {
   const encryptedData = encryptObj({
     division: `${adminAppState.activeDiv}`,
@@ -381,19 +379,17 @@ DOM.addStudentBtn.addEventListener("click", () => {
   });
 
   DOM.addUserPopup.link.textContent = encryptedData;
+  encryptedCode = encryptedData;
   fadeInEffect(DOM.addUserPopup.popup);
 });
 DOM.addTeacherBtn.addEventListener("click", () => {
-  const encryptedData = encryptLink({
+  const encryptedData = encryptObj({
     division: `${adminAppState.activeDiv}`,
     semester: `${adminAppState.activeSem.replace("semester- ", "")}`,
     role: "teacher",
   });
-  encryptedLink = encryptedData;
-  const signupUrl = `http://localhost:5173/signup?data=${encodeURIComponent(
-    encryptedData,
-  )}`;
-  DOM.addUserPopup.link.textContent = signupUrl;
+  encryptedCode = encryptedData;
+  DOM.addUserPopup.link.textContent = encryptedCode;
   fadeInEffect(DOM.addUserPopup.popup);
 });
 DOM.addUserPopup.successBtn.addEventListener("click", () => {
@@ -404,7 +400,7 @@ DOM.addUserPopup.link.addEventListener("click", (e) => {
   navigator.clipboard.writeText(DOM.addUserPopup.link.textContent);
   DOM.addUserPopup.link.textContent = "Copied!";
   setTimeout(() => {
-    DOM.addUserPopup.link.textContent = encryptedLink;
+    DOM.addUserPopup.link.textContent = encryptedCode;
   }, 2000);
 });
 function encryptObj(obj) {

@@ -77,6 +77,7 @@ loginForm.addEventListener("submit", async (e) => {
     })
     .then(async (userCredential) => {
       console.log("User signed in:", userCredential.user);
+      history.pushState({}, "", "/");
     })
     .catch((error) => {
       console.error("Login failed:", error.message);
@@ -97,6 +98,7 @@ forgotPasswordLink.addEventListener("click", async (e) => {
   showResetPasswordSection();
 });
 export async function showLoginSection() {
+  history.pushState({}, "", "/?login=''");
   await hideSections(false, false, false, false);
   await fadeInEffect(loginSection);
   swiper.update();
@@ -108,13 +110,12 @@ export async function showResetPasswordSection() {
   await fadeInEffect(resetPasswordSection);
   history.pushState({}, "", "?resetPassword");
 }
-
 // reset password var and listner
 const resetPasswordSection = document.querySelector(".reset-password-section");
 const resetPasswordForm = document.querySelector("#reset-password-form");
 const registeredEmailInput = document.querySelector("#registered-email-input");
 const registeredEmailInputRelatedError = document.querySelector(
-  "#registered-email-related-error"
+  "#registered-email-related-error",
 );
 const backToLoginPageBtn = document.querySelector(".back-to-login-btn");
 const resetPasswordBtn = document.querySelector(".reset-password-btn");
@@ -153,7 +154,7 @@ resetPasswordForm.addEventListener("submit", (e) => {
       registeredEmailInputRelatedError.classList.add("text-text-error");
     });
 });
-function toggleFormState(isDisabled) {
+export function toggleFormState(isDisabled) {
   emailInput.disabled = isDisabled;
   passwordInput.disabled = isDisabled;
   keepLoginCheckBox.disabled = isDisabled;

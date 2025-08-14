@@ -1207,7 +1207,7 @@ async function renderUpcomingSubmissions() {
         deleteCutoffHour,
         deleteCutoffMinute,
       );
-      if (now > deleteTime) {
+      if (now > deleteTime && appState.userData.role !== "student") {
         console.log("this is old");
         await deleteData(
           `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/upcomingSubmissionData/${appState.activeSubject}/${key}`,

@@ -45,6 +45,8 @@ import {
   adminAppState,
 } from "./appstate.js";
 import { showErrorSection } from "./error.js";
+import { toggleFormState } from "./login.js";
+
 import * as Sentry from "@sentry/browser";
 Sentry.init({
   dsn: "https://9f9da5737a2f44249457aa7e774fe3d2@o4509828633788416.ingest.us.sentry.io/4509828649189376",
@@ -65,6 +67,56 @@ const cancelButton = confirmationPopup.querySelector(".cancel-btn");
 const lgUserPfp = document.querySelector(".navigation-user-pfp");
 let localUserData;
 let isSignupWithQueryParams = false;
+const selectClassPopup = document.querySelector(".select-class-popup-wrapper");
+const selectClassPopupCloseButton =
+  selectClassPopup.querySelector(".close-popup-btn");
+const selectClassCardContainer =
+  selectClassPopup.querySelector(".card-container");
+function showSelectClassPopup(user) {
+  selectClassCardContainer.innerHTML = "";
+  const classList = user.assignedClass;
+  const numMap = {
+    1: "FYCO",
+    2: "FYCO",
+    3: "SYCO",
+    4: "SYCO",
+    5: "TYCO",
+    6: "TYCO",
+  };
+  for (const key in classList) {
+    const element = classList[key];
+    const card = document.createElement("div");
+    card.className =
+      "bg-surface-3 w-full rounded-[1.25rem] p-4 text-center cursor-pointer custom-hover";
+    card.setAttribute("semester", element.semester);
+    card.setAttribute("division", element.division);
+    card.innerHTML = numMap[element.semester] + "-" + element.division;
+    console.log(card);
+    selectClassCardContainer.appendChild(card);
+    card.addEventListener("click", async () => {
+      fadeOutEffect(selectClassPopup);
+      const userPfp = document.querySelectorAll(".user-pfp");
+      userPfp.forEach((pfp) => {
+        pfp.src = user.pfpLink;
+      });
+      await initAppState(user, element.semester, element.division);
+      await fadeInEffect(lottieLoadingScreen);
+      await hideSections();
+      await loadContent();
+      await applyEditModeUI();
+      initRouting();
+    });
+  }
+  fadeOutEffect(lottieLoadingScreen);
+  fadeInEffect(selectClassPopup);
+}
+selectClassPopupCloseButton.addEventListener("click", async () => {
+  toggleFormState(false);
+  showSectionLoader();
+  await signOutUser();
+  hideSectionLoader();
+  fadeOutEffect(selectClassPopup);
+});
 export let isNewUser = { flag: false };
 export async function showSectionLoader(message = "Loading...") {
   sectionLoaderMessage.textContent = message;
@@ -76,7 +128,7 @@ export async function hideSectionLoader() {
 async function loadContent() {
   await loadTestSection();
   await loadSubjectSelectionList();
-  await loadLeaderboardSection();
+  // await loadLeaderboardSection();
   await loadSessionsSection();
   await loadDashboard();
 }
@@ -110,11 +162,16 @@ document.addEventListener("DOMContentLoaded", async () => {
           logEvent(analytics, "login", { method: "firebase" });
           const user = await getUserData(userCredential.uid);
           console.log(user);
-
+          if (user.role === "teacher") {
+            showSelectClassPopup(user);
+            showElement(editModeToggleButton);
+            return;
+          }
           if (user.role === "admin") {
             localUserData = user;
             await fadeOutEffect(lottieLoadingScreen);
             initAdminRouting(user);
+            showElement(editModeToggleButton);
             return;
           }
           const userPfp = document.querySelectorAll(".user-pfp");
@@ -151,7 +208,10 @@ export async function initRouting() {
   const tests = params.get("tests");
   const pyq = params.get("pyq");
   const sessions = params.get("sessions");
-  if (dashboard) {
+  if (window.location.href.includes("login")) {
+    await hideSections(false, false, false, false);
+    showLoginSection();
+  } else if (dashboard) {
     setActiveNavIcon(dashboardIcon);
     await showDashboard();
     await fadeOutEffect(lottieLoadingScreen);
@@ -266,7 +326,8 @@ export async function applyEditModeUI() {
   }
 }
 window.addEventListener("popstate", () => {
-  if (localUserData.role === "admin") {
+  if (localUserData === undefined) initRouting();
+  else if (!localUserData.role && localUserData.role === "admin") {
     initAdminRouting();
   } else {
     initRouting();
@@ -281,11 +342,13 @@ function trackPageView(pageName, sem, div, subject) {
   });
 }
 import { registerSW } from "virtual:pwa-register";
-const updateSW = registerSW({
+
+registerSW({
+  immediate: true,
   onNeedRefresh() {
-    if (confirm("New version available. Refresh?")) {
-      updateSW();
-    }
+    console.log("New content available, please refresh.");
   },
-  onOfflineReady() {},
+  onOfflineReady() {
+    console.log("App ready to work offline.");
+  },
 });

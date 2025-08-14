@@ -31,6 +31,7 @@ import {
 } from "./index.js";
 import * as Sentry from "@sentry/browser";
 import { showErrorSection } from "./error";
+import { showLoginSection } from "./login.js";
 const DOM = {
   loginSection: document.querySelector(".login-section"),
   createAccountLink: document.querySelector(".create-account-link"),
@@ -172,6 +173,7 @@ let userObj = {
   rollNumber: "",
   email: "",
   pfpLink: "",
+  role: "student",
   semester: "1",
   division: "a",
   theme: "default",
@@ -200,19 +202,31 @@ DOM.classCodePopup.successBtn.addEventListener("click", async () => {
     showElement(DOM.classCodePopup.error);
     return;
   }
+
   console.log("Decrypted Data:", decryptedData);
   userObj.division = decryptedData.division;
   userObj.semester = Number(
     decryptedData.semester.replace("semester", "").trim(),
   );
   if (decryptedData.role === "teacher") {
+    userObj.role = "teacher";
+    userObj.assignedClass = {
+      [`${userObj.semester}${userObj.division}`]: {},
+    };
+    userObj.assignedClass[`${userObj.semester}${userObj.division}`].semester =
+      userObj.semester;
+    userObj.assignedClass[`${userObj.semester}${userObj.division}`].division =
+      userObj.division;
     hideElement(DOM.userDetails.rollNoWrapper);
     hideElement(DOM.summaryForm.rollNoWrapper);
   }
   await preloadIntroImages();
   hideSectionLoader();
-  fadeOutEffect(DOM.classCodePopup.popup);
+  await fadeOutEffect(DOM.classCodePopup.popup);
+  DOM.classCodePopup.input.value = "";
+  hideElement(DOM.classCodePopup.error);
   await hideSections(false, false, false, false);
+  history.pushState({}, "", "/?signup=''");
   fadeInEffect(DOM.intro.section);
 });
 DOM.classCodePopup.closeBtn.addEventListener("click", () => {
@@ -544,8 +558,15 @@ function initSummaryForm() {
   DOM.summaryForm.details.pfp.src = userObj.pfpLink;
   DOM.summaryForm.details.rollNo.textContent = userObj.rollNumber;
   DOM.summaryForm.details.email.textContent = userObj.email;
-  DOM.summaryForm.details.semester.textContent = userObj.semester;
-  DOM.summaryForm.details.division.textContent = userObj.division;
+  if (userObj.role === "teacher") {
+    DOM.summaryForm.details.semester.textContent =
+      userObj.assignedClass[`${userObj.semester}${userObj.division}`].semester;
+    DOM.summaryForm.details.division.textContent =
+      userObj.assignedClass[`${userObj.semester}${userObj.division}`].division;
+  } else {
+    DOM.summaryForm.details.semester.textContent = userObj.semester;
+    DOM.summaryForm.details.division.textContent = userObj.division;
+  }
 }
 DOM.summaryForm.previousBtn.addEventListener("click", async () => {
   await fadeOutEffect(DOM.summaryForm.section);
@@ -620,6 +641,10 @@ function renderImage(className, link) {
 }
 renderPfpWrapper();
 async function writeUserData() {
+  if (userObj.role === "teacher") {
+    userObj.semester = null;
+    userObj.division = null;
+  }
   const path = ref(db, `userData/${userObj.userId}`);
   return await set(path, userObj)
     .then(() => {})
@@ -636,8 +661,8 @@ DOM.successLottiePlayer.addEventListener("complete", async () => {
   await setTimeout(() => {
     fadeOutEffect(DOM.successScreen);
   }, 1000);
-  setTimeout(() => {
-    fadeInEffect(DOM.loginSection);
-  }, 1500);
   isNewUser.flag = false;
+  setTimeout(() => {
+    showLoginSection();
+  }, 1500);
 });
