@@ -223,7 +223,12 @@ input[type="number"] {
   grid-template-columns: repeat(auto-fit, minmax(3.125rem, 1fr));
   gap: 1rem;
 }
-.auto-grid-cards {
+.auto-grid-semester-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+}
+.auto-grid-division-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 16px;
@@ -251,6 +256,11 @@ input[type="number"] {
     display: grid;
     gap: 1rem;
     grid-template-columns: repeat(auto-fit, minmax(150px, 200px));
+  }
+  .auto-grid-division-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 300px));
+    gap: 16px;
   }
 }
 .grid-auto-fit > * {

@@ -54,6 +54,9 @@ const DOM = {
   adminBtnWrapper: document.querySelector(".admin-btn-wrapper"),
   addUserPopup: {
     popup: document.querySelector(".add-user-link-popup-wrapper"),
+    popupTitle: document.querySelector(
+      ".add-user-link-popup-wrapper .popup-title",
+    ),
     link: document.querySelector("#add-user-link"),
     successBtn: document.querySelector(
       ".add-user-link-popup-wrapper .success-btn",
@@ -216,7 +219,6 @@ export async function initAdminRouting(userData) {
   adminAppState.semesterData = await getWholeSemesterData();
   await hideSections(true, true, false, true);
   showElement(adminSection);
-
   showElement(DOM.adminBtnWrapper);
   hideElement(DOM.editBtn);
   const urlParams = new URLSearchParams(window.location.search);
@@ -250,14 +252,14 @@ async function showSemesterList() {
     const card = document.createElement("div");
     card.className =
       "card bg-surface-2 text-text-primary w-full rounded-3xl p-6 text-center font-semibold cursor-pointer custom-hover";
-    card.textContent = semesterName;
+    card.textContent = `Semester - ${semesterName}`;
     card.addEventListener("click", async (e) => {
       let activeSem = e.target.textContent;
-      adminAppState.activeSem = activeSem;
+      adminAppState.activeSem = activeSem.replace("Semester - ", "");
       history.pushState(
         { sem: activeSem },
         "",
-        `?sem=${encodeURIComponent(activeSem)}`,
+        `?sem=${encodeURIComponent(activeSem.replace("Semester - ", ""))}`,
       );
       showDivisionList();
     });
@@ -360,9 +362,7 @@ function getStudentRawData() {
   const q = query(
     usersRef,
     orderByChild("class"),
-    equalTo(
-      `${adminAppState.activeSem.replace("semester", "")}${adminAppState.activeDiv}`,
-    ),
+    equalTo(`${adminAppState.activeSem}${adminAppState.activeDiv}`),
   );
   return get(q).then((snapshot) => {
     if (snapshot.exists()) {
@@ -377,7 +377,7 @@ async function getTeacherData() {
   const q = query(usersRef, orderByChild("role"), equalTo("teacher"));
   const snapshot = await get(q);
   adminAppState.allTeachers = snapshot.val();
-  const sem = adminAppState.activeSem.replace("semester", "");
+  const sem = adminAppState.activeSem;
   const div = adminAppState.activeDiv;
   const matchingTeachers = [];
   for (const key in snapshot.val()) {
@@ -445,6 +445,8 @@ function renderTeacherCardInPopup() {
     });
     encryptedCode = encryptedData;
     DOM.addUserPopup.link.textContent = encryptedCode;
+    DOM.addUserPopup.popupTitle.textContent = `Add teacher`;
+
     fadeInEffect(DOM.addUserPopup.popup);
   });
 }
@@ -538,11 +540,12 @@ let encryptedCode = "";
 DOM.addStudentBtn.addEventListener("click", () => {
   const encryptedData = encryptObj({
     division: `${adminAppState.activeDiv}`,
-    semester: `${adminAppState.activeSem.replace("semester", "")}`,
+    semester: `${adminAppState.activeSem}`,
     role: "student",
   });
   DOM.addUserPopup.link.textContent = encryptedData;
   encryptedCode = encryptedData;
+  DOM.addUserPopup.popupTitle.textContent = `Add student`;
   fadeInEffect(DOM.addUserPopup.popup);
 });
 DOM.addTeacherBtn.addEventListener("click", () => {
@@ -568,11 +571,10 @@ function encryptObj(obj) {
 
 DOM.logOutBtn.addEventListener("click", signOutUser);
 DOM.visitClassRoomBtn.addEventListener("click", async () => {
+  fadeInEffect(lottieLoadingScreen);
   localUserData.userData = adminAppState.userData;
   localUserData.isVisitingClass = true;
-  localUserData.userData.semester = Number(
-    adminAppState.activeSem.replace("semester", ""),
-  );
+  localUserData.userData.semester = Number(adminAppState.activeSem);
   localUserData.userData.division = adminAppState.activeDiv;
   initClass();
 });
@@ -662,8 +664,7 @@ function initIndividualUserPopup(isTeacher = false) {
   <span class="text-text-secondary">${student.role.charAt(0).toUpperCase()}${student.role.slice(1)}</span>
 `;
 
-    const sem = student.semester;
-    const div = student.division;
+    const [sem, div] = student.class.split("");
     DOM.individualUserPopup.sem.innerHTML = `
   <span class="text-text-primary">Semester:</span>
   <span class="text-text-secondary">${sem}</span>
@@ -836,8 +837,9 @@ DOM.rolePopup.successBtn.addEventListener("click", async () => {
 
 // sem div
 DOM.individualUserPopup.sem.addEventListener("click", () => {
-  DOM.semDivPopup.inputs.semester.value = activeUserObj.semester;
-  DOM.semDivPopup.inputs.division.value = activeUserObj.division;
+  const [sem, div] = activeUserObj.class.split("");
+  DOM.semDivPopup.inputs.semester.value = sem;
+  DOM.semDivPopup.inputs.division.value = div;
   fadeInEffect(DOM.semDivPopup.popup);
 });
 DOM.individualUserPopup.div.addEventListener("click", () => {
@@ -870,11 +872,9 @@ DOM.semDivPopup.successBtn.addEventListener("click", async () => {
   );
   if (!isConfirmed) return;
   else {
-    sem = Number(sem);
     showSectionLoader("Updating sem and div...");
     await updateData(`userData/${activeUserId}`, {
-      semester: sem,
-      division: div,
+      class: `${sem}${div}`,
     });
     fadeOutEffect(DOM.semDivPopup.popup);
   }

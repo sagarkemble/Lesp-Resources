@@ -27,6 +27,7 @@ import {
 } from "firebase/database";
 import { getAnalytics, logEvent, setUserId } from "firebase/analytics";
 import { showErrorSection } from "./error";
+import { resetForm } from "./login";
 import * as Sentry from "@sentry/browser";
 const firebaseConfig = {
   apiKey: "AIzaSyDM6R7E9NRG1FjBsu8v_T9QdKth0LUeLDU",
@@ -94,7 +95,7 @@ export function writeData(path, data) {
 export function signOutUser() {
   return signOut(auth)
     .then(() => {
-      console.log("Signed out successfully.");
+      resetForm();
     })
     .catch((error) => {
       showErrorSection();

@@ -66,7 +66,6 @@ loginForm.addEventListener("submit", async (e) => {
     .then(async (userCredential) => {
       console.log("User signed in:", userCredential.user);
       history.pushState({}, "", "/");
-      toggleFormState(false);
     })
     .catch((error) => {
       console.error("Login failed:", error.message);
@@ -82,6 +81,12 @@ loginForm.addEventListener("submit", async (e) => {
       }
     });
 });
+export function resetForm() {
+  emailInput.value = "";
+  passwordInput.value = "";
+  keepLoginCheckBox.checked = false;
+  toggleFormState(false);
+}
 forgotPasswordLink.addEventListener("click", async (e) => {
   e.preventDefault();
   showResetPasswordSection();
@@ -143,7 +148,7 @@ resetPasswordForm.addEventListener("submit", (e) => {
       registeredEmailInputRelatedError.classList.add("text-text-error");
     });
 });
-export function toggleFormState(isDisabled) {
+export async function toggleFormState(isDisabled) {
   emailInput.disabled = isDisabled;
   passwordInput.disabled = isDisabled;
   keepLoginCheckBox.disabled = isDisabled;
@@ -151,14 +156,14 @@ export function toggleFormState(isDisabled) {
   resetPasswordBtn.disabled = isDisabled;
   registeredEmailInput.disabled = isDisabled;
   if (isDisabled) {
-    fadeOutEffectOpacity(resetPasswordBtnText);
-    fadeOutEffectOpacity(loginBtnText);
-    fadeInEffect(loginBtnLoader);
-    fadeInEffect(resetPasswordBtnLoader);
+    await fadeOutEffectOpacity(resetPasswordBtnText);
+    await fadeOutEffectOpacity(loginBtnText);
+    await fadeInEffect(loginBtnLoader);
+    await fadeInEffect(resetPasswordBtnLoader);
   } else {
-    fadeOutEffect(resetPasswordBtnLoader);
-    fadeOutEffect(loginBtnLoader);
-    fadeInEffectOpacity(resetPasswordBtnText);
-    fadeInEffectOpacity(loginBtnText);
+    await fadeOutEffect(resetPasswordBtnLoader);
+    await fadeOutEffect(loginBtnLoader);
+    await fadeInEffectOpacity(resetPasswordBtnText);
+    await fadeInEffectOpacity(loginBtnText);
   }
 }

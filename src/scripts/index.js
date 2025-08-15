@@ -31,7 +31,13 @@ import {
   subjectSelectorPopup,
 } from "./navigation.js";
 import { loadSubjectSection } from "./subject.js";
-import { showLoginSection, showResetPasswordSection } from "./login.js";
+import {
+  loginSection,
+  showLoginSection,
+  showResetPasswordSection,
+  toggleFormState,
+  resetForm,
+} from "./login.js";
 import { showSessionsSection, loadSessionsSection } from "./sessions.js";
 import {
   loadLeaderboardSection,
@@ -45,14 +51,13 @@ import {
   adminAppState,
 } from "./appstate.js";
 import { showErrorSection } from "./error.js";
-import { toggleFormState, loginSection } from "./login.js";
 
 import * as Sentry from "@sentry/browser";
-import posthog from "posthog-js";
-posthog.init("phc_UUXjQythPW9iojWal45runQ8gCQId8Ku5PYrPSofo6h", {
-  api_host: "https://us.i.posthog.com",
-  person_profiles: "identified_only",
-});
+// import posthog from "posthog-js";
+// posthog.init("phc_UUXjQythPW9iojWal45runQ8gCQId8Ku5PYrPSofo6h", {
+//   api_host: "https://us.i.posthog.com",
+//   person_profiles: "identified_only",
+// });
 Sentry.init({
   dsn: "https://9f9da5737a2f44249457aa7e774fe3d2@o4509828633788416.ingest.us.sentry.io/4509828649189376",
   sendDefaultPii: true,
@@ -79,9 +84,17 @@ const selectClassPopupCloseButton =
   selectClassPopup.querySelector(".close-popup-btn");
 const selectClassCardContainer =
   selectClassPopup.querySelector(".card-container");
-function showSelectClassPopup(user) {
+async function showSelectClassPopup(user) {
   selectClassCardContainer.innerHTML = "";
   const classList = user.assignedClasses;
+  if (Object.keys(classList).length === 1) {
+    const [sem, div] = Object.keys(classList)[0].split("");
+    localUserData.userData = user;
+    localUserData.userData.class = `${sem}${div}`;
+    hideSectionLoader();
+    initClass();
+    return;
+  }
   const numMap = {
     1: "FYCO",
     2: "FYCO",
@@ -90,11 +103,9 @@ function showSelectClassPopup(user) {
     5: "TYCO",
     6: "TYCO",
   };
-
   for (const key in classList) {
-    // key is like "1A", "2B"
-    const semesterNum = key[0]; // "1", "2", ...
-    const division = key[1]; // "A", "B", ...
+    const semesterNum = key[0];
+    const division = key[1];
     const card = document.createElement("div");
     card.className =
       "bg-surface-3 w-full rounded-[1.25rem] p-4 text-center cursor-pointer custom-hover";
@@ -105,28 +116,22 @@ function showSelectClassPopup(user) {
 
     card.addEventListener("click", async () => {
       fadeOutEffect(selectClassPopup);
-      document.querySelectorAll(".user-pfp").forEach((pfp) => {
-        pfp.src = user.pfpLink;
-      });
-      await initAppState(user, semesterNum, division);
-      await fadeInEffect(lottieLoadingScreen);
-      await hideSections();
-      await loadContent();
-      await applyEditModeUI();
-      initRouting();
+      localUserData.userData = user;
+      localUserData.userData.class = `${semesterNum}${division}`;
+      initClass();
     });
   }
 
-  fadeOutEffect(lottieLoadingScreen);
+  await hideSectionLoader();
   fadeInEffect(selectClassPopup);
 }
 
 selectClassPopupCloseButton.addEventListener("click", async () => {
-  toggleFormState(false);
-  showSectionLoader();
+  await showSectionLoader("Loading...", false);
+  await toggleFormState(false);
+  hideElement(loginSection);
+  hideElement(selectClassPopup);
   await signOutUser();
-  hideSectionLoader();
-  fadeOutEffect(selectClassPopup);
 });
 export let isNewUser = { flag: false };
 export async function showSectionLoader(
@@ -176,9 +181,8 @@ export async function showConfirmationPopup(
 }
 document.addEventListener("DOMContentLoaded", async () => {
   try {
-    // showSectionLoader("Loading...", false);
+    showSectionLoader("Loading...", false);
     onAuthStateChanged(auth, async (userCredential) => {
-      // showSectionLoader("Loading...", false, 200);
       if (isNewUser.flag) return;
       try {
         if (userCredential) {
@@ -186,19 +190,17 @@ document.addEventListener("DOMContentLoaded", async () => {
           console.log(user);
           if (user.role === "teacher") {
             showSelectClassPopup(user);
-            showElement(editModeToggleButton);
             return;
           }
           if (user.role === "admin") {
+            showSectionLoader("Loading...", false, 200);
             localUserData.userData = user;
             initAdminRouting(user);
+            resetForm();
             return;
           }
-          // const userPfp = document.querySelectorAll(".user-pfp");
-          // userPfp.forEach((pfp) => {
-          //   pfp.src = user.pfpLink;
-          // });
           localUserData.userData = user;
+          hideSectionLoader();
           initClass();
         } else {
           await hideSectionLoader();
@@ -217,18 +219,25 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 export async function initClass() {
+  fadeInEffect(lottieLoadingScreen);
   const userPfp = document.querySelectorAll(".user-pfp");
   userPfp.forEach((pfp) => {
     pfp.src = localUserData.userData.pfpLink;
   });
   const [Semester, Division] = localUserData.userData.class.split("");
-  console.log(localUserData.userData.class);
-
+  console.log(Semester, Division);
   await initAppState(localUserData.userData, Semester, Division);
   await fadeInEffect(lottieLoadingScreen);
+  if (
+    localUserData.userData.role === "admin" ||
+    localUserData.userData.role === "teacher"
+  )
+    showElement(editModeToggleButton);
+  else hideElement(editModeToggleButton);
   await hideSections();
   await loadContent();
   await applyEditModeUI();
+  resetForm();
   initRouting();
 }
 export async function initRouting() {
@@ -292,6 +301,8 @@ export async function hideSections(
   await (showSidebar ? showElement(sideBar) : hideElement(sideBar));
   await (showHeader ? showElement(header) : hideElement(header));
   const allSections = document.querySelectorAll("section");
+  const adminBtnWrapper = document.querySelector(".admin-btn-wrapper");
+  hideElement(adminBtnWrapper);
   hideElement(subjectSelectorPopup);
   for (const section of allSections) {
     await hideElement(section);
@@ -377,7 +388,6 @@ function trackPageView(pageName, sem, div, subject) {
   });
 }
 import { registerSW } from "virtual:pwa-register";
-
 registerSW({
   immediate: true,
   onNeedRefresh() {

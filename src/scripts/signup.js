@@ -224,6 +224,7 @@ DOM.classCodePopup.successBtn.addEventListener("click", async () => {
   await hideSections(false, false, false, false);
   history.pushState({}, "", "/?signup=''");
   fadeInEffect(DOM.intro.section);
+  DOM.classCodePopup.input.value = "";
 });
 DOM.classCodePopup.closeBtn.addEventListener("click", () => {
   fadeOutEffect(DOM.classCodePopup.popup);
@@ -633,9 +634,12 @@ function renderImage(className, link) {
 renderPfpWrapper();
 async function writeUserData() {
   if (userObj.role === "teacher") {
-    userObj.semester = null;
-    userObj.division = null;
+    userObj.class = null;
+  } else {
+    userObj.class = `${userObj.semester}${userObj.division}`;
   }
+  userObj.semester = null;
+  userObj.division = null;
   const path = ref(db, `userData/${userObj.userId}`);
   return await set(path, userObj)
     .then(() => {})
