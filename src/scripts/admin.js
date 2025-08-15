@@ -6,14 +6,25 @@ import {
   query,
   orderByChild,
   equalTo,
+  signOutUser,
+  pushData,
+  writeData,
 } from "./firebase.js";
 import {
   showConfirmationPopup,
   showSectionLoader,
   hideSectionLoader,
   initRouting,
+  localUserData,
+  initClass,
+  lottieLoadingScreen,
 } from "./index";
-import { fadeInEffect, fadeOutEffect } from "./animation";
+import {
+  fadeInEffect,
+  fadeOutEffect,
+  hideElement,
+  showElement,
+} from "./animation";
 import {
   adminAppState,
   appState,
@@ -24,8 +35,8 @@ import {
 import { headerIcon, headerTitle } from "./navigation";
 import { hideSections } from "./index";
 const adminSection = document.querySelector(".admin-section");
-let activeStudentId = null;
-let activeStudentObj = null;
+let activeUserId = null;
+let activeUserObj = null;
 const DOM = {
   adminSection: document.querySelector(".admin-section"),
   semesterList: document.querySelector(".semester-list"),
@@ -34,8 +45,13 @@ const DOM = {
   divCardContainer: document.querySelector(".div-card-container"),
   classRoom: document.querySelector(".class-room"),
   studentCardContainer: document.querySelector(".student-card-container"),
+  teacherCardContainer: document.querySelector(".teacher-card-container"),
   addStudentBtn: document.querySelector(".class-room .add-student-btn"),
   addTeacherBtn: document.querySelector(".class-room .add-teacher-btn"),
+  logOutBtn: document.querySelector(".admin-logout-btn"),
+  editBtn: document.querySelector(".edit-mode-toggle-btn"),
+  visitClassRoomBtn: document.querySelector(".visit-class-room-btn"),
+  adminBtnWrapper: document.querySelector(".admin-btn-wrapper"),
   addUserPopup: {
     popup: document.querySelector(".add-user-link-popup-wrapper"),
     link: document.querySelector("#add-user-link"),
@@ -56,6 +72,9 @@ const DOM = {
     ),
     rollNo: document.querySelector(".individual-user-popup-wrapper .roll-no"),
     email: document.querySelector(".individual-user-popup-wrapper .email"),
+    assignedClasses: document.querySelector(
+      ".individual-user-popup-wrapper .assigned-classes",
+    ),
     sem: document.querySelector(".individual-user-popup-wrapper .sem"),
     div: document.querySelector(".individual-user-popup-wrapper .div"),
     role: document.querySelector(".individual-user-popup-wrapper .role"),
@@ -77,6 +96,18 @@ const DOM = {
     points: document.querySelector(".individual-user-popup-wrapper .points"),
     closePopupBtn: document.querySelector(
       ".individual-user-popup-wrapper .close-popup-btn",
+    ),
+    removeUserBtn: document.querySelector(
+      ".individual-user-popup-wrapper .remove-user-btn",
+    ),
+  },
+  pickTeacherPopup: {
+    popup: document.querySelector(".pick-teacher-popup-wrapper"),
+    cardContainer: document.querySelector(
+      ".pick-teacher-popup-wrapper .card-container",
+    ),
+    closePopupBtn: document.querySelector(
+      ".pick-teacher-popup-wrapper .close-popup-btn",
     ),
   },
   namePopup: {
@@ -184,7 +215,10 @@ export async function initAdminRouting(userData) {
   adminAppState.semesterData = await getWholeSemesterData();
   await hideSections(true, true, false, true);
   await fadeInEffect(adminSection);
+  showElement(DOM.adminBtnWrapper);
+  hideElement(DOM.editBtn);
   const urlParams = new URLSearchParams(window.location.search);
+  const semesterList = urlParams.get("semesterList");
   const sem = urlParams.get("sem");
   const div = urlParams.get("div");
   if (div) {
@@ -195,29 +229,25 @@ export async function initAdminRouting(userData) {
   } else if (sem) {
     adminAppState.activeSem = sem;
     await showDivisionList();
+  } else if (semesterList) {
+    await showSemesterList();
   } else {
     await showSemesterList();
   }
+  fadeOutEffect(lottieLoadingScreen);
 }
 //semester section
 async function showSemesterList() {
   await hideAdminDivisions();
+  history.pushState({}, "", `?semesterList=''`);
   headerIcon.src =
     "https://ik.imagekit.io/yn9gz2n2g/others/semester.png?updatedAt=1751607364675";
   headerTitle.textContent = "Admin Section";
   for (const key in adminAppState.semesterData) {
     const semesterName = key;
     const card = document.createElement("div");
-    card.classList.add(
-      "card",
-      "bg-surface-2",
-      "text-text-primary",
-      "w-full",
-      "rounded-3xl",
-      "p-6",
-      "text-center",
-      "font-semibold",
-    );
+    card.className =
+      "card bg-surface-2 text-text-primary w-full rounded-3xl p-6 text-center font-semibold cursor-pointer custom-hover";
     card.textContent = semesterName;
     card.addEventListener("click", async (e) => {
       let activeSem = e.target.textContent;
@@ -225,17 +255,19 @@ async function showSemesterList() {
       history.pushState(
         { sem: activeSem },
         "",
-        `admin.html?sem=${encodeURIComponent(activeSem)}`,
+        `?sem=${encodeURIComponent(activeSem)}`,
       );
       showDivisionList();
     });
     DOM.semCardContainer.appendChild(card);
   }
-  fadeInEffect(DOM.semesterList);
+  history.pushState({}, "", "?semesterList=''");
+  await fadeInEffect(DOM.semesterList);
+  await fadeOutEffect(lottieLoadingScreen);
 }
 async function unloadSemesterList() {
+  await fadeOutEffect(DOM.semesterList);
   DOM.semCardContainer.innerHTML = "";
-  fadeOutEffect(DOM.semesterList);
 }
 //division section
 async function showDivisionList() {
@@ -247,16 +279,8 @@ async function showDivisionList() {
     .divisionList) {
     const divisionName = `Div - ${key}`;
     const card = document.createElement("div");
-    card.classList.add(
-      "card",
-      "bg-surface-2",
-      "text-text-primary",
-      "w-full",
-      "rounded-3xl",
-      "p-6",
-      "text-center",
-      "font-semibold",
-    );
+    card.className =
+      "card bg-surface-2 text-text-primary w-full rounded-3xl p-6 text-center font-semibold custom-hover cursor-pointer";
     card.textContent = divisionName;
     card.addEventListener("click", async (e) => {
       let activeDiv = e.target.textContent.replace("Div - ", "");
@@ -275,18 +299,20 @@ async function showDivisionList() {
   fadeInEffect(DOM.divisionList);
 }
 async function unloadDivisionList() {
+  await fadeOutEffect(DOM.divisionList);
   DOM.divCardContainer.innerHTML = "";
-  fadeOutEffect(DOM.divisionList);
 }
 // class room section
-const viewClassRoomButton = document.querySelector(".visit-classroom-btn");
 async function showClassRoom() {
   await hideAdminDivisions();
+  showElement(DOM.visitClassRoomBtn);
   headerIcon.src =
     "https://ik.imagekit.io/yn9gz2n2g/others/semester.png?updatedAt=1751607364675";
   headerTitle.textContent = adminAppState.activeDiv;
   const studentRawData = await getStudentRawData();
   let sortedRollNoWiseStudentData = {};
+  let teacherData = await getTeacherData();
+  console.log(teacherData);
   if (studentRawData) {
     sortedRollNoWiseStudentData = Object.entries(studentRawData)
       .sort(([, a], [, b]) => a.rollNumber - b.rollNumber)
@@ -297,20 +323,26 @@ async function showClassRoom() {
   } else {
     sortedRollNoWiseStudentData = {};
   }
+  if (teacherData) {
+    adminAppState.semesterData[adminAppState.activeSem].divisionList[
+      adminAppState.activeDiv
+    ].teacherList = teacherData;
+  }
   adminAppState.semesterData[adminAppState.activeSem].divisionList[
     adminAppState.activeDiv
   ].studentList = sortedRollNoWiseStudentData;
   renderIndividualStudentCard();
+  renderIndividualTeacherCard();
+  renderTeacherCardInPopup();
   fadeInEffect(DOM.classRoom);
 }
 async function unloadClassRoom() {
+  await fadeOutEffect(DOM.classRoom);
+  hideElement(DOM.visitClassRoomBtn);
   DOM.studentCardContainer.innerHTML = "";
-  fadeOutEffect(DOM.classRoom);
+  DOM.teacherCardContainer.innerHTML = "";
+  DOM.pickTeacherPopup.cardContainer.innerHTML = "";
 }
-
-viewClassRoomButton.addEventListener("click", async () => {
-  await showClassRoom();
-});
 async function hideAdminDivisions() {
   await unloadSemesterList();
   await unloadDivisionList();
@@ -332,6 +364,82 @@ function getStudentRawData() {
     }
   });
 }
+async function getTeacherData() {
+  const usersRef = ref(db, "userData");
+  const q = query(usersRef, orderByChild("role"), equalTo("teacher"));
+  const snapshot = await get(q);
+  adminAppState.allTeachers = snapshot.val();
+  const sem = adminAppState.activeSem.replace("semester", "");
+  const div = adminAppState.activeDiv;
+  const matchingTeachers = [];
+  for (const key in snapshot.val()) {
+    const assignedClass = snapshot.val()[key].assignedClasses;
+    if (assignedClass && assignedClass[`${sem}${div}`]) {
+      matchingTeachers.push(snapshot.val()[key]);
+    }
+  }
+  return matchingTeachers;
+}
+function renderTeacherCardInPopup() {
+  for (const key in adminAppState.allTeachers) {
+    const element = adminAppState.allTeachers[key];
+    const card = document.createElement("div");
+    card.className =
+      "card bg-surface-2 items-center border border-surface-3 p-3 md:px-4 flex justify-between rounded-xl cursor-pointer";
+    const wrapper = document.createElement("div");
+    wrapper.className =
+      "wrapper w-[12rem] md:w-[22rem] gap-1.5 md:gap-4 flex items-center justify-between";
+    const namePfpWrapper = document.createElement("div");
+    namePfpWrapper.className = "name-pfp-wrapper flex items-center gap-2";
+
+    const img = document.createElement("img");
+    img.src = element.pfpLink;
+    img.alt = "";
+    img.className = "pfp h-10 w-10";
+
+    const nameContainer = document.createElement("div");
+    nameContainer.className =
+      "flex flex-col leading-tight text-sm md:text-base";
+
+    const firstName = document.createElement("p");
+    firstName.className = "truncate w-full";
+    firstName.textContent = element.firstName;
+
+    const lastName = document.createElement("p");
+    lastName.className = "truncate w-full";
+    lastName.textContent = element.lastName;
+
+    nameContainer.appendChild(firstName);
+    nameContainer.appendChild(lastName);
+
+    namePfpWrapper.appendChild(img);
+    namePfpWrapper.appendChild(nameContainer);
+
+    wrapper.appendChild(namePfpWrapper);
+    card.appendChild(wrapper);
+
+    DOM.pickTeacherPopup.cardContainer.appendChild(card);
+    card.addEventListener("click", () => {
+      console.log("clicked");
+      addTeacherInClass(key);
+    });
+  }
+  const wrapper = document.createElement("div");
+  wrapper.className =
+    "p-4 text-center border border-surface-3 rounded-xl cursor-pointer custom-hover";
+  wrapper.innerHTML = "Add new teacher account";
+  DOM.pickTeacherPopup.cardContainer.appendChild(wrapper);
+  wrapper.addEventListener("click", () => {
+    const encryptedData = encryptObj({
+      division: `${adminAppState.activeDiv}`,
+      semester: `${adminAppState.activeSem.replace("semester", "")}`,
+      role: "teacher",
+    });
+    encryptedCode = encryptedData;
+    DOM.addUserPopup.link.textContent = encryptedCode;
+    fadeInEffect(DOM.addUserPopup.popup);
+  });
+}
 function renderIndividualStudentCard() {
   for (const key in adminAppState.semesterData[adminAppState.activeSem]
     .divisionList[adminAppState.activeDiv].studentList) {
@@ -341,7 +449,7 @@ function renderIndividualStudentCard() {
       ].studentList[key];
     const card = document.createElement("div");
     card.className =
-      "individual-student-card bg-surface-2 flex w-full items-center justify-between rounded-3xl px-6 py-5";
+      "individual-student-card bg-surface-2 flex w-full items-center justify-between rounded-3xl px-6 py-5 cursor-pointer custom-hover";
     const wrapper = document.createElement("div");
     wrapper.className = "image-name-wrapper flex items-center gap-2";
     const img = document.createElement("img");
@@ -359,38 +467,78 @@ function renderIndividualStudentCard() {
     card.appendChild(wrapper);
     card.appendChild(rollP);
     card.addEventListener("click", () => {
-      activeStudentId = key;
-      activeStudentObj =
+      activeUserId = key;
+      activeUserObj =
         adminAppState.semesterData[adminAppState.activeSem].divisionList[
           adminAppState.activeDiv
         ].studentList[key];
-      initIndividualStudentPopup();
+      initIndividualUserPopup();
     });
     DOM.studentCardContainer.appendChild(card);
   }
 }
+function renderIndividualTeacherCard() {
+  for (const key in adminAppState.semesterData[adminAppState.activeSem]
+    .divisionList[adminAppState.activeDiv].teacherList) {
+    const teacher =
+      adminAppState.semesterData[adminAppState.activeSem].divisionList[
+        adminAppState.activeDiv
+      ].teacherList[key];
+    const card = document.createElement("div");
+    card.className =
+      "individual-teacher-card bg-surface-2 flex w-full items-center justify-between rounded-3xl px-6 py-5 cursor-pointer custom-hover";
+    const wrapper = document.createElement("div");
+    wrapper.className = "image-name-wrapper flex items-center gap-2";
+    const img = document.createElement("img");
+    img.src = teacher.pfpLink;
+    img.alt = "";
+    img.className = "pfp h-[45px] w-[45px] lg:h-[50px] lg:w-[50px]";
+    const nameP = document.createElement("p");
+    nameP.className = "student-name";
+    nameP.textContent = `${teacher.firstName} ${teacher.lastName}`;
+    wrapper.appendChild(img);
+    wrapper.appendChild(nameP);
+    card.appendChild(wrapper);
+    card.addEventListener("click", () => {
+      activeUserId = teacher.userId;
+      activeUserObj = teacher;
+      initIndividualUserPopup(true);
+    });
+    DOM.teacherCardContainer.appendChild(card);
+  }
+}
+async function addTeacherInClass(teacherId) {
+  console.log("clicked");
+  const isConfirm = await showConfirmationPopup(
+    "Teacher will be added will have access to the class",
+  );
+  if (!isConfirm) return;
+  showSectionLoader("Updating data...");
+  const key = `${adminAppState.activeSem.replace("semester", "")}${adminAppState.activeDiv}`;
+  await updateData(`userData/${teacherId}/assignedClasses/`, {
+    [key]: true,
+  });
+  showSectionLoader("Syncing data...");
+  await syncAdminData();
+  hideAdminDivisions();
+  await hideSectionLoader();
+  await showClassRoom();
+}
+
 //add student link
 let encryptedCode = "";
 DOM.addStudentBtn.addEventListener("click", () => {
   const encryptedData = encryptObj({
     division: `${adminAppState.activeDiv}`,
-    semester: `${adminAppState.activeSem.replace("semester- ", "")}`,
+    semester: `${adminAppState.activeSem.replace("semester", "")}`,
     role: "student",
   });
-
   DOM.addUserPopup.link.textContent = encryptedData;
   encryptedCode = encryptedData;
   fadeInEffect(DOM.addUserPopup.popup);
 });
 DOM.addTeacherBtn.addEventListener("click", () => {
-  const encryptedData = encryptObj({
-    division: `${adminAppState.activeDiv}`,
-    semester: `${adminAppState.activeSem.replace("semester- ", "")}`,
-    role: "teacher",
-  });
-  encryptedCode = encryptedData;
-  DOM.addUserPopup.link.textContent = encryptedCode;
-  fadeInEffect(DOM.addUserPopup.popup);
+  fadeInEffect(DOM.pickTeacherPopup.popup);
 });
 DOM.addUserPopup.successBtn.addEventListener("click", () => {
   fadeOutEffect(DOM.addUserPopup.popup);
@@ -409,50 +557,134 @@ function encryptObj(obj) {
   encoded = encoded.match(/.{1,4}/g).join("-");
   return encoded;
 }
+
+DOM.logOutBtn.addEventListener("click", signOutUser);
+DOM.visitClassRoomBtn.addEventListener("click", async () => {
+  localUserData.userData = adminAppState.userData;
+  localUserData.isVisitingClass = true;
+  localUserData.userData.semester = Number(
+    adminAppState.activeSem.replace("semester", ""),
+  );
+  localUserData.userData.division = adminAppState.activeDiv;
+  initClass();
+});
+DOM.pickTeacherPopup.closePopupBtn.addEventListener("click", () => {
+  fadeOutEffect(DOM.pickTeacherPopup.popup);
+});
+// DOM.removeUserBtn.addEventListener("click", async () => {
+//   const isConfirmed = await showConfirmationPopup(
+//     "Are you sure you want to remove this user?",
+//   );
+// });
+
 // individual student related
 DOM.individualUserPopup.closePopupBtn.addEventListener("click", () => {
   fadeOutEffect(DOM.individualUserPopup.popup);
 });
-function initIndividualStudentPopup() {
-  const student = activeStudentObj;
-  console.log(student);
-  DOM.individualUserPopup.firstName.textContent = `First Name: ${student.firstName}`;
-  DOM.individualUserPopup.lastName.textContent = `Last Name: ${student.lastName}`;
-  DOM.individualUserPopup.displayName.textContent = `${student.firstName} ${student.lastName}`;
-  DOM.individualUserPopup.rollNo.textContent = `Roll No: ${student.rollNumber}`;
-  DOM.individualUserPopup.email.textContent = `Email: ${student.email}`;
-  DOM.individualUserPopup.role.textContent = `Role: ${student.role
-    .charAt(0)
-    .toUpperCase()}${student.role.slice(1)}`;
-  const sem = student.semester;
-  const div = student.division;
-  DOM.individualUserPopup.sem.textContent = `Semester: ${sem}`;
-  DOM.individualUserPopup.div.textContent = `Division: ${div.toUpperCase()}`;
-  DOM.individualUserPopup.pfp.src = student.pfpLink;
-  const gold = student.medalList.gold || 0;
-  const silver = student.medalList.silver || 0;
-  const bronze = student.medalList.bronze || 0;
-  DOM.individualUserPopup.medals.gold.textContent = gold;
-  DOM.individualUserPopup.medals.silver.textContent = silver;
-  DOM.individualUserPopup.medals.bronze.textContent = bronze;
-  const totalPoints = gold * 30 + silver * 20 + bronze * 10;
-  DOM.individualUserPopup.points.textContent = totalPoints;
+function initIndividualUserPopup(isTeacher = false) {
+  if (isTeacher) {
+    const teacher = activeUserObj;
+    let assignedClasses = Object.keys(teacher.assignedClasses).join(", ");
+
+    DOM.individualUserPopup.firstName.innerHTML = `
+  <span class="text-text-primary">First Name:</span>
+  <span class="text-text-secondary">${teacher.firstName}</span>
+`;
+
+    DOM.individualUserPopup.lastName.innerHTML = `
+  <span class="text-text-primary">Last Name:</span>
+  <span class="text-text-secondary">${teacher.lastName}</span>
+`;
+
+    DOM.individualUserPopup.displayName.innerHTML = `${teacher.firstName} ${teacher.lastName}`;
+
+    DOM.individualUserPopup.email.innerHTML = `
+  <span class="text-text-primary">Email:</span>
+  <span class="text-text-secondary break-all">${teacher.email}</span>
+`;
+
+    DOM.individualUserPopup.assignedClasses.innerHTML = `
+  <span class="text-text-primary">Assigned Classes:</span>
+  <span class="text-text-secondary break-all">${assignedClasses}</span>
+`;
+
+    DOM.individualUserPopup.pfp.src = teacher.pfpLink;
+
+    showElement(DOM.individualUserPopup.assignedClasses);
+    hideElement(DOM.individualUserPopup.rollNo);
+    hideElement(DOM.individualUserPopup.role);
+    hideElement(DOM.individualUserPopup.sem);
+    hideElement(DOM.individualUserPopup.div);
+    hideElement(DOM.individualUserPopup.medalPointWrapper);
+  } else {
+    const student = activeUserObj;
+    showElement(DOM.individualUserPopup.rollNo);
+    showElement(DOM.individualUserPopup.role);
+    showElement(DOM.individualUserPopup.sem);
+    showElement(DOM.individualUserPopup.div);
+    showElement(DOM.individualUserPopup.medalPointWrapper);
+    hideElement(DOM.individualUserPopup.assignedClasses);
+    console.log(student);
+    DOM.individualUserPopup.firstName.innerHTML = `
+  <span class="text-text-primary">First Name:</span>
+  <span class="text-text-secondary">${student.firstName}</span>
+`;
+
+    DOM.individualUserPopup.lastName.innerHTML = `
+  <span class="text-text-primary">Last Name:</span>
+  <span class="text-text-secondary">${student.lastName}</span>
+`;
+
+    DOM.individualUserPopup.displayName.innerHTML = `
+  ${student.firstName} ${student.lastName}
+`;
+
+    DOM.individualUserPopup.rollNo.innerHTML = `
+  <span class="text-text-primary">Roll No:</span>
+  <span class="text-text-secondary">${student.rollNumber}</span>
+`;
+
+    DOM.individualUserPopup.email.innerHTML = `
+  <span class="text-text-primary">Email:</span>
+  <span class="text-text-secondary">${student.email}</span>
+`;
+
+    DOM.individualUserPopup.role.innerHTML = `
+  <span class="text-text-primary">Role:</span>
+  <span class="text-text-secondary">${student.role.charAt(0).toUpperCase()}${student.role.slice(1)}</span>
+`;
+
+    const sem = student.semester;
+    const div = student.division;
+    DOM.individualUserPopup.sem.innerHTML = `
+  <span class="text-text-primary">Semester:</span>
+  <span class="text-text-secondary">${sem}</span>
+`;
+    DOM.individualUserPopup.div.innerHTML = `
+  <span class="text-text-primary">Division:</span>
+  <span class="text-text-secondary">${div.toUpperCase()}</span>
+`;
+    DOM.individualUserPopup.pfp.src = student.pfpLink;
+    const gold = student.medalList.gold || 0;
+    const silver = student.medalList.silver || 0;
+    const bronze = student.medalList.bronze || 0;
+    DOM.individualUserPopup.medals.gold.textContent = gold;
+    DOM.individualUserPopup.medals.silver.textContent = silver;
+    DOM.individualUserPopup.medals.bronze.textContent = bronze;
+    const totalPoints = gold * 30 + silver * 20 + bronze * 10;
+    DOM.individualUserPopup.points.textContent = totalPoints;
+  }
   fadeInEffect(DOM.individualUserPopup.popup);
 }
-
 //first name last name
 DOM.individualUserPopup.firstName.addEventListener("click", () => {
-  DOM.namePopup.inputs.firstName.value =
-    DOM.individualUserPopup.firstName.textContent.split(": ")[1];
-  DOM.namePopup.inputs.lastName.value =
-    DOM.individualUserPopup.lastName.textContent.split(": ")[1];
+  DOM.namePopup.inputs.firstName.value = activeUserObj.firstName;
+  DOM.namePopup.inputs.lastName.value = activeUserObj.lastName;
   fadeInEffect(DOM.namePopup.popup);
 });
 DOM.individualUserPopup.lastName.addEventListener("click", () => {
-  DOM.namePopup.inputs.firstName.value =
-    DOM.individualUserPopup.firstName.textContent.split(": ")[1];
-  DOM.namePopup.inputs.lastName.value =
-    DOM.individualUserPopup.lastName.textContent.split(": ")[1];
+  DOM.namePopup.inputs.firstName.value = activeUserObj.firstName;
+  DOM.namePopup.inputs.lastName.value = activeUserObj.lastName;
   fadeInEffect(DOM.namePopup.popup);
 });
 DOM.namePopup.closePopupBtn.addEventListener("click", () => {
@@ -480,7 +712,7 @@ DOM.namePopup.successBtn.addEventListener("click", async () => {
   );
   if (!isConfirmed) return;
   showSectionLoader("Updating name...");
-  await updateData(`userData/${activeStudentId}`, {
+  await updateData(`userData/${activeUserId}`, {
     firstName: firstName,
     lastName: lastName,
   });
@@ -495,8 +727,7 @@ DOM.namePopup.successBtn.addEventListener("click", async () => {
 
 // roll no
 DOM.individualUserPopup.rollNo.addEventListener("click", () => {
-  DOM.rollNoPopup.input.value = DOM.individualUserPopup.rollNo.textContent =
-    activeStudentObj.rollNumber;
+  DOM.rollNoPopup.input.value = activeUserObj.rollNumber;
   fadeInEffect(DOM.rollNoPopup.popup);
 });
 DOM.rollNoPopup.closePopupBtn.addEventListener("click", () => {
@@ -539,7 +770,7 @@ DOM.rollNoPopup.successBtn.addEventListener("click", async () => {
         if (!isConfirmed) return;
         else {
           showSectionLoader("Updating roll number...");
-          await updateData(`userData/${activeStudentId}`, {
+          await updateData(`userData/${activeUserId}`, {
             rollNumber: rollNo,
           });
           fadeOutEffect(DOM.rollNoPopup.popup);
@@ -559,9 +790,8 @@ DOM.rollNoPopup.successBtn.addEventListener("click", async () => {
 
 // role
 DOM.individualUserPopup.role.addEventListener("click", () => {
-  if (activeStudentObj.role === "student")
-    DOM.rolePopup.input.value = "student";
-  else if (activeStudentObj.role === "editor")
+  if (activeUserObj.role === "student") DOM.rolePopup.input.value = "student";
+  else if (activeUserObj.role === "editor")
     DOM.rolePopup.input.value = "editor";
   fadeInEffect(DOM.rolePopup.popup);
 });
@@ -582,7 +812,7 @@ DOM.rolePopup.successBtn.addEventListener("click", async () => {
   if (!isConfirmed) return;
   else {
     showSectionLoader("Updating role...");
-    await updateData(`userData/${activeStudentId}`, {
+    await updateData(`userData/${activeUserId}`, {
       role: role,
     });
     fadeOutEffect(DOM.rolePopup.popup);
@@ -598,13 +828,13 @@ DOM.rolePopup.successBtn.addEventListener("click", async () => {
 
 // sem div
 DOM.individualUserPopup.sem.addEventListener("click", () => {
-  DOM.semDivPopup.inputs.semester.value = activeStudentObj.semester;
-  DOM.semDivPopup.inputs.division.value = activeStudentObj.division;
+  DOM.semDivPopup.inputs.semester.value = activeUserObj.semester;
+  DOM.semDivPopup.inputs.division.value = activeUserObj.division;
   fadeInEffect(DOM.semDivPopup.popup);
 });
 DOM.individualUserPopup.div.addEventListener("click", () => {
-  DOM.semDivPopup.inputs.semester.value = activeStudentObj.semester;
-  DOM.semDivPopup.inputs.division.value = activeStudentObj.division;
+  DOM.semDivPopup.inputs.semester.value = activeUserObj.semester;
+  DOM.semDivPopup.inputs.division.value = activeUserObj.division;
   fadeInEffect(DOM.semDivPopup.popup);
 });
 DOM.semDivPopup.closePopupBtn.addEventListener("click", () => {
@@ -634,7 +864,7 @@ DOM.semDivPopup.successBtn.addEventListener("click", async () => {
   else {
     sem = Number(sem);
     showSectionLoader("Updating sem and div...");
-    await updateData(`userData/${activeStudentId}`, {
+    await updateData(`userData/${activeUserId}`, {
       semester: sem,
       division: div,
     });
@@ -691,7 +921,7 @@ DOM.medalPopup.successBtn.addEventListener("click", async () => {
   if (!isConfirmed) return;
   else {
     showSectionLoader("Updating medals...");
-    await updateData(`userData/${activeStudentId}/medalList`, {
+    await updateData(`userData/${activeUserId}/medalList`, {
       gold: gold,
       silver: silver,
       bronze: bronze,

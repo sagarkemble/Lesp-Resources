@@ -388,9 +388,12 @@
         <button class="button-hug edit-mode-toggle-btn ml-auto hidden">
           Edit
         </button>
-        <button class="button-hug visit-classroom-btn ml-auto hidden">
-          Visit classroom
-        </button>
+        <div class="admin-btn-wrapper ml-auto flex hidden gap-2">
+          <button class="button-hug visit-class-room-btn hidden">
+            Visit classroom
+          </button>
+          <button class="button-hug admin-logout-btn">Logout</button>
+        </div>
       </header>
       <!-- class room code -->
       <div
@@ -3575,7 +3578,7 @@
           <button class="button-hug">Reload</button>
         </a>
       </section>
-      <!-- admin section  pending-->
+      <!-- admin section -->
       <section
         class="admin-section flex h-full w-full flex-col items-center justify-center gap-4"
       >
@@ -3829,6 +3832,7 @@
             <button class="button-fill success-btn" type="button">Edit</button>
           </div>
         </div>
+        <!-- semester list -->
         <div
           class="semester-list flex hidden h-full w-full flex-col gap-4 transition-all duration-200 lg:gap-5"
         >
@@ -3836,6 +3840,7 @@
             class="sem-card-container auto-grid-cards flex w-full flex-row flex-wrap justify-start gap-4 lg:gap-5"
           ></div>
         </div>
+        <!-- division list -->
         <div
           class="division-list flex hidden h-full w-full flex-col gap-4 transition-all duration-200 lg:gap-5"
         >
@@ -3843,9 +3848,26 @@
             class="div-card-container auto-grid-cards flex w-full flex-row flex-wrap justify-start gap-4 lg:gap-5"
           ></div>
         </div>
+        <!-- class room -->
         <div
           class="class-room flex hidden h-full w-full flex-col gap-4 transition-all duration-200 lg:gap-5"
         >
+          <!-- popup -->
+          <div
+            class="pick-teacher-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-5 backdrop-blur-xs transition-all duration-200"
+          >
+            <div
+              class="popup bg-surface-2 relative flex max-h-[80vh] w-full max-w-[25.0rem] flex-col gap-4 rounded-3xl p-6"
+            >
+              <div class="wrapper flex w-full items-center justify-between">
+                <p class="popup-title text-2xl font-semibold">Pick teacher</p>
+                <i class="fa-solid fa-xmark close-popup-btn text-xl"></i>
+              </div>
+              <div
+                class="card-container flex h-full flex-col gap-4 overflow-y-auto"
+              ></div>
+            </div>
+          </div>
           <div
             class="teacher-card-container-wrapper flex flex-col items-center gap-2 lg:gap-3"
           >
@@ -3876,7 +3898,6 @@
               <p class="main-title text-2xl font-semibold">Teachers</p>
               <button class="button-hug add-teacher-btn">Add teacher</button>
             </div>
-
             <div
               class="teacher-card-container auto-grid-student-cards flex w-full flex-row flex-wrap justify-start gap-4 lg:gap-5"
             ></div>
@@ -3885,7 +3906,7 @@
             class="student-card-container-wrapper flex flex-col items-center gap-2 lg:gap-3"
           >
             <div
-              class="add-user-link-popup-wrapper absolute top-0 left-0 z-20 flex hidden h-full w-full items-center justify-center bg-[#00000020] transition-all duration-200"
+              class="add-user-link-popup-wrapper absolute top-0 left-0 z-50 flex hidden h-full w-full items-center justify-center bg-[#00000080] backdrop-blur-xs transition-all duration-200"
             >
               <div
                 class="add-user-link-popup bg-surface-2 flex w-80 flex-col gap-4 rounded-3xl p-6 lg:gap-5"
@@ -3915,14 +3936,15 @@
           </div>
         </div>
         <div
-          class="individual-user-popup-wrapper fixed top-0 left-0 z-20 flex hidden h-full w-full flex-col items-center justify-center gap-4 bg-[#00000080] p-4"
+          class="individual-user-popup-wrapper fixed top-0 left-0 z-20 flex hidden h-full w-full flex-col items-center justify-center gap-4 bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
         >
           <div
             class="popup bg-surface-2 relative flex max-h-[90vh] max-w-96 flex-col gap-4 rounded-3xl px-6 py-5 lg:gap-5"
           >
-            <div class="close-popup-btn absolute -top-8 right-4 cursor-pointer">
+            <div class="close-popup-btn absolute top-4 right-4 cursor-pointer">
               <i class="fa-solid fa-xmark"></i>
             </div>
+
             <div class="wrapper flex flex-col items-center gap-3 lg:gap-4">
               <div
                 class="profile-pic-name-wrapper flex flex-col items-center gap-2 lg:gap-3"
@@ -3936,7 +3958,9 @@
                   saagar kemble
                 </p>
               </div>
-              <div class="medal-point-wrapper flex items-center gap-5">
+              <div
+                class="medal-point-wrapper flex cursor-pointer items-center gap-5"
+              >
                 <div class="points-wrapper flex items-center gap-1">
                   <img
                     src="https://ik.imagekit.io/yn9gz2n2g/others/coin.png?updatedAt=1751607575051"
@@ -3980,15 +4004,25 @@
               </div>
             </div>
             <div
-              class="student-info-wrapper flex h-fit flex-col items-start gap-4 overflow-y-auto lg:gap-5"
+              class="student-info-wrapper border-surface-3 flex h-fit flex-col items-start gap-4 overflow-y-auto rounded-2xl border-2 p-4 lg:gap-5"
             >
-              <p class="first-name">First Name: sagar</p>
-              <p class="last-name">Last Name: kemble</p>
-              <p class="roll-no">Roll No: 242213</p>
-              <p class="email break-all">Email: sagar.kemble@example.com</p>
-              <p class="role">Role: Student</p>
-              <p class="sem">Semester: 3</p>
-              <p class="div">Division: A</p>
+              <p class="first-name cursor-pointer">First Name: sagar</p>
+              <p class="last-name cursor-pointer">Last Name: kemble</p>
+              <p class="roll-no cursor-pointer">Roll No: 242213</p>
+              <p class="email cursor-pointer break-all">
+                Email: sagar.kemble@example.com
+              </p>
+              <p class="assigned-classes cursor-pointer break-all">
+                Assigned Class: 3A
+              </p>
+              <p class="role cursor-pointer">Role: Student</p>
+              <p class="sem cursor-pointer">Semester: 3</p>
+              <p class="div cursor-pointer">Division: A</p>
+            </div>
+            <div
+              class="remove-user-btn border-surface-3 cursor-pointer rounded-xl border p-4 text-center"
+            >
+              Remove User
             </div>
           </div>
         </div>

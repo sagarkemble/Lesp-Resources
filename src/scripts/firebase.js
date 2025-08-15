@@ -79,6 +79,18 @@ export function updateData(path, data) {
       return;
     });
 }
+export function writeData(path, data) {
+  return set(ref(db, path), data)
+    .then(() => {
+      console.log("Data written successfully.");
+    })
+    .catch((error) => {
+      showErrorSection();
+      console.error("Error writing data:", error);
+      Sentry.captureException(error);
+      return;
+    });
+}
 export function signOutUser() {
   return signOut(auth)
     .then(() => {

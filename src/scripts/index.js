@@ -48,6 +48,11 @@ import { showErrorSection } from "./error.js";
 import { toggleFormState } from "./login.js";
 
 import * as Sentry from "@sentry/browser";
+import posthog from "posthog-js";
+posthog.init("phc_UUXjQythPW9iojWal45runQ8gCQId8Ku5PYrPSofo6h", {
+  api_host: "https://us.i.posthog.com",
+  person_profiles: "identified_only",
+});
 Sentry.init({
   dsn: "https://9f9da5737a2f44249457aa7e774fe3d2@o4509828633788416.ingest.us.sentry.io/4509828649189376",
   sendDefaultPii: true,
@@ -65,8 +70,10 @@ const confirmationTitle = confirmationPopup.querySelector(".title");
 const confirmButton = confirmationPopup.querySelector(".confirm-btn");
 const cancelButton = confirmationPopup.querySelector(".cancel-btn");
 const lgUserPfp = document.querySelector(".navigation-user-pfp");
-let localUserData;
-let isSignupWithQueryParams = false;
+export let localUserData = {
+  userData: undefined,
+  isVisitingClass: false,
+};
 const selectClassPopup = document.querySelector(".select-class-popup-wrapper");
 const selectClassPopupCloseButton =
   selectClassPopup.querySelector(".close-popup-btn");
@@ -74,7 +81,7 @@ const selectClassCardContainer =
   selectClassPopup.querySelector(".card-container");
 function showSelectClassPopup(user) {
   selectClassCardContainer.innerHTML = "";
-  const classList = user.assignedClass;
+  const classList = user.assignedClasses;
   const numMap = {
     1: "FYCO",
     2: "FYCO",
@@ -83,23 +90,25 @@ function showSelectClassPopup(user) {
     5: "TYCO",
     6: "TYCO",
   };
+
   for (const key in classList) {
-    const element = classList[key];
+    // key is like "1A", "2B"
+    const semesterNum = key[0]; // "1", "2", ...
+    const division = key[1]; // "A", "B", ...
     const card = document.createElement("div");
     card.className =
       "bg-surface-3 w-full rounded-[1.25rem] p-4 text-center cursor-pointer custom-hover";
-    card.setAttribute("semester", element.semester);
-    card.setAttribute("division", element.division);
-    card.innerHTML = numMap[element.semester] + "-" + element.division;
-    console.log(card);
+    card.setAttribute("semester", semesterNum);
+    card.setAttribute("division", division);
+    card.innerHTML = `${numMap[semesterNum]}-${division}`;
     selectClassCardContainer.appendChild(card);
+
     card.addEventListener("click", async () => {
       fadeOutEffect(selectClassPopup);
-      const userPfp = document.querySelectorAll(".user-pfp");
-      userPfp.forEach((pfp) => {
+      document.querySelectorAll(".user-pfp").forEach((pfp) => {
         pfp.src = user.pfpLink;
       });
-      await initAppState(user, element.semester, element.division);
+      await initAppState(user, semesterNum, division);
       await fadeInEffect(lottieLoadingScreen);
       await hideSections();
       await loadContent();
@@ -107,9 +116,11 @@ function showSelectClassPopup(user) {
       initRouting();
     });
   }
+
   fadeOutEffect(lottieLoadingScreen);
   fadeInEffect(selectClassPopup);
 }
+
 selectClassPopupCloseButton.addEventListener("click", async () => {
   toggleFormState(false);
   showSectionLoader();
@@ -154,9 +165,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     await fadeInEffect(lottieLoadingScreen);
     onAuthStateChanged(auth, async (userCredential) => {
+      if (isNewUser.flag) return;
       try {
-        if (isNewUser.flag) return;
         if (userCredential) {
+          posthog.capture("my event", { property: "value" });
           console.log(userCredential);
           setUserId(analytics, userCredential.uid);
           logEvent(analytics, "login", { method: "firebase" });
@@ -168,10 +180,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
           }
           if (user.role === "admin") {
-            localUserData = user;
-            await fadeOutEffect(lottieLoadingScreen);
+            localUserData.userData = user;
             initAdminRouting(user);
-            showElement(editModeToggleButton);
             return;
           }
           const userPfp = document.querySelectorAll(".user-pfp");
@@ -200,6 +210,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     Sentry.captureException(error);
   }
 });
+export async function initClass() {
+  const userPfp = document.querySelectorAll(".user-pfp");
+  userPfp.forEach((pfp) => {
+    pfp.src = localUserData.userData.pfpLink;
+  });
+  await initAppState(
+    localUserData.userData,
+    localUserData.userData.semester,
+    localUserData.userData.division,
+  );
+  await fadeInEffect(lottieLoadingScreen);
+  await hideSections();
+  await loadContent();
+  await applyEditModeUI();
+  initRouting();
+}
 export async function initRouting() {
   const params = new URLSearchParams(window.location.search);
   const dashboard = params.get("dashboard");
@@ -326,8 +352,12 @@ export async function applyEditModeUI() {
   }
 }
 window.addEventListener("popstate", () => {
-  if (localUserData === undefined) initRouting();
-  else if (!localUserData.role && localUserData.role === "admin") {
+  if (localUserData.userData === undefined) initRouting();
+  else if (
+    localUserData.userData.role &&
+    localUserData.userData.role === "admin" &&
+    !localUserData.userData.isVisitingClass
+  ) {
     initAdminRouting();
   } else {
     initRouting();

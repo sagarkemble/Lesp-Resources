@@ -78,6 +78,7 @@ loginForm.addEventListener("submit", async (e) => {
     .then(async (userCredential) => {
       console.log("User signed in:", userCredential.user);
       history.pushState({}, "", "/");
+      toggleFormState(false);
     })
     .catch((error) => {
       console.error("Login failed:", error.message);

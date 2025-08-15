@@ -20,6 +20,7 @@ export let adminAppState = {
   semesterData: null,
   divisionData: null,
   studentData: null,
+  teacherData: null,
   activeSem: null,
   activeDiv: null,
 };

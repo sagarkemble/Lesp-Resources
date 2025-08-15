@@ -210,13 +210,9 @@ DOM.classCodePopup.successBtn.addEventListener("click", async () => {
   );
   if (decryptedData.role === "teacher") {
     userObj.role = "teacher";
-    userObj.assignedClass = {
-      [`${userObj.semester}${userObj.division}`]: {},
+    userObj.assignedClasses = {
+      [`${userObj.semester}${userObj.division}`]: true,
     };
-    userObj.assignedClass[`${userObj.semester}${userObj.division}`].semester =
-      userObj.semester;
-    userObj.assignedClass[`${userObj.semester}${userObj.division}`].division =
-      userObj.division;
     hideElement(DOM.userDetails.rollNoWrapper);
     hideElement(DOM.summaryForm.rollNoWrapper);
   }
@@ -558,15 +554,8 @@ function initSummaryForm() {
   DOM.summaryForm.details.pfp.src = userObj.pfpLink;
   DOM.summaryForm.details.rollNo.textContent = userObj.rollNumber;
   DOM.summaryForm.details.email.textContent = userObj.email;
-  if (userObj.role === "teacher") {
-    DOM.summaryForm.details.semester.textContent =
-      userObj.assignedClass[`${userObj.semester}${userObj.division}`].semester;
-    DOM.summaryForm.details.division.textContent =
-      userObj.assignedClass[`${userObj.semester}${userObj.division}`].division;
-  } else {
-    DOM.summaryForm.details.semester.textContent = userObj.semester;
-    DOM.summaryForm.details.division.textContent = userObj.division;
-  }
+  DOM.summaryForm.details.semester.textContent = userObj.semester;
+  DOM.summaryForm.details.division.textContent = userObj.division;
 }
 DOM.summaryForm.previousBtn.addEventListener("click", async () => {
   await fadeOutEffect(DOM.summaryForm.section);
@@ -597,11 +586,13 @@ DOM.summaryForm.form.addEventListener("submit", async (e) => {
       DOM.successLottiePlayer.play();
     } catch (error) {
       showErrorSection();
+      console.error("Error creating user:", error);
       Sentry.captureException(error);
       await fadeOutEffect(DOM.summaryForm.section);
     }
   } catch (error) {
     showErrorSection();
+    console.error("Error creating user:", error);
     Sentry.captureException(error);
     console.error(error);
   }
@@ -649,6 +640,7 @@ async function writeUserData() {
   return await set(path, userObj)
     .then(() => {})
     .catch((error) => {
+      console.error("Error writing user data:", error);
       showErrorSection();
       Sentry.captureException(error);
     });
