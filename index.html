@@ -390,7 +390,7 @@
         </button>
         <div class="admin-btn-wrapper ml-auto flex hidden gap-2">
           <button class="button-hug visit-class-room-btn hidden">
-            Visit classroom
+            View class
           </button>
           <button class="button-hug admin-logout-btn">Logout</button>
         </div>
@@ -3580,7 +3580,7 @@
       </section>
       <!-- admin section -->
       <section
-        class="admin-section flex h-full w-full flex-col items-center justify-center gap-4"
+        class="admin-section flex hidden h-full w-full flex-col items-center justify-center gap-4 transition-all duration-200"
       >
         <!-- edit name popup -->
         <div
@@ -3832,109 +3832,44 @@
             <button class="button-fill success-btn" type="button">Edit</button>
           </div>
         </div>
-        <!-- semester list -->
+        <!--pick teacher popup -->
         <div
-          class="semester-list flex hidden h-full w-full flex-col gap-4 transition-all duration-200 lg:gap-5"
+          class="pick-teacher-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-5 backdrop-blur-xs transition-all duration-200"
         >
           <div
-            class="sem-card-container auto-grid-cards flex w-full flex-row flex-wrap justify-start gap-4 lg:gap-5"
-          ></div>
-        </div>
-        <!-- division list -->
-        <div
-          class="division-list flex hidden h-full w-full flex-col gap-4 transition-all duration-200 lg:gap-5"
-        >
-          <div
-            class="div-card-container auto-grid-cards flex w-full flex-row flex-wrap justify-start gap-4 lg:gap-5"
-          ></div>
-        </div>
-        <!-- class room -->
-        <div
-          class="class-room flex hidden h-full w-full flex-col gap-4 transition-all duration-200 lg:gap-5"
-        >
-          <!-- popup -->
-          <div
-            class="pick-teacher-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-5 backdrop-blur-xs transition-all duration-200"
+            class="popup bg-surface-2 relative flex max-h-[80vh] w-full max-w-[25.0rem] flex-col gap-4 rounded-3xl p-6"
           >
-            <div
-              class="popup bg-surface-2 relative flex max-h-[80vh] w-full max-w-[25.0rem] flex-col gap-4 rounded-3xl p-6"
-            >
-              <div class="wrapper flex w-full items-center justify-between">
-                <p class="popup-title text-2xl font-semibold">Pick teacher</p>
-                <i class="fa-solid fa-xmark close-popup-btn text-xl"></i>
-              </div>
-              <div
-                class="card-container flex h-full flex-col gap-4 overflow-y-auto"
-              ></div>
-            </div>
-          </div>
-          <div
-            class="teacher-card-container-wrapper flex flex-col items-center gap-2 lg:gap-3"
-          >
-            <div
-              class="add-teacher-link-popup-wrapper absolute top-0 left-0 z-20 flex hidden h-full w-full items-center justify-center bg-[#00000020] transition-all duration-200"
-            >
-              <div
-                class="add-teacher-link-popup bg-surface-2 flex w-80 flex-col gap-4 rounded-3xl p-6 lg:gap-5"
-              >
-                <p class="text-text-primary popup-title text-2xl font-semibold">
-                  Add teacher link
-                </p>
-                <p
-                  class="bg-surface-3 text-text-link flex w-full items-center gap-4 rounded-xl p-4"
-                >
-                  <span
-                    id="add-teacher-link"
-                    class="block w-full truncate"
-                  ></span>
-                </p>
-
-                <div class="btn-wrapper flex justify-end gap-4">
-                  <button class="button-fill success-btn">Ok</button>
-                </div>
-              </div>
-            </div>
             <div class="wrapper flex w-full items-center justify-between">
-              <p class="main-title text-2xl font-semibold">Teachers</p>
-              <button class="button-hug add-teacher-btn">Add teacher</button>
+              <p class="popup-title text-2xl font-semibold">Pick teacher</p>
+              <i class="fa-solid fa-xmark close-popup-btn text-xl"></i>
             </div>
             <div
-              class="teacher-card-container auto-grid-student-cards flex w-full flex-row flex-wrap justify-start gap-4 lg:gap-5"
-            ></div>
-          </div>
-          <div
-            class="student-card-container-wrapper flex flex-col items-center gap-2 lg:gap-3"
-          >
-            <div
-              class="add-user-link-popup-wrapper absolute top-0 left-0 z-50 flex hidden h-full w-full items-center justify-center bg-[#00000080] backdrop-blur-xs transition-all duration-200"
-            >
-              <div
-                class="add-user-link-popup bg-surface-2 flex w-80 flex-col gap-4 rounded-3xl p-6 lg:gap-5"
-              >
-                <p class="text-text-primary popup-title text-2xl font-semibold">
-                  Add student link
-                </p>
-                <p
-                  class="bg-surface-3 text-text-link flex w-full items-center gap-4 rounded-xl p-4"
-                >
-                  <span id="add-user-link" class="block w-full truncate"></span>
-                </p>
-
-                <div class="btn-wrapper flex justify-end gap-4">
-                  <button class="button-fill success-btn">Ok</button>
-                </div>
-              </div>
-            </div>
-            <div class="wrapper flex w-full items-center justify-between">
-              <p class="main-title text-2xl font-semibold">Students</p>
-              <button class="button-hug add-student-btn">Add student</button>
-            </div>
-
-            <div
-              class="student-card-container auto-grid-student-cards flex w-full flex-row flex-wrap justify-start gap-4 lg:gap-5"
+              class="card-container flex h-full flex-col gap-4 overflow-y-auto"
             ></div>
           </div>
         </div>
+        <!-- add user code popup -->
+        <div
+          class="add-user-link-popup-wrapper absolute top-0 left-0 z-50 flex hidden h-full w-full items-center justify-center bg-[#00000080] backdrop-blur-xs transition-all duration-200"
+        >
+          <div
+            class="add-user-link-popup bg-surface-2 flex w-80 flex-col gap-4 rounded-3xl p-6 lg:gap-5"
+          >
+            <p class="text-text-primary popup-title text-2xl font-semibold">
+              Add student link
+            </p>
+            <p
+              class="bg-surface-3 text-text-link flex w-full items-center gap-4 rounded-xl p-4"
+            >
+              <span id="add-user-link" class="block w-full truncate"></span>
+            </p>
+
+            <div class="btn-wrapper flex justify-end gap-4">
+              <button class="button-fill success-btn">Ok</button>
+            </div>
+          </div>
+        </div>
+        <!-- individual user popup -->
         <div
           class="individual-user-popup-wrapper fixed top-0 left-0 z-20 flex hidden h-full w-full flex-col items-center justify-center gap-4 bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
         >
@@ -4024,6 +3959,56 @@
             >
               Remove User
             </div>
+          </div>
+        </div>
+        <!-- semester list -->
+        <div
+          class="semester-list flex hidden h-full w-full flex-col gap-4 transition-all duration-200 lg:gap-5"
+        >
+          <div
+            class="sem-card-container auto-grid-cards flex w-full flex-row flex-wrap justify-start gap-4 lg:gap-5"
+          ></div>
+        </div>
+        <!-- division list -->
+        <div
+          class="division-list flex hidden h-full w-full flex-col gap-4 transition-all duration-200 lg:gap-5"
+        >
+          <div
+            class="div-card-container auto-grid-cards flex w-full flex-row flex-wrap justify-start gap-4 lg:gap-5"
+          ></div>
+        </div>
+        <!-- class room -->
+        <div
+          class="class-room flex hidden h-full w-full flex-col gap-4 transition-all duration-200 lg:gap-5"
+        >
+          <!-- teacher container -->
+          <div
+            class="teacher-card-container-wrapper flex flex-col items-center gap-2 lg:gap-3"
+          >
+            <div class="wrapper flex w-full items-center gap-2 lg:gap-3">
+              <p class="title text-2xl font-semibold">Teachers</p>
+              <div class="plus-icon add-teacher-btn cursor-pointer">
+                <i class="fa-solid fa-plus cursor-pointer text-2xl"></i>
+              </div>
+            </div>
+            <div
+              class="teacher-card-container auto-grid-student-cards flex w-full flex-row flex-wrap justify-start gap-4 lg:gap-5"
+            ></div>
+          </div>
+          <!-- student container -->
+          <div
+            class="student-card-container-wrapper flex flex-col items-center gap-2 lg:gap-3"
+          >
+            <div class="wrapper flex w-full items-center gap-2 lg:gap-3">
+              <p class="main-title text-2xl font-semibold">Students</p>
+              <div class="plus-icon add-student-btn cursor-pointer">
+                <i class="fa-solid fa-plus cursor-pointer text-2xl"></i>
+              </div>
+            </div>
+
+            <div
+              class="student-card-container auto-grid-student-cards flex w-full flex-row flex-wrap justify-start gap-4 lg:gap-5"
+            ></div>
           </div>
         </div>
       </section>

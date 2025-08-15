@@ -7,23 +7,12 @@ import {
   fadeInEffectOpacity,
 } from "./animation.js";
 import {
-  app,
   signInWithEmailAndPassword,
   auth,
-  get,
-  equalTo,
-  ref,
-  db,
-  child,
-  onAuthStateChanged,
   inMemoryPersistence,
   sendPasswordResetEmail,
   browserLocalPersistence,
   setPersistence,
-  orderByChild,
-  signOut,
-  query,
-  getDatabase,
 } from "./firebase.js";
 const swiper = new Swiper("#login-section-swiper", {
   direction: "horizontal",
@@ -37,9 +26,8 @@ const swiper = new Swiper("#login-section-swiper", {
     crossFade: true,
   },
 });
-const loadingScreen = document.querySelector(".loading-screen");
 // login section
-const loginSection = document.querySelector(".login-section");
+export const loginSection = document.querySelector(".login-section");
 const loginForm = document.querySelector("#login-form");
 const emailInput = document.querySelector("#email-input");
 const passwordInput = document.querySelector("#password-input");

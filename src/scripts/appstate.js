@@ -26,7 +26,6 @@ export let adminAppState = {
 };
 export async function initAppState(userData, semester, division) {
   try {
-    semester = `semester${semester}`;
     const globalData = await getGlobalData();
     const semesterGlobalData = await getSemesterGlobalData(semester);
     const divisionData = await getDivisionData(semester, division);

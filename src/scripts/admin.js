@@ -208,13 +208,15 @@ const DOM = {
   },
 };
 export async function initAdminRouting(userData) {
+  await showSectionLoader("Loading...", false);
   if (userData) {
     adminAppState.userData = userData;
     adminAppState.userId = userData.id;
   }
   adminAppState.semesterData = await getWholeSemesterData();
   await hideSections(true, true, false, true);
-  await fadeInEffect(adminSection);
+  showElement(adminSection);
+
   showElement(DOM.adminBtnWrapper);
   hideElement(DOM.editBtn);
   const urlParams = new URLSearchParams(window.location.search);
@@ -234,10 +236,10 @@ export async function initAdminRouting(userData) {
   } else {
     await showSemesterList();
   }
-  fadeOutEffect(lottieLoadingScreen);
 }
 //semester section
 async function showSemesterList() {
+  await showSectionLoader("Loading...", false);
   await hideAdminDivisions();
   history.pushState({}, "", `?semesterList=''`);
   headerIcon.src =
@@ -262,8 +264,8 @@ async function showSemesterList() {
     DOM.semCardContainer.appendChild(card);
   }
   history.pushState({}, "", "?semesterList=''");
-  await fadeInEffect(DOM.semesterList);
-  await fadeOutEffect(lottieLoadingScreen);
+  showElement(DOM.semesterList);
+  hideSectionLoader(200);
 }
 async function unloadSemesterList() {
   await fadeOutEffect(DOM.semesterList);
@@ -271,6 +273,7 @@ async function unloadSemesterList() {
 }
 //division section
 async function showDivisionList() {
+  showSectionLoader("Loading...", false);
   await hideAdminDivisions();
   headerIcon.src =
     "https://ik.imagekit.io/yn9gz2n2g/others/semester.png?updatedAt=1751607364675";
@@ -296,7 +299,8 @@ async function showDivisionList() {
     });
     DOM.divCardContainer.appendChild(card);
   }
-  fadeInEffect(DOM.divisionList);
+  showElement(DOM.divisionList);
+  hideSectionLoader(200);
 }
 async function unloadDivisionList() {
   await fadeOutEffect(DOM.divisionList);
@@ -304,6 +308,7 @@ async function unloadDivisionList() {
 }
 // class room section
 async function showClassRoom() {
+  showSectionLoader("Loading...", false);
   await hideAdminDivisions();
   showElement(DOM.visitClassRoomBtn);
   headerIcon.src =
@@ -334,7 +339,8 @@ async function showClassRoom() {
   renderIndividualStudentCard();
   renderIndividualTeacherCard();
   renderTeacherCardInPopup();
-  fadeInEffect(DOM.classRoom);
+  showElement(DOM.classRoom);
+  hideSectionLoader(200);
 }
 async function unloadClassRoom() {
   await fadeOutEffect(DOM.classRoom);
@@ -353,8 +359,10 @@ function getStudentRawData() {
   const usersRef = ref(db, "userData");
   const q = query(
     usersRef,
-    orderByChild("division"),
-    equalTo(adminAppState.activeDiv),
+    orderByChild("class"),
+    equalTo(
+      `${adminAppState.activeSem.replace("semester", "")}${adminAppState.activeDiv}`,
+    ),
   );
   return get(q).then((snapshot) => {
     if (snapshot.exists()) {

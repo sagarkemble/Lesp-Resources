@@ -45,7 +45,7 @@ import {
   adminAppState,
 } from "./appstate.js";
 import { showErrorSection } from "./error.js";
-import { toggleFormState } from "./login.js";
+import { toggleFormState, loginSection } from "./login.js";
 
 import * as Sentry from "@sentry/browser";
 import posthog from "posthog-js";
@@ -129,11 +129,24 @@ selectClassPopupCloseButton.addEventListener("click", async () => {
   fadeOutEffect(selectClassPopup);
 });
 export let isNewUser = { flag: false };
-export async function showSectionLoader(message = "Loading...") {
+export async function showSectionLoader(
+  message = "Loading...",
+  isBlur = true,
+  duration = 200,
+) {
+  if (!isBlur) {
+    sectionLoader.classList.remove("bg-[#00000080]", "backdrop-blur-xs");
+    sectionLoader.classList.add("bg-surface");
+  } else {
+    sectionLoader.classList.remove("bg-surface");
+    sectionLoader.classList.add("bg-[#00000080]", "backdrop-blur-xs");
+  }
+  sectionLoader.style.transitionDuration = `${duration}ms`;
   sectionLoaderMessage.textContent = message;
   await fadeInEffect(sectionLoader);
 }
-export async function hideSectionLoader() {
+export async function hideSectionLoader(duration = 200) {
+  sectionLoader.style.transitionDuration = `${duration}ms`;
   await fadeOutEffect(sectionLoader);
 }
 async function loadContent() {
@@ -163,15 +176,12 @@ export async function showConfirmationPopup(
 }
 document.addEventListener("DOMContentLoaded", async () => {
   try {
-    await fadeInEffect(lottieLoadingScreen);
+    // showSectionLoader("Loading...", false);
     onAuthStateChanged(auth, async (userCredential) => {
+      // showSectionLoader("Loading...", false, 200);
       if (isNewUser.flag) return;
       try {
         if (userCredential) {
-          posthog.capture("my event", { property: "value" });
-          console.log(userCredential);
-          setUserId(analytics, userCredential.uid);
-          logEvent(analytics, "login", { method: "firebase" });
           const user = await getUserData(userCredential.uid);
           console.log(user);
           if (user.role === "teacher") {
@@ -184,18 +194,14 @@ document.addEventListener("DOMContentLoaded", async () => {
             initAdminRouting(user);
             return;
           }
-          const userPfp = document.querySelectorAll(".user-pfp");
-          userPfp.forEach((pfp) => {
-            pfp.src = user.pfpLink;
-          });
-          await initAppState(user, user.semester, user.division);
-          await fadeInEffect(lottieLoadingScreen);
-          await hideSections();
-          await loadContent();
-          await applyEditModeUI();
-          initRouting();
+          // const userPfp = document.querySelectorAll(".user-pfp");
+          // userPfp.forEach((pfp) => {
+          //   pfp.src = user.pfpLink;
+          // });
+          localUserData.userData = user;
+          initClass();
         } else {
-          await fadeOutEffect(lottieLoadingScreen);
+          await hideSectionLoader();
           await showLoginSection();
         }
       } catch (error) {
@@ -215,11 +221,10 @@ export async function initClass() {
   userPfp.forEach((pfp) => {
     pfp.src = localUserData.userData.pfpLink;
   });
-  await initAppState(
-    localUserData.userData,
-    localUserData.userData.semester,
-    localUserData.userData.division,
-  );
+  const [Semester, Division] = localUserData.userData.class.split("");
+  console.log(localUserData.userData.class);
+
+  await initAppState(localUserData.userData, Semester, Division);
   await fadeInEffect(lottieLoadingScreen);
   await hideSections();
   await loadContent();
