@@ -28,7 +28,7 @@ import {
 import { getAnalytics, logEvent, setUserId } from "firebase/analytics";
 import { showErrorSection } from "./error";
 import { resetForm } from "./login";
-import * as Sentry from "@sentry/browser";
+import { trackUserLogout } from "./posthog";
 const firebaseConfig = {
   apiKey: "AIzaSyDM6R7E9NRG1FjBsu8v_T9QdKth0LUeLDU",
   authDomain: "lesp-resources-350d1.firebaseapp.com",
@@ -50,9 +50,7 @@ export function deleteData(path) {
       console.log("Data deleted successfully.");
     })
     .catch((error) => {
-      showErrorSection();
-      Sentry.captureException(error);
-      console.error("Error deleting data:", error);
+      showErrorSection("Error deleting data:", error);
       return;
     });
 }
@@ -62,9 +60,7 @@ export function pushData(path, data) {
       console.log("Data pushed successfully.");
     })
     .catch((error) => {
-      showErrorSection();
-      console.error("Error pushing data:", error);
-      Sentry.captureException(error);
+      showErrorSection("Error pushing data:", error);
       return;
     });
 }
@@ -74,9 +70,7 @@ export function updateData(path, data) {
       console.log("Data updated successfully.");
     })
     .catch((error) => {
-      showErrorSection();
-      console.error("Error pushing data:", error);
-      Sentry.captureException(error);
+      showErrorSection("Error updating data:", error);
       return;
     });
 }
@@ -86,21 +80,18 @@ export function writeData(path, data) {
       console.log("Data written successfully.");
     })
     .catch((error) => {
-      showErrorSection();
-      console.error("Error writing data:", error);
-      Sentry.captureException(error);
+      showErrorSection("Error writing data:", error);
       return;
     });
 }
 export function signOutUser() {
+  trackUserLogout(auth.currentUser.email);
   return signOut(auth)
     .then(() => {
       resetForm();
     })
     .catch((error) => {
-      showErrorSection();
-      Sentry.captureException(error);
-      console.error("Sign-out error:", error);
+      showErrorSection("Error signing out:", error);
     });
 }
 export {

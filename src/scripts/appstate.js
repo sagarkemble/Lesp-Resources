@@ -1,6 +1,5 @@
 import { showErrorSection } from "./error.js";
 import { get, ref, db, child } from "./firebase.js";
-import * as Sentry from "@sentry/browser";
 export let appState = {
   userData: null,
   userId: null,
@@ -42,9 +41,7 @@ export async function initAppState(userData, semester, division) {
     appState.activeNavIcon = null;
     appState.subjectMetaData = appState.divisionData.subjectMetaDataList;
   } catch (error) {
-    showErrorSection();
-    console.error("Error initializing app state:", error);
-    Sentry.captureException(error);
+    showErrorSection("Error initializing app state:", error);
   }
 }
 export function getUserData(userId) {
@@ -85,7 +82,7 @@ function getGlobalData() {
       }
     })
     .catch((error) => {
-      console.error(error.message);
+      showErrorSection("Error fetching global data:", error);
       return null;
     });
 }
@@ -101,7 +98,7 @@ function getDivisionData(semester, division) {
       }
     })
     .catch((error) => {
-      console.error(error.message);
+      showErrorSection("Error fetching division data:", error);
       return null;
     });
 }
@@ -115,7 +112,7 @@ export function getWholeSemesterData() {
       }
     })
     .catch((error) => {
-      console.error(error.message);
+      showErrorSection("Error fetching whole semester data:", error);
       return null;
     });
 }
@@ -130,7 +127,4 @@ export async function syncDbData() {
 }
 export async function syncAdminData() {
   adminAppState.semesterData = await getWholeSemesterData();
-}
-export async function loadSubjectSection() {
-  await syncDbData();
 }

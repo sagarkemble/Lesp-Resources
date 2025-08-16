@@ -51,17 +51,14 @@ import {
   adminAppState,
 } from "./appstate.js";
 import { showErrorSection } from "./error.js";
-
-import * as Sentry from "@sentry/browser";
-// import posthog from "posthog-js";
-// posthog.init("phc_UUXjQythPW9iojWal45runQ8gCQId8Ku5PYrPSofo6h", {
-//   api_host: "https://us.i.posthog.com",
-//   person_profiles: "identified_only",
-// });
-Sentry.init({
-  dsn: "https://9f9da5737a2f44249457aa7e774fe3d2@o4509828633788416.ingest.us.sentry.io/4509828649189376",
-  sendDefaultPii: true,
-});
+import {
+  trackLoginUser,
+  trackClass,
+  trackPage,
+  trackSubjectPage,
+  trackUserLogout,
+  resetPostHog,
+} from "./posthog.js";
 export const lottieLoadingScreen = document.querySelector(
   ".lottie-loading-screen",
 );
@@ -181,13 +178,14 @@ export async function showConfirmationPopup(
 }
 document.addEventListener("DOMContentLoaded", async () => {
   try {
+    resetPostHog();
     showSectionLoader("Loading...", false);
     onAuthStateChanged(auth, async (userCredential) => {
       if (isNewUser.flag) return;
       try {
         if (userCredential) {
           const user = await getUserData(userCredential.uid);
-          console.log(user);
+          trackLoginUser(userCredential.uid, user.email);
           if (user.role === "teacher") {
             showSelectClassPopup(user);
             return;
@@ -207,37 +205,38 @@ document.addEventListener("DOMContentLoaded", async () => {
           await showLoginSection();
         }
       } catch (error) {
-        showErrorSection();
-        console.error("Error during authentication state change.", error);
-        Sentry.captureException(error);
+        showErrorSection("Error during authentication state change:", error);
       }
     });
   } catch (error) {
-    showErrorSection();
-    console.error("Error during initialization.", error);
-    Sentry.captureException(error);
+    showErrorSection("Error during initialization:", error);
   }
 });
 export async function initClass() {
-  fadeInEffect(lottieLoadingScreen);
-  const userPfp = document.querySelectorAll(".user-pfp");
-  userPfp.forEach((pfp) => {
-    pfp.src = localUserData.userData.pfpLink;
-  });
-  const [Semester, Division] = localUserData.userData.class.split("");
-  await initAppState(localUserData.userData, Semester, Division);
-  await fadeInEffect(lottieLoadingScreen);
-  if (
-    localUserData.userData.role === "admin" ||
-    localUserData.userData.role === "teacher"
-  )
-    showElement(editModeToggleButton);
-  else hideElement(editModeToggleButton);
-  await hideSections();
-  await loadContent();
-  await applyEditModeUI();
-  resetForm();
-  initRouting();
+  try {
+    fadeInEffect(lottieLoadingScreen);
+    const userPfp = document.querySelectorAll(".user-pfp");
+    userPfp.forEach((pfp) => {
+      pfp.src = localUserData.userData.pfpLink;
+    });
+    const [Semester, Division] = localUserData.userData.class.split("");
+    await initAppState(localUserData.userData, Semester, Division);
+    await fadeInEffect(lottieLoadingScreen);
+    if (
+      localUserData.userData.role === "admin" ||
+      localUserData.userData.role === "teacher"
+    )
+      showElement(editModeToggleButton);
+    else hideElement(editModeToggleButton);
+    await hideSections();
+    await loadContent();
+    await applyEditModeUI();
+    trackClass(Semester, Division);
+    resetForm();
+    initRouting();
+  } catch (error) {
+    showErrorSection("Error initializing class:", error);
+  }
 }
 export async function initRouting() {
   const params = new URLSearchParams(window.location.search);
@@ -249,40 +248,46 @@ export async function initRouting() {
   const sessions = params.get("sessions");
   if (window.location.href.includes("login")) {
     await hideSections(false, false, false, false);
+    trackPage("Login");
     showLoginSection();
   } else if (dashboard) {
     setActiveNavIcon(dashboardIcon);
+    trackPage("Dashboard");
     await showDashboard();
     await fadeOutEffect(lottieLoadingScreen);
   } else if (activeSubject) {
     appState.activeSubject = activeSubject;
-    trackPageView(
-      "subject_page",
+    trackSubjectPage(
+      appState.activeSubject,
       appState.activeSem,
       appState.activeDiv,
-      appState.activeSubject,
     );
     setActiveNavIcon(subjectIcon);
     await loadSubjectSection();
     await fadeOutEffect(lottieLoadingScreen);
   } else if (leaderboard) {
     setActiveNavIcon(leaderboardIcon);
+    trackPage("Leaderboard");
     await showLeaderboardSection();
     await fadeOutEffect(lottieLoadingScreen);
   } else if (tests) {
     setActiveNavIcon(testsIcon);
+    trackPage("Tests");
     await fadeOutEffect(lottieLoadingScreen);
     showTestsSection();
   } else if (sessions) {
     setActiveNavIcon(sessionsIcon);
     await fadeOutEffect(lottieLoadingScreen);
+    trackPage("Sessions");
     showSessionsSection();
   } else if (pyq) {
     await fadeOutEffect(lottieLoadingScreen);
+    trackPage("Previous Year Questions");
     showPyq();
   } else {
     history.pushState({}, "", "/?dashboard=''");
     setActiveNavIcon(dashboardIcon);
+    trackPage("Dashboard");
     await showDashboard();
     await fadeOutEffect(lottieLoadingScreen);
   }
@@ -379,14 +384,8 @@ window.addEventListener("popstate", () => {
     initRouting();
   }
 });
-function trackPageView(pageName, sem, div, subject) {
-  logEvent(analytics, "page_view_custom", {
-    page_name: pageName,
-    semester: appState.activeSem,
-    division: appState.activeDiv,
-    subject: subject || "N/A",
-  });
-}
+
+// pwa config
 import { registerSW } from "virtual:pwa-register";
 registerSW({
   immediate: true,
@@ -397,3 +396,40 @@ registerSW({
     console.log("App ready to work offline.");
   },
 });
+// Store the event for later use
+let deferredPrompt;
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  // Prevent the default mini-infobar from appearing on mobile
+  e.preventDefault();
+
+  // Save the event for later use
+  deferredPrompt = e;
+
+  // Show your custom install UI
+  showInstallPrompt();
+});
+export function showInstallPrompt() {
+  const installButton = document.getElementById("install");
+  installButton.hidden = false;
+
+  installButton.addEventListener("click", async () => {
+    if (deferredPrompt) {
+      // Show the install prompt
+      deferredPrompt.prompt();
+
+      // Wait for the user's response
+      const { outcome } = await deferredPrompt.userChoice;
+
+      if (outcome === "accepted") {
+        console.log("User accepted the install prompt");
+      } else {
+        console.log("User dismissed the install prompt");
+      }
+
+      // Clear the deferredPrompt variable
+      deferredPrompt = null;
+      installButton.hidden = true;
+    }
+  });
+}

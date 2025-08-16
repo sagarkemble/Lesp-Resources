@@ -196,10 +196,14 @@ const DOM = {
   },
 };
 export async function loadSessionsSection() {
-  await unloadSessionsSection();
-  await renderUpcomingSession();
-  await renderPreviousSession();
-  applyEditModeUI();
+  try {
+    await unloadSessionsSection();
+    await renderUpcomingSession();
+    await renderPreviousSession();
+    applyEditModeUI();
+  } catch (error) {
+    showErrorSection("Error loading sessions:", error);
+  }
 }
 async function unloadSessionsSection() {
   await fadeOutEffect(sessionsSection);

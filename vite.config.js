@@ -153,7 +153,7 @@ export default defineConfig({
   ],
 
   server: {
-    allowedHosts: ["21856694743a.ngrok-free.app"],
+    allowedHosts: ["ea102a315220.ngrok-free.app"],
   },
   build: {
     rollupOptions: {

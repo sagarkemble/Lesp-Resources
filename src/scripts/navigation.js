@@ -79,6 +79,7 @@ testsIcon.addEventListener("click", () => {
   initRouting();
 });
 export function loadSubjectSelectionList() {
+  subjectSelectorCardWrapper.innerHTML = "";
   for (const key in appState.subjectMetaData) {
     const subject = appState.subjectMetaData[key];
 

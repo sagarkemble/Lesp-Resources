@@ -34,6 +34,7 @@ import {
 } from "./appstate";
 import { headerIcon, headerTitle } from "./navigation";
 import { hideSections } from "./index";
+import { showErrorSection } from "./error.js";
 const adminSection = document.querySelector(".admin-section");
 let activeUserId = null;
 let activeUserObj = null;
@@ -359,35 +360,43 @@ async function hideAdminDivisions() {
 }
 // other function
 function getStudentRawData() {
-  const usersRef = ref(db, "userData");
-  const q = query(
-    usersRef,
-    orderByChild("class"),
-    equalTo(`${adminAppState.activeSem}${adminAppState.activeDiv}`),
-  );
-  return get(q).then((snapshot) => {
-    if (snapshot.exists()) {
-      return snapshot.val();
-    } else {
-      console.log("No users found for div:", adminAppState.activeDiv);
-    }
-  });
+  try {
+    const usersRef = ref(db, "userData");
+    const q = query(
+      usersRef,
+      orderByChild("class"),
+      equalTo(`${adminAppState.activeSem}${adminAppState.activeDiv}`),
+    );
+    return get(q).then((snapshot) => {
+      if (snapshot.exists()) {
+        return snapshot.val();
+      } else {
+        console.log("No users found for div:", adminAppState.activeDiv);
+      }
+    });
+  } catch (error) {
+    showErrorSection("Error fetching student data:", error);
+  }
 }
 async function getTeacherData() {
-  const usersRef = ref(db, "userData");
-  const q = query(usersRef, orderByChild("role"), equalTo("teacher"));
-  const snapshot = await get(q);
-  adminAppState.allTeachers = snapshot.val();
-  const sem = adminAppState.activeSem;
-  const div = adminAppState.activeDiv;
-  const matchingTeachers = [];
-  for (const key in snapshot.val()) {
-    const assignedClass = snapshot.val()[key].assignedClasses;
-    if (assignedClass && assignedClass[`${sem}${div}`]) {
-      matchingTeachers.push(snapshot.val()[key]);
+  try {
+    const usersRef = ref(db, "userData");
+    const q = query(usersRef, orderByChild("role"), equalTo("teacher"));
+    const snapshot = await get(q);
+    adminAppState.allTeachers = snapshot.val();
+    const sem = adminAppState.activeSem;
+    const div = adminAppState.activeDiv;
+    const matchingTeachers = [];
+    for (const key in snapshot.val()) {
+      const assignedClass = snapshot.val()[key].assignedClasses;
+      if (assignedClass && assignedClass[`${sem}${div}`]) {
+        matchingTeachers.push(snapshot.val()[key]);
+      }
     }
+    return matchingTeachers;
+  } catch (error) {
+    showErrorSection("Error fetching teacher data:", error);
   }
-  return matchingTeachers;
 }
 function renderTeacherCardInPopup() {
   for (const key in adminAppState.allTeachers) {
@@ -760,35 +769,39 @@ DOM.rollNoPopup.successBtn.addEventListener("click", async () => {
     return;
   }
   if (rollNo) {
-    showSectionLoader("Checking rollno...");
-    const q = query(
-      ref(db, "userData"),
-      orderByChild("rollNumber"),
-      equalTo(rollNo),
-    );
-    await get(q).then(async (snapshot) => {
-      if (snapshot.exists()) {
-        DOM.rollNoPopup.error.textContent = "Roll No already exists";
-        fadeInEffect(DOM.rollNoPopup.error);
-        hideSectionLoader();
-        isError = true;
-        return;
-      } else {
-        hideSectionLoader();
-        const isConfirmed = await showConfirmationPopup(
-          "This will change the roll no of the student. Are you sure?",
-        );
-        if (!isConfirmed) return;
-        else {
-          showSectionLoader("Updating roll number...");
-          await updateData(`userData/${activeUserId}`, {
-            rollNumber: rollNo,
-          });
-          fadeOutEffect(DOM.rollNoPopup.popup);
+    try {
+      showSectionLoader("Checking rollno...");
+      const q = query(
+        ref(db, "userData"),
+        orderByChild("rollNumber"),
+        equalTo(rollNo),
+      );
+      await get(q).then(async (snapshot) => {
+        if (snapshot.exists()) {
+          DOM.rollNoPopup.error.textContent = "Roll No already exists";
+          fadeInEffect(DOM.rollNoPopup.error);
+          hideSectionLoader();
+          isError = true;
+          return;
+        } else {
+          hideSectionLoader();
+          const isConfirmed = await showConfirmationPopup(
+            "This will change the roll no of the student. Are you sure?",
+          );
+          if (!isConfirmed) return;
+          else {
+            showSectionLoader("Updating roll number...");
+            await updateData(`userData/${activeUserId}`, {
+              rollNumber: rollNo,
+            });
+            fadeOutEffect(DOM.rollNoPopup.popup);
+          }
         }
-      }
-    });
-    if (isError) return;
+      });
+      if (isError) return;
+    } catch (error) {
+      showErrorSection("Error updating roll number", error);
+    }
   }
   await fadeOutEffect(DOM.rollNoPopup.popup);
   await fadeOutEffect(DOM.individualUserPopup.popup);

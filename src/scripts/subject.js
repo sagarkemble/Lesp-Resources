@@ -1,4 +1,4 @@
-import { deleteData, pushData, updateData } from "./firebase.js";
+import { app, deleteData, pushData, updateData } from "./firebase.js";
 import { deleteDriveFile, uploadDriveFile } from "./driveApi.js";
 import { appState, syncDbData } from "./appstate.js";
 import {
@@ -14,12 +14,19 @@ import {
   applyEditModeUI,
   showConfirmationPopup,
 } from "./index.js";
-import { headerIcon, headerTitle, subjectSelectorPopup } from "./navigation.js";
+import { headerIcon, headerTitle } from "./navigation.js";
 import { showErrorSection } from "./error.js";
-const subjectPageSection = document.querySelector(".subject-page-section");
+import {
+  renderUpcomingSubmissions as dashboardRenderUpcomingSubmissions,
+  renderNoticeSlider as dashboardRenderNoticeSlider,
+} from "./dashboard.js";
+import {
+  trackCreateEvent,
+  trackDeleteEvent,
+  trackEditEvent,
+} from "./posthog.js";
 const DOM = {
   subjectPageSection: document.querySelector(".subject-page-section"),
-  // Swiper
   noticeSwiper: {
     swiper: new Swiper("#subject-page-swiper", {
       direction: "horizontal",
@@ -50,7 +57,6 @@ const DOM = {
     prevBtn: document.querySelector(".swiper-button-prev"),
     nextBtn: document.querySelector(".swiper-button-next"),
   },
-  // Editor Tool Buttons
   editorBtn: {
     addNoticeBtn: document.querySelector(
       ".subject-page-section .add-notice-btn",
@@ -69,7 +75,6 @@ const DOM = {
       ".subject-page-section .warning-popup-wrapper .message",
     ),
   },
-  // Add Notice Popup
   noticePopup: {
     popup: document.querySelector(
       ".subject-page-section .add-notice-popup-wrapper",
@@ -117,8 +122,6 @@ const DOM = {
       ),
     },
   },
-
-  // Add Category Popup
   categoryPopup: {
     popup: document.querySelector(".add-category-popup-wrapper"),
     popupTitle: document.querySelector(
@@ -133,8 +136,6 @@ const DOM = {
     input: document.querySelector("#category-title-input"),
     error: document.querySelector(".add-category-popup-wrapper .title-error"),
   },
-
-  // Add Item Popup
   itemPopup: {
     popup: document.querySelector(".add-item-popup-wrapper"),
     popupTitle: document.querySelector(".add-item-popup-wrapper .popup-title"),
@@ -179,8 +180,6 @@ const DOM = {
       inputWrapper: document.querySelector(".item-file-input-wrapper"),
     },
   },
-
-  // Add Submission Popup
   submissionPopup: {
     popup: document.querySelector(".add-submission-popup-wrapper"),
     popupTitle: document.querySelector(
@@ -188,9 +187,6 @@ const DOM = {
     ),
     dateInputWrapper: document.querySelector(
       ".add-submission-popup-wrapper .date-input-wrapper",
-    ),
-    descriptionInputWrapper: document.querySelector(
-      ".add-submission-popup-wrapper .description-input-wrapper",
     ),
     closeBtn: document.querySelector(
       ".add-submission-popup-wrapper .close-popup-btn",
@@ -201,10 +197,7 @@ const DOM = {
     successBtn: document.querySelector(
       ".add-submission-popup-wrapper .success-btn",
     ),
-    changeDateBtn: document.querySelector(
-      ".add-submission-popup-wrapper .change-date-btn",
-    ),
-    orLine: document.querySelector(".add-submission-popup-wrapper .or-line"),
+
     inputs: {
       title: document.querySelector("#submission-title-input"),
       description: document.querySelector("#submission-description-input"),
@@ -225,8 +218,6 @@ const DOM = {
       ".add-submission-popup-wrapper .fake-placeholder",
     ),
   },
-
-  // Upcoming Submissions
   upcomingSubmissions: {
     container: document.querySelector(
       ".subject-page-section .upcoming-submissions",
@@ -243,21 +234,25 @@ const DOM = {
   },
 };
 export async function loadSubjectSection() {
-  await unloadSubjectSection();
-  await renderNoticeSlider();
-  await renderUpcomingSubmissions();
-  await renderResources();
-  headerIcon.src = appState.subjectMetaData[appState.activeSubject].iconLink;
-  headerTitle.textContent =
-    appState.subjectMetaData[appState.activeSubject].name;
-  await hideSections();
-  DOM.noticeSwiper.swiper.slideTo(0, 0);
-  DOM.noticeSwiper.swiper.update();
-  await applyEditModeUI();
-  await fadeInEffect(subjectPageSection);
+  try {
+    await unloadSubjectSection();
+    await renderNoticeSlider();
+    await renderUpcomingSubmissions();
+    await renderResources();
+    headerIcon.src = appState.subjectMetaData[appState.activeSubject].iconLink;
+    headerTitle.textContent =
+      appState.subjectMetaData[appState.activeSubject].name;
+    await hideSections();
+    DOM.noticeSwiper.swiper.slideTo(0, 0);
+    DOM.noticeSwiper.swiper.update();
+    await applyEditModeUI();
+    await fadeInEffect(DOM.subjectPageSection);
+  } catch (err) {
+    showErrorSection("Error loading subject section", err);
+  }
 }
 async function unloadSubjectSection() {
-  await fadeOutEffect(subjectPageSection);
+  await fadeOutEffect(DOM.subjectPageSection);
   document.querySelectorAll(".dynamic-container").forEach((container) => {
     container.remove();
   });
@@ -265,15 +260,12 @@ async function unloadSubjectSection() {
   DOM.upcomingSubmissions.cardContainer.innerHTML = "";
 }
 // notice related functions and var
-
-async function renderNoticeSlider() {
+export function renderNoticeSlider() {
   const noticeEntries =
     appState.divisionData?.noticeData?.subjectNoticeData?.[
       appState.activeSubject
     ] || {};
   if (Object.keys(noticeEntries).length === 0 || !noticeEntries) {
-    console.log("this is suisusisiusi no notice data");
-
     DOM.noticeSwiper.swiper.el.classList.add("!hidden");
     return;
   }
@@ -350,8 +342,7 @@ async function renderNoticeSlider() {
     attachment.textContent = "See attachment";
     attachment.className = "cursor-pointer hidden";
     attachment.target = "_blank";
-    deleteIcon.addEventListener("click", async () => {
-      console.log("this is gonna delete");
+    deleteIcon.addEventListener("click", () => {
       deleteNotice(key, noticeData.attachmentId, noticeData.scope);
     });
 
@@ -426,8 +417,10 @@ async function deleteNotice(key, attachmentId) {
   await deleteData(
     `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/noticeData/subjectNoticeData/${appState.activeSubject}/${key}`,
   );
+  trackEditEvent(appState.activeSubject, "Deleted notice");
   await showSectionLoader("Syncing data...");
   await syncDbData();
+  await dashboardRenderUpcomingSubmissions();
   await hideSectionLoader();
   loadSubjectSection();
 }
@@ -531,10 +524,12 @@ DOM.noticePopup.successBtn.addEventListener("click", async () => {
       scope: appState.activeSubject,
     },
   );
+  trackEditEvent(appState.activeSubject, "Added notice");
   await fadeOutEffect(DOM.noticePopup.popup);
   showSectionLoader("Syncing data...");
   resetAddNoticePopup();
   await syncDbData();
+  await dashboardRenderNoticeSlider();
   await hideSectionLoader();
   loadSubjectSection();
 });
@@ -585,12 +580,14 @@ DOM.categoryPopup.successBtn.addEventListener("click", async () => {
       `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList/${selectedCategoryId}/metaData`,
       { name: title },
     );
+    trackEditEvent(appState.activeSubject, "Edited category name to:" + title);
   } else {
     showSectionLoader("Adding category...");
     await pushData(
       `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList`,
       { metaData: { name: title, isVisible: true } },
     );
+    trackCreateEvent(appState.activeSubject, "Added category:" + title);
   }
   await fadeOutEffect(DOM.categoryPopup.popup);
   showSectionLoader("Syncing data...");
@@ -632,12 +629,16 @@ async function deleteCategory() {
   await deleteData(
     `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList/${selectedCategoryId}`,
   );
+  trackDeleteEvent(
+    appState.activeSubject,
+    "Deleted category:" + data.metaData.name,
+  );
   await showSectionLoader("Syncing data...");
   await syncDbData();
   hideSectionLoader();
   loadSubjectSection();
 }
-async function resetAddCategoryPopup() {
+function resetAddCategoryPopup() {
   showElement(DOM.categoryPopup.successBtn);
   hideElement(DOM.categoryPopup.error);
   DOM.categoryPopup.input.value = "";
@@ -662,7 +663,7 @@ async function toggleCategoryVisibility() {
   );
   if (!confirm) return;
   await showSectionLoader("Changing visibility...");
-  updateData(
+  await updateData(
     `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList/${selectedCategoryId}/metaData`,
     {
       isVisible:
@@ -823,7 +824,9 @@ DOM.itemPopup.successBtn.addEventListener("click", async () => {
         link: attachmentURL,
         attachmentId,
       },
+      trackEditEvent(appState.activeSubject, "Updated item:" + title),
     );
+    trackEditEvent(appState.activeSubject, "Updated item:" + title);
   } else {
     showSectionLoader("Adding item...");
     await pushData(
@@ -836,6 +839,7 @@ DOM.itemPopup.successBtn.addEventListener("click", async () => {
         isVisible: true,
       },
     );
+    trackCreateEvent(appState.activeSubject, "Added item:" + title);
   }
   await fadeOutEffect(DOM.itemPopup.popup);
   showSectionLoader("Syncing data...");
@@ -845,34 +849,43 @@ DOM.itemPopup.successBtn.addEventListener("click", async () => {
   loadSubjectSection();
 });
 DOM.itemPopup.editTools.unhideBtn.addEventListener("click", async () => {
+  const title =
+    `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList/${selectedCategoryId}/itemList/${selectedItemId}`
+      .name;
   let confirm = await showConfirmationPopup(
     "Are you sure you want to unhide this item?",
   );
   if (!confirm) return;
   showSectionLoader("Unhiding item...");
-  updateData(
+  await updateData(
     `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList/${selectedCategoryId}/itemList/${selectedItemId}`,
     { isVisible: true },
   );
   fadeOutEffect(DOM.itemPopup.popup);
   showSectionLoader("Syncing data...");
   await syncDbData();
+  trackEditEvent(appState.activeSubject, "Unhide item:" + title);
   resetAddItemPopup();
   hideSectionLoader();
   loadSubjectSection();
 });
 DOM.itemPopup.editTools.hideBtn.addEventListener("click", async () => {
+  const title =
+    `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList/${selectedCategoryId}/itemList/${selectedItemId}`
+      .name;
   let confirm = await showConfirmationPopup(
     "Are you sure you want to hide this item?",
   );
   if (!confirm) return;
   showSectionLoader("Hiding item...");
-  updateData(
+  await updateData(
     `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList/${selectedCategoryId}/itemList/${selectedItemId}`,
     { isVisible: false },
   );
   fadeOutEffect(DOM.itemPopup.popup);
   showSectionLoader("Syncing data...");
+  trackEditEvent(appState.activeSubject, "Hide item:" + title);
+
   await syncDbData();
   resetAddItemPopup();
   hideSectionLoader();
@@ -910,6 +923,7 @@ DOM.itemPopup.editTools.deleteBtn.addEventListener("click", async () => {
   );
   fadeOutEffect(DOM.itemPopup.popup);
   showSectionLoader("Syncing data...");
+  trackDeleteEvent(appState.activeSubject, "Deleted item:" + title);
   await syncDbData();
   resetAddItemPopup();
   hideSectionLoader();
@@ -918,14 +932,17 @@ DOM.itemPopup.editTools.deleteBtn.addEventListener("click", async () => {
 function renderResources() {
   const categoryData =
     appState.subjectData?.[appState.activeSubject]?.containerList || {};
+
   if (!categoryData || !Object.keys(categoryData).length) {
     return;
   }
+
   for (const categoryId in categoryData) {
     const category = categoryData[categoryId];
     const container = document.createElement("div");
     container.className =
       "category-item-container dynamic-container gap-2 lg:gap-3 flex flex-col w-full";
+
     const headingWrapper = document.createElement("div");
     headingWrapper.className = "gap-2 lg:gap-3 flex items-center w-full";
     const heading = document.createElement("p");
@@ -987,6 +1004,7 @@ function renderResources() {
       selectedCategoryId = categoryId;
       toggleCategoryVisibility();
     });
+
     const items = category?.itemList || {};
     for (const itemId in items) {
       const item = items[itemId];
@@ -1023,7 +1041,7 @@ function renderResources() {
       });
     }
     container.appendChild(cardContainer);
-    subjectPageSection.appendChild(container);
+    DOM.subjectPageSection.appendChild(container);
   }
 }
 // upcoming submission var and function
@@ -1047,11 +1065,8 @@ DOM.submissionPopup.inputs.date.addEventListener("input", () => {
   hideElement(DOM.submissionPopup.fakeDatePlaceholder);
 });
 DOM.submissionPopup.successBtn.addEventListener("click", async () => {
-  console.log("clicked");
-  hideElement(DOM.submissionPopup.errors.description);
   hideElement(DOM.submissionPopup.errors.title);
   let title = DOM.submissionPopup.inputs.title.value;
-  let description = DOM.submissionPopup.inputs.description.value;
   let date = DOM.submissionPopup.inputs.date.value;
   let isError = false;
   if (!title) {
@@ -1059,25 +1074,14 @@ DOM.submissionPopup.successBtn.addEventListener("click", async () => {
     DOM.submissionPopup.errors.title.textContent = "Required";
     showElement(DOM.submissionPopup.errors.title);
   }
-  if (!description && !date) {
+  if (!date) {
     isError = true;
-    DOM.submissionPopup.errors.description.textContent = "Required";
-    showElement(DOM.submissionPopup.errors.description);
-  }
-  if (description && date) {
-    await showWarningPopup("Please enter either a description or a date.");
-    await fadeOutEffect(DOM.submissionPopup.popup);
-    resetAddUpcomingSubmissionPopup();
-    return;
+    DOM.submissionPopup.errors.date.textContent = "Required";
+    showElement(DOM.submissionPopup.errors.date);
   }
   if (isError) return;
-  if (description) {
-    date = description;
-  }
   if (isSubmissionEditing) {
     showSectionLoader("Updating submission...");
-    console.log("called");
-
     await updateData(
       `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/upcomingSubmissionData/${appState.activeSubject}/${selectedSubmissionId}`,
       {
@@ -1085,6 +1089,7 @@ DOM.submissionPopup.successBtn.addEventListener("click", async () => {
         dueDate: date,
       },
     );
+    trackEditEvent(appState.activeSubject, "Edited submission:" + title);
   } else {
     showSectionLoader("Creating submission...");
     await pushData(
@@ -1094,14 +1099,14 @@ DOM.submissionPopup.successBtn.addEventListener("click", async () => {
         dueDate: date,
       },
     );
+    trackCreateEvent(appState.activeSubject, "Created submission:" + title);
   }
-  console.log("updated");
-
   await fadeOutEffect(DOM.submissionPopup.popup);
   showSectionLoader("Syncing data...");
   await syncDbData();
   resetAddUpcomingSubmissionPopup();
   hideSectionLoader();
+  await dashboardRenderUpcomingSubmissions();
   loadSubjectSection();
 });
 DOM.submissionPopup.deleteBtn.addEventListener("click", async () => {
@@ -1115,8 +1120,13 @@ DOM.submissionPopup.deleteBtn.addEventListener("click", async () => {
   );
   await fadeOutEffect(DOM.submissionPopup.popup);
   showSectionLoader("Syncing data...");
+  trackDeleteEvent(
+    appState.activeSubject,
+    "Deleted submission:" + selectedSubmissionId,
+  );
   await syncDbData();
   resetAddUpcomingSubmissionPopup();
+  await dashboardRenderUpcomingSubmissions();
   hideSectionLoader();
   loadSubjectSection();
 });
@@ -1131,45 +1141,19 @@ DOM.submissionPopup.inputs.title.addEventListener("input", () => {
     hideElement(DOM.submissionPopup.errors.title);
   }
 });
-DOM.submissionPopup.inputs.description.addEventListener("input", () => {
-  if (DOM.submissionPopup.inputs.description.value.length == 21) {
-    DOM.submissionPopup.errors.description.textContent =
-      "Max 20 characters reached";
-    DOM.submissionPopup.inputs.description.value =
-      DOM.submissionPopup.inputs.description.value.slice(0, 20);
-    showElement(DOM.submissionPopup.errors.description);
-  } else {
-    hideElement(DOM.submissionPopup.errors.description);
-  }
-});
 
 function resetAddUpcomingSubmissionPopup() {
   showElement(DOM.submissionPopup.dateInputWrapper);
-  showElement(DOM.submissionPopup.descriptionInputWrapper);
-  hideElement(DOM.submissionPopup.changeDateBtn);
   showElement(DOM.submissionPopup.fakeDatePlaceholder);
   hideElement(DOM.submissionPopup.deleteBtn);
   DOM.submissionPopup.inputs.title.value = "";
-  DOM.submissionPopup.inputs.description.value = "";
   DOM.submissionPopup.inputs.date.value = "";
   isSubmissionEditing = false;
   selectedSubmissionId = null;
   DOM.submissionPopup.popupTitle.textContent = "Add Submission";
   DOM.submissionPopup.successBtn.textContent = "Create";
 }
-DOM.submissionPopup.changeDateBtn.addEventListener("click", () => {
-  showElement(DOM.submissionPopup.dateInputWrapper);
-  showElement(DOM.submissionPopup.orLine);
-  showElement(DOM.submissionPopup.descriptionInputWrapper);
-  DOM.submissionPopup.inputs.description.value = "";
-  hideElement(DOM.submissionPopup.changeDateBtn);
-});
-
 function editUpcomingSubmission(submissionId) {
-  showElement(DOM.submissionPopup.changeDateBtn);
-  hideElement(DOM.submissionPopup.dateInputWrapper);
-  hideElement(DOM.submissionPopup.descriptionInputWrapper);
-  hideElement(DOM.submissionPopup.orLine);
   DOM.submissionPopup.successBtn.textContent = "Edit";
   DOM.submissionPopup.inputs.title.value =
     appState.divisionData.upcomingSubmissionData[appState.activeSubject][
@@ -1179,6 +1163,7 @@ function editUpcomingSubmission(submissionId) {
     appState.divisionData.upcomingSubmissionData[appState.activeSubject][
       submissionId
     ].dueDate;
+  hideElement(DOM.submissionPopup.fakeDatePlaceholder);
   isSubmissionEditing = true;
   selectedSubmissionId = submissionId;
   DOM.submissionPopup.popupTitle.textContent = "Edit Submission";
@@ -1190,17 +1175,17 @@ async function renderUpcomingSubmissions() {
     (appState.divisionData?.upcomingSubmissionData || {})[
       appState.activeSubject
     ] || {};
-  if (!submissionData || !Object.keys(submissionData).length) {
+  const sortedSubmissionData = sortSubmissionsByDateObj(submissionData);
+  if (!sortedSubmissionData || !Object.keys(sortedSubmissionData).length) {
     hideElement(DOM.upcomingSubmissions.container);
-    console.log("No upcoming found");
     return;
   }
   showElement(DOM.upcomingSubmissions.container);
   const now = new Date();
   const deleteCutoffHour = 17;
   const deleteCutoffMinute = 30;
-  for (const key in submissionData) {
-    let submission = submissionData[key];
+  for (const key in sortedSubmissionData) {
+    let submission = sortedSubmissionData[key];
     if (
       typeof submission.dueDate === "string" &&
       /^\d{4}-\d{2}-\d{2}$/.test(submission.dueDate)
@@ -1242,11 +1227,7 @@ async function renderUpcomingSubmissions() {
 }
 function formatDateBasedOnProximity(rawDate) {
   const dateObj = new Date(rawDate);
-  if (isNaN(dateObj)) return rawDate.charAt(0).toUpperCase() + rawDate.slice(1);
-
   const now = new Date();
-
-  // Normalize both to YYYY-MM-DD (removing time portion)
   const todayStr = now.toISOString().split("T")[0];
   const dateStr = dateObj.toISOString().split("T")[0];
 
@@ -1272,4 +1253,13 @@ function formatDateBasedOnProximity(rawDate) {
     });
     return `${day}-${month}`;
   }
+}
+function sortSubmissionsByDateObj(submissionData) {
+  return Object.fromEntries(
+    Object.entries(submissionData).sort(([, a], [, b]) => {
+      const dateA = new Date(a.dueDate);
+      const dateB = new Date(b.dueDate);
+      return dateA - dateB; // ascending
+    }),
+  );
 }

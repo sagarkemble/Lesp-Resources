@@ -29,9 +29,9 @@ import {
   hideSectionLoader,
   hideSections,
 } from "./index.js";
-import * as Sentry from "@sentry/browser";
 import { showErrorSection } from "./error";
 import { showLoginSection } from "./login.js";
+import { trackSignup } from "./posthog.js";
 const DOM = {
   loginSection: document.querySelector(".login-section"),
   createAccountLink: document.querySelector(".create-account-link"),
@@ -348,9 +348,7 @@ DOM.userDetails.form.addEventListener("submit", async (e) => {
         }
       })
       .catch((error) => {
-        showErrorSection();
-        Sentry.captureException(error);
-        console.error("Error checking roll number:", error);
+        showErrorSection("Error checking roll number:", error);
         isError = true;
       });
   }
@@ -441,9 +439,7 @@ DOM.userCredentials.form.addEventListener("submit", async (e) => {
       }
     })
     .catch((error) => {
-      showErrorSection();
-      Sentry.captureException(error);
-      console.error("Error checking email:", error);
+      showErrorSection("Error checking email:", error);
     });
 
   if (isError) {
@@ -578,22 +574,18 @@ DOM.summaryForm.form.addEventListener("submit", async (e) => {
     await writeUserData();
     try {
       await signOut(auth);
+      trackSignup(userObj.email);
       await fadeOutEffect(DOM.summaryForm.btnLoader);
       await fadeInEffectOpacity(DOM.summaryForm.btnText);
       await fadeOutEffect(DOM.summaryForm.section);
       await fadeInEffect(DOM.successScreen);
       DOM.successLottiePlayer.play();
     } catch (error) {
-      showErrorSection();
-      console.error("Error creating user:", error);
-      Sentry.captureException(error);
+      showErrorSection("Error creating user:", error);
       await fadeOutEffect(DOM.summaryForm.section);
     }
   } catch (error) {
-    showErrorSection();
-    console.error("Error creating user:", error);
-    Sentry.captureException(error);
-    console.error(error);
+    showErrorSection("Error creating user:", error);
   }
   DOM.summaryForm.nextBtn.disabled = false;
   DOM.summaryForm.previousBtn.disabled = false;
@@ -642,9 +634,7 @@ async function writeUserData() {
   return await set(path, userObj)
     .then(() => {})
     .catch((error) => {
-      console.error("Error writing user data:", error);
-      showErrorSection();
-      Sentry.captureException(error);
+      showErrorSection("Error writing user data:", error);
     });
 }
 DOM.successLottiePlayer.addEventListener("complete", async () => {

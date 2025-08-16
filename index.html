@@ -1,5 +1,8 @@
 <!doctype html>
-<html lang="en" class="bg-surface h-full lg:text-[0.8rem] 2xl:text-[1rem]">
+<html
+  lang="en"
+  class="bg-surface no-scroll-bar h-full lg:text-[0.8rem] 2xl:text-[1rem]"
+>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -35,8 +38,24 @@
     </style>
   </head>
   <body
-    class="text-text-primary bg-surface flex h-full w-full transition-all duration-200"
+    class="text-text-primary bg-surface flex min-h-full w-full transition-all duration-200"
   >
+    <!-- error section pending-->
+    <div
+      class="error-section bg-surface absolute z-[70] flex hidden h-full w-full flex-col items-center justify-center gap-4 transition-all duration-200"
+    >
+      <img src="/error-images/error.png" alt="" class="max-w-[22.5rem]" />
+      <div
+        class="text-text-primary flex flex-wrap items-center justify-center gap-2 text-center text-2xl font-semibold"
+      >
+        <p class=""></p>
+        Ooops! , something went wrong
+        <p class="shrink-0">: &#40;</p>
+      </div>
+      <a href="">
+        <button class="button-hug">Reload</button>
+      </a>
+    </div>
     <!-- initial loading screen -->
     <div
       class="lottie-loading-screen bg-surface fixed top-0 left-0 z-60 flex hidden h-full w-full items-center justify-center py-4 transition-all duration-200"
@@ -373,7 +392,7 @@
       </div>
     </nav>
     <main
-      class="flex h-full w-full min-w-0 flex-1 flex-col gap-4 px-4 py-3 lg:ml-[4.375rem]"
+      class="flex min-h-full w-full min-w-0 flex-1 flex-col gap-4 px-4 py-3 lg:mb-0 lg:ml-[4.375rem]"
     >
       <!-- navbar -->
       <header class="flex hidden w-full items-center gap-2 lg:gap-3">
@@ -791,7 +810,9 @@
           </div>
           <div class="subject-type-wrapper flex w-full gap-4">
             <div class="subject-input-wrapper flex w-1/2 flex-col gap-1">
-              <label class="text-text-primary px-1" for="add-notice-title"
+              <label
+                class="text-text-primary px-1"
+                for="timetable-subject-selection-drop-down"
                 >Subject</label
               >
               <div class="wrapper relative">
@@ -821,7 +842,9 @@
               <p class="subject-error text-text-error hidden px-1 text-sm"></p>
             </div>
             <div class="type-input-wrapper flex w-1/2 flex-col gap-1">
-              <label class="text-text-primary px-1" for="add-notice-popup-title"
+              <label
+                class="text-text-primary px-1"
+                for="timetable-type-selection-drop-down"
                 >Type</label
               >
               <div class="wrapper relative">
@@ -927,7 +950,7 @@
       </div>
       <!-- login-section pending-->
       <section
-        class="login-section flex hidden h-full min-h-full w-full flex-col items-center justify-center gap-2 transition-all duration-200"
+        class="login-section flex hidden h-full w-full flex-col items-center justify-center gap-2 transition-all duration-200"
       >
         <form
           id="login-form"
@@ -1884,7 +1907,7 @@
       </section>
       <!-- subject page section -->
       <section
-        class="subject-page-section flex hidden h-full w-full flex-col gap-4 transition-all duration-200 lg:gap-5"
+        class="subject-page-section flex hidden min-h-full w-full flex-col gap-4 pb-2 transition-all duration-200 lg:min-h-0 lg:gap-5 lg:pb-0"
       >
         <!-- warning popup -->
         <div
@@ -2149,30 +2172,7 @@
               />
               <p class="title-error text-text-error hidden px-1 text-sm"></p>
             </div>
-            <div class="description-input-wrapper relative flex flex-col gap-1">
-              <label
-                class="text-text-primary px-1"
-                for="submission-description-input"
-              >
-                Submission date
-              </label>
-              <input
-                type="text"
-                id="submission-description-input"
-                autocomplete="off"
-                maxlength="21"
-                placeholder="e.g. Within next week"
-                class="title-input bg-surface-3 border-surface-4 focus:border-surface-3 placeholder:text-text-tertiary focus:!ring-primary-400 caret-primary-50 text-primary-50 box-border w-full rounded-lg border-2 px-3 py-1.5 pr-10 focus:!ring-1 focus:outline-none"
-              />
-              <p
-                class="submission-description-error text-text-error hidden px-1 text-sm"
-              ></p>
-            </div>
-            <div class="or-line flex w-full items-center gap-2 text-center">
-              <div class="line bg-surface-4 h-0.5 w-full"></div>
-              <p class="text-sm">or</p>
-              <div class="line bg-surface-4 h-0.5 w-full"></div>
-            </div>
+
             <div class="date-input-wrapper relative flex flex-col gap-1">
               <label class="text-text-primary px-1" for="submission-date-input">
                 Click to choose from calendar
@@ -2196,9 +2196,7 @@
               </div>
               <p class="date-error text-text-error hidden px-1 text-sm"></p>
             </div>
-            <button class="button-fill change-date-btn hidden">
-              Change date
-            </button>
+
             <button class="button-fill success-btn" type="button">
               Add submission
             </button>
@@ -3591,22 +3589,7 @@
           class="leaderboard-card-container flex w-full flex-col gap-4 lg:gap-5"
         ></div>
       </section>
-      <!-- error section pending-->
-      <section
-        class="error-section flex hidden h-full w-full flex-col items-center justify-center gap-4 transition-all duration-200"
-      >
-        <img src="/error-images/error.png" alt="" class="max-w-[22.5rem]" />
-        <div
-          class="text-text-primary flex flex-wrap items-center justify-center gap-2 text-center text-2xl font-semibold"
-        >
-          <p class=""></p>
-          Ooops! , something went wrong
-          <p class="shrink-0">: &#40;</p>
-        </div>
-        <a href="">
-          <button class="button-hug">Reload</button>
-        </a>
-      </section>
+
       <!-- admin section -->
       <section
         class="admin-section flex hidden h-full w-full flex-col items-center justify-center gap-4 transition-all duration-200"

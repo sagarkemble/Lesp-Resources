@@ -147,51 +147,55 @@ let studentRawData = null;
 let sortedRollNoWiseStudentData = null;
 let rankWiseSortedData = null;
 export async function loadLeaderboardSection() {
-  await unloadLeaderBoardSection();
-  studentRawData = await getStudentRawData();
+  try {
+    await unloadLeaderBoardSection();
+    studentRawData = await getStudentRawData();
 
-  if (studentRawData && Object.keys(studentRawData).length > 0) {
-    sortedRollNoWiseStudentData = Object.entries(studentRawData)
-      .sort(([, a], [, b]) => a.rollNumber - b.rollNumber)
-      .reduce((acc, [key, val]) => {
-        acc[key] = val;
+    if (studentRawData && Object.keys(studentRawData).length > 0) {
+      sortedRollNoWiseStudentData = Object.entries(studentRawData)
+        .sort(([, a], [, b]) => a.rollNumber - b.rollNumber)
+        .reduce((acc, [key, val]) => {
+          acc[key] = val;
+          return acc;
+        }, {});
+    } else {
+      sortedRollNoWiseStudentData = {}; // or leave undefined, depending on your needs
+    }
+
+    const medalPoints = { bronze: 10, silver: 20, gold: 30 };
+    rankWiseSortedData = Object.entries(sortedRollNoWiseStudentData).reduce(
+      (acc, [userId, user]) => {
+        const { firstName, lastName, medalList, pfpLink } = user;
+        const bronze = medalList.bronze || 0;
+        const silver = medalList.silver || 0;
+        const gold = medalList.gold || 0;
+        const totalPoints =
+          bronze * medalPoints.bronze +
+          silver * medalPoints.silver +
+          gold * medalPoints.gold;
+        acc[userId] = {
+          firstName,
+          lastName,
+          name: `${firstName} ${lastName}`,
+          pfpLink,
+          bronze,
+          silver,
+          gold,
+          totalPoints,
+          userId,
+        };
         return acc;
-      }, {});
-  } else {
-    sortedRollNoWiseStudentData = {}; // or leave undefined, depending on your needs
+      },
+      {},
+    );
+    initLeaderBoardTopper();
+    renderLeaderboardCards();
+    initPreviousTestWinner();
+    renderStudentCardInPopup();
+    initStats();
+  } catch (error) {
+    showErrorSection("Error loading leaderboard:", error);
   }
-
-  const medalPoints = { bronze: 10, silver: 20, gold: 30 };
-  rankWiseSortedData = Object.entries(sortedRollNoWiseStudentData).reduce(
-    (acc, [userId, user]) => {
-      const { firstName, lastName, medalList, pfpLink } = user;
-      const bronze = medalList.bronze || 0;
-      const silver = medalList.silver || 0;
-      const gold = medalList.gold || 0;
-      const totalPoints =
-        bronze * medalPoints.bronze +
-        silver * medalPoints.silver +
-        gold * medalPoints.gold;
-      acc[userId] = {
-        firstName,
-        lastName,
-        name: `${firstName} ${lastName}`,
-        pfpLink,
-        bronze,
-        silver,
-        gold,
-        totalPoints,
-        userId,
-      };
-      return acc;
-    },
-    {},
-  );
-  initLeaderBoardTopper();
-  renderLeaderboardCards();
-  initPreviousTestWinner();
-  renderStudentCardInPopup();
-  initStats();
 }
 async function unloadLeaderBoardSection() {
   await fadeOutEffect(leaderboarSection);

@@ -1,6 +1,5 @@
 import { showSectionLoader, hideSectionLoader } from "./index.js";
 import { showErrorSection } from "./error.js";
-import * as Sentry from "@sentry/browser";
 export async function deleteDriveFile(attachmentId) {
   if (!attachmentId) return false;
   try {
@@ -24,9 +23,7 @@ export async function deleteDriveFile(attachmentId) {
 
     return true;
   } catch (err) {
-    console.error("Error deleting attachment from Drive:", err.message);
-    Sentry.captureException(err);
-    showErrorSection();
+    showErrorSection("Error deleting attachment from Drive:", err);
     return false;
   }
 }
@@ -64,9 +61,7 @@ export async function uploadDriveFile(file, path) {
       fileId: result.fileId,
     };
   } catch (err) {
-    showErrorSection();
-    console.error("Upload error:", err.message);
-    Sentry.captureException(err);
+    showErrorSection("Error uploading file to Drive:", err);
     return null;
   }
 }

@@ -14,6 +14,7 @@ import {
   browserLocalPersistence,
   setPersistence,
 } from "./firebase.js";
+import { showInstallPrompt } from "./index.js";
 const swiper = new Swiper("#login-section-swiper", {
   direction: "horizontal",
   loop: true,
@@ -41,6 +42,7 @@ const loginBtnLoader = loginBtn.querySelector(".btn-loader");
 const loginBtnText = loginBtn.querySelector(".text");
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
+  showInstallPrompt();
   emailRelatedError.textContent = "";
   passwordRelatedError.textContent = "";
   loginFormRelatedError.textContent = "";

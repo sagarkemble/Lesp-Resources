@@ -16,10 +16,9 @@ import { headerIcon, headerTitle } from "./navigation.js";
 import { appState, syncDbData } from "./appstate.js";
 import { deleteDriveFile, uploadDriveFile } from "./driveApi.js";
 import { initUpcomingTestCard as dashboardInitUpcomingTestCard } from "./dashboard.js";
-const testsSection = document.querySelector(".tests-section");
+import { showErrorSection } from "./error.js";
 const DOM = {
   testsSection: document.querySelector(".tests-section"),
-  // Upcoming Test
   upcomingTest: {
     container: document.querySelector(".upcoming-test"),
     card: document.querySelector(".upcoming-test .card"),
@@ -35,7 +34,6 @@ const DOM = {
     noUpcomingTest: document.querySelector(".upcoming-test .no-test"),
     scheduleBtn: document.querySelector(".schedule-test-btn"),
   },
-  // Upcoming Test Popup
   upcomingTestPopup: {
     popup: document.querySelector(".edit-upcoming-test-popup-wrapper"),
     popupTitle: document.querySelector(
@@ -86,14 +84,12 @@ const DOM = {
       ),
     },
   },
-  // Previous Test
   previousTest: {
     container: document.querySelector(".previous-tests"),
     noPreviousTest: document.querySelector(".no-previous-test"),
     addContentBtn: document.querySelector(".previous-tests .add-content-btn"),
     cardContainer: document.querySelector(".previous-tests .card-container"),
   },
-  // Previous Test Popup
   previousTestPopup: {
     popup: document.querySelector(".previous-test-popup-wrapper"),
     popupTitle: document.querySelector(
@@ -160,20 +156,24 @@ const DOM = {
 };
 
 export async function loadTestSection() {
-  await unloadTestsSection();
-  initUpcomingTestCard();
-  renderPreviousTestCard();
-  applyEditModeUI();
+  try {
+    await unloadTestsSection();
+    initUpcomingTestCard();
+    renderPreviousTestCard();
+    applyEditModeUI();
+  } catch (err) {
+    showErrorSection("Error while loading test section", err);
+  }
 }
 export async function showTestsSection() {
   headerIcon.src =
     "https://ik.imagekit.io/yn9gz2n2g/others/test.png?updatedAt=1751607386764";
   headerTitle.textContent = "Tests";
   await hideSections();
-  fadeInEffect(testsSection);
+  fadeInEffect(DOM.testsSection);
 }
 async function unloadTestsSection() {
-  await fadeOutEffect(testsSection);
+  await fadeOutEffect(DOM.testsSection);
   DOM.previousTest.cardContainer.innerHTML = "";
 }
 // upcoming test listner and functions
@@ -280,7 +280,6 @@ DOM.upcomingTestPopup.successBtn.addEventListener("click", async () => {
   await syncDbData();
   hideSectionLoader();
   await loadTestSection();
-  console.log(appState.divisionData);
   await dashboardInitUpcomingTestCard();
   showTestsSection();
 });

@@ -1,4 +1,5 @@
 import { appState, syncDbData } from "./appstate.js";
+
 import {
   fadeInEffect,
   fadeOutEffect,
@@ -29,8 +30,9 @@ import {
   signOutUser,
   set,
 } from "./firebase.js";
-import * as Sentry from "@sentry/browser";
+import { renderNoticeSlider as subjectRenderNoticeSlider } from "./subject.js";
 import { showErrorSection } from "./error.js";
+
 const dashboardSection = document.querySelector(".dashboard-section");
 export const timeTablePopupSwiper = new Swiper("#time-table-popup-swiper", {
   direction: "horizontal",
@@ -413,9 +415,7 @@ export async function loadDashboard() {
     await loadTypeSelectorSubjects();
     renderTimeTablePopupSubjects();
   } catch (error) {
-    console.error("Error loading dashboard:", error);
-    showErrorSection();
-    Sentry.captureException(error);
+    showErrorSection("Error loading dashboard:", error);
   }
 }
 export async function showDashboard() {
@@ -445,49 +445,66 @@ export async function unloadDashboard() {
   timeTablePopupSwiper.removeAllSlides();
   DOM.noticeSwiper.swiper.removeAllSlides();
 }
-function renderUpcomingSubmissions() {
+export function renderUpcomingSubmissions() {
+  DOM.upcomingSubmissions.cardContainer.innerHTML = "";
   const upcomingSubmissions = appState?.divisionData?.upcomingSubmissionData;
   if (!upcomingSubmissions || Object.keys(upcomingSubmissions).length === 0) {
     hideElement(DOM.upcomingSubmissions.container);
     return;
   }
   const subjectMetaData = appState.subjectMetaData;
-  for (const key in upcomingSubmissions) {
-    const subject = upcomingSubmissions[key];
-    const subjectName = subjectMetaData[key].name;
-    const subjectIcon = subjectMetaData[key].iconLink;
-    for (const key2 in subject) {
-      const submission = subject[key2];
-      const card = document.createElement("div");
-      card.classList.add(
-        "card",
-        "p-4",
-        "bg-surface-2",
-        "rounded-[1.125rem]",
-        "flex",
-        "flex-col",
-
-        "lg:gap-3",
-        "py-5",
-      );
-      const date = formatDateBasedOnProximity(submission.dueDate);
-      card.innerHTML = `
-       <div class="wrapper flex items-center gap-1 lg:gap-3 pt-1 ">
-                <img
-                  src="${subjectIcon}"
-                  alt=""
-                  class="w-[1.5rem] h-[1.5rem] lg:w-[2.5rem] lg:h-[2.5rem] mb-1 lg:mb-0"
-                />
-                <p class="subject-name font-semibold text-text-primary">${subjectName.charAt(0).toUpperCase() + subjectName.slice(1)}</p>
-              </div>
-              <div class="wrapper flex flex-col lg:gap-1 text-text-secondary">
-                <p class="description">${submission.name.charAt(0).toUpperCase() + submission.name.slice(1)}</p>
-                <p class="submission-date">${date.charAt(0).toUpperCase() + date.slice(1)}</p>
-              </div>
-      `;
-      DOM.upcomingSubmissions.cardContainer.appendChild(card);
+  const allSubmissions = [];
+  for (const subjectKey in upcomingSubmissions) {
+    const subject = upcomingSubmissions[subjectKey];
+    for (const submissionKey in subject) {
+      allSubmissions.push({
+        ...subject[submissionKey],
+        subjectName: subjectMetaData[subjectKey].name,
+        subjectIcon: subjectMetaData[subjectKey].iconLink,
+        dueDate: subject[submissionKey].dueDate,
+      });
     }
   }
+
+  allSubmissions.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+  allSubmissions.forEach((submission) => {
+    const card = document.createElement("div");
+    card.classList.add(
+      "card",
+      "p-4",
+      "bg-surface-2",
+      "rounded-[1.125rem]",
+      "flex",
+      "flex-col",
+      "lg:gap-3",
+      "py-5",
+    );
+
+    const date = formatDateBasedOnProximity(submission.dueDate);
+
+    card.innerHTML = `
+      <div class="wrapper flex items-center gap-1 lg:gap-3 pt-1 ">
+        <img
+          src="${submission.subjectIcon}"
+          alt=""
+          class="w-[1.5rem] h-[1.5rem] lg:w-[2.5rem] lg:h-[2.5rem] mb-1 lg:mb-0"
+        />
+        <p class="subject-name font-semibold text-text-primary">
+          ${submission.subjectName.charAt(0).toUpperCase() + submission.subjectName.slice(1)}
+        </p>
+      </div>
+      <div class="wrapper flex flex-col lg:gap-1 text-text-secondary">
+        <p class="description">
+          ${submission.name.charAt(0).toUpperCase() + submission.name.slice(1)}
+        </p>
+        <p class="submission-date">
+          ${date.charAt(0).toUpperCase() + date.slice(1)}
+        </p>
+      </div>
+    `;
+
+    DOM.upcomingSubmissions.cardContainer.appendChild(card);
+  });
 }
 function showWarningPopup(message) {
   return new Promise((resolve) => {
@@ -659,6 +676,7 @@ DOM.noticePopup.successBtn.addEventListener("click", async () => {
     createdAt: Date.now(),
     scope: type,
   };
+  let isSubNotice = false;
   if (type === "department") {
     await pushData(`globalData/noticeList`, obj);
   } else if (type === "division") {
@@ -677,17 +695,21 @@ DOM.noticePopup.successBtn.addEventListener("click", async () => {
       `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/noticeData/subjectNoticeData/${type}`,
       obj,
     );
+    isSubNotice = true;
   }
   await fadeOutEffect(DOM.noticePopup.popup);
   resetNoticePopup();
   await showSectionLoader("Syncing data...");
   await syncDbData();
+  if (isSubNotice) await subjectRenderNoticeSlider();
+
   await hideSectionLoader();
   await loadDashboard();
   showDashboard();
 });
 
 function loadTypeSelectorSubjects() {
+  DOM.noticePopup.inputs.scope.innerHTML = "";
   for (const key in appState.subjectMetaData) {
     const element = appState.subjectMetaData[key];
     const option = document.createElement("option");
@@ -716,7 +738,8 @@ function loadTypeSelectorTimetablePopup() {
     DOM.timeTablePopup.inputs.type.appendChild(option2);
   }
 }
-async function renderNoticeSlider() {
+export async function renderNoticeSlider() {
+  DOM.noticeSwiper.swiper.removeAllSlides();
   const noticeEntries = getFlatNoticeOrdered();
   if (!noticeEntries || Object.keys(noticeEntries).length === 0) {
     DOM.noticeSwiper.swiper.el.classList.add("!hidden");
@@ -919,6 +942,7 @@ async function deleteNotice(key, attachmentId, scope) {
     }
     showSectionLoader("Deleting notice...");
   }
+  let isSubNotice = false;
   if (scope === "department") {
     await deleteData(`globalData/noticeList/${key}`);
   } else if (scope === "semester") {
@@ -933,12 +957,15 @@ async function deleteNotice(key, attachmentId, scope) {
     await deleteData(
       `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/noticeData/subjectNoticeData/${scope}/${key}`,
     );
+    isSubNotice = true;
   }
   await deleteData(
     `semesters/${appState.activeSem}/divisions/${appState.activeDiv}/subjects/notice/${appState.activeSubject}/${key}`,
   );
   await showSectionLoader("Syncing data...");
   await syncDbData();
+  if (isSubNotice) await subjectRenderNoticeSlider();
+
   await hideSectionLoader();
   await loadDashboard();
   showDashboard();
