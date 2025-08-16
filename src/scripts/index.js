@@ -410,6 +410,7 @@ if (window.matchMedia("(display-mode: standalone)").matches) {
   installPwaDescription.textContent =
     "We suggest you to use the site in the app for better experience.";
   installPwaBtn.textContent = "Open";
+  fadeInEffect(installPwaPopup);
   console.log("Running in browser");
 }
 
