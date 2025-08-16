@@ -14,7 +14,6 @@ import {
   browserLocalPersistence,
   setPersistence,
 } from "./firebase.js";
-import { showInstallPrompt } from "./index.js";
 const swiper = new Swiper("#login-section-swiper", {
   direction: "horizontal",
   loop: true,
@@ -40,7 +39,9 @@ const forgotPasswordLink = document.querySelector("#forgot-password-link");
 const loginBtn = document.querySelector(".login-btn");
 const loginBtnLoader = loginBtn.querySelector(".btn-loader");
 const loginBtnText = loginBtn.querySelector(".text");
-const installPwaPopup = document.querySelector(".install-pwa-popup-wrapper");
+export const installPwaPopup = document.querySelector(
+  ".install-pwa-popup-wrapper",
+);
 export const installPwaBtn = installPwaPopup.querySelector(".success-btn");
 
 loginForm.addEventListener("submit", async (e) => {

@@ -401,53 +401,22 @@ registerSW({
 let deferredPrompt;
 
 window.addEventListener("beforeinstallprompt", (e) => {
-  // Prevent the default mini-infobar from appearing on mobile
   e.preventDefault();
-
-  // Save the event for later use
+  fadeInEffect(installPwaPopup);
   deferredPrompt = e;
-
-  // Show your custom install UI
-  showInstallPrompt();
 });
-export function showInstallPrompt() {
-  const installButton = document.getElementById("install");
-  installButton.hidden = false;
-
-  installButton.addEventListener("click", async () => {
-    if (deferredPrompt) {
-      // Show the install prompt
-      deferredPrompt.prompt();
-
-      // Wait for the user's response
-      const { outcome } = await deferredPrompt.userChoice;
-
-      if (outcome === "accepted") {
-        console.log("User accepted the install prompt");
-      } else {
-        console.log("User dismissed the install prompt");
-      }
-
-      // Clear the deferredPrompt variable
-      deferredPrompt = null;
-      installButton.hidden = true;
-    }
-  });
-}
 installPwaBtn.addEventListener("click", async () => {
   if (deferredPrompt) {
     deferredPrompt.prompt();
-
     const { outcome } = await deferredPrompt.userChoice;
-
     if (outcome === "accepted") {
       console.log("User accepted the install prompt");
+      fadeOutEffect(installPwaPopup);
     } else {
       console.log("User dismissed the install prompt");
+      fadeOutEffect(installPwaPopup);
     }
-
-    // Clear the deferredPrompt variable and hide button
     deferredPrompt = null;
-    installPwaBtn.style.display = "none"; // or installPwaBtn.hidden = true;
+    installPwaBtn.style.display = "none";
   }
 });
