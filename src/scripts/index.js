@@ -401,7 +401,7 @@ registerSW({
 let deferredPrompt;
 
 window.addEventListener("beforeinstallprompt", (e) => {
-  // Prevent the default mini-infobar from appearing on mobile
+  fadeInEffect(installPwaPopup);
   e.preventDefault();
 
   // Save the event for later use
