@@ -40,6 +40,9 @@ const forgotPasswordLink = document.querySelector("#forgot-password-link");
 const loginBtn = document.querySelector(".login-btn");
 const loginBtnLoader = loginBtn.querySelector(".btn-loader");
 const loginBtnText = loginBtn.querySelector(".text");
+const installPwaPopup = document.querySelector(".install-pwa-popup-wrapper");
+export const installPwaBtn = installPwaPopup.querySelector(".success-btn");
+
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   showInstallPrompt();
@@ -83,9 +86,7 @@ loginForm.addEventListener("submit", async (e) => {
       }
     });
 });
-// loginBtn.addEventListener("click", async () => {
-//   showInstallPrompt();
-// });
+
 export function resetForm() {
   emailInput.value = "";
   passwordInput.value = "";

@@ -37,6 +37,7 @@ import {
   showResetPasswordSection,
   toggleFormState,
   resetForm,
+  installPwaBtn,
 } from "./login.js";
 import { showSessionsSection, loadSessionsSection } from "./sessions.js";
 import {
@@ -433,3 +434,20 @@ export function showInstallPrompt() {
     }
   });
 }
+installPwaBtn.addEventListener("click", async () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+
+    const { outcome } = await deferredPrompt.userChoice;
+
+    if (outcome === "accepted") {
+      console.log("User accepted the install prompt");
+    } else {
+      console.log("User dismissed the install prompt");
+    }
+
+    // Clear the deferredPrompt variable and hide button
+    deferredPrompt = null;
+    installPwaBtn.style.display = "none"; // or installPwaBtn.hidden = true;
+  }
+});
