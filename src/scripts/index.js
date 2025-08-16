@@ -37,8 +37,6 @@ import {
   showResetPasswordSection,
   toggleFormState,
   resetForm,
-  installPwaBtn,
-  installPwaPopup,
 } from "./login.js";
 import { showSessionsSection, loadSessionsSection } from "./sessions.js";
 import {
@@ -400,11 +398,12 @@ registerSW({
 });
 // Store the event for later use
 let deferredPrompt;
-
+const installPwaPopup = document.querySelector(".install-pwa-popup-wrapper");
+const installPwaBtn = installPwaPopup.querySelector(".success-btn");
+const installPwaCloseBtn = installPwaPopup.querySelector(".close-popup-btn");
 window.addEventListener("beforeinstallprompt", (e) => {
-  const installPwaPopup = document.getElementById("install-pwa-popup");
   fadeInEffect(installPwaPopup);
-  e.preventDefault();
+  // e.prompt();
   deferredPrompt = e;
 });
 installPwaBtn.addEventListener("click", async () => {
@@ -413,10 +412,11 @@ installPwaBtn.addEventListener("click", async () => {
     const { outcome } = await deferredPrompt.userChoice;
     if (outcome === "accepted") {
       console.log("User accepted the install prompt");
+      fadeOutEffect(installPwaPopup);
     } else {
       console.log("User dismissed the install prompt");
+      fadeOutEffect(installPwaPopup);
     }
     deferredPrompt = null;
-    installPwaBtn.style.display = "none";
   }
 });
