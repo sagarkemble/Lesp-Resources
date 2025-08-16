@@ -401,20 +401,41 @@ registerSW({
 let deferredPrompt;
 
 window.addEventListener("beforeinstallprompt", (e) => {
+  // Prevent the default mini-infobar from appearing on mobile
   e.preventDefault();
-  fadeInEffect(installPwaPopup);
+
+  // Save the event for later use
   deferredPrompt = e;
+
+  // Show your custom install UI
+  showInstallPrompt();
 });
+export function showInstallPrompt() {
+  const installButton = document.getElementById("install");
+  installButton.hidden = false;
+
+  installButton.addEventListener("click", async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === "accepted") {
+        console.log("User accepted the install prompt");
+      } else {
+        console.log("User dismissed the install prompt");
+      }
+      deferredPrompt = null;
+      installButton.hidden = true;
+    }
+  });
+}
 installPwaBtn.addEventListener("click", async () => {
   if (deferredPrompt) {
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
     if (outcome === "accepted") {
       console.log("User accepted the install prompt");
-      fadeOutEffect(installPwaPopup);
     } else {
       console.log("User dismissed the install prompt");
-      fadeOutEffect(installPwaPopup);
     }
     deferredPrompt = null;
     installPwaBtn.style.display = "none";
