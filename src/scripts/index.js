@@ -420,3 +420,6 @@ installPwaBtn.addEventListener("click", async () => {
     deferredPrompt = null;
   }
 });
+installPwaCloseBtn.addEventListener("click", () => {
+  fadeOutEffect(installPwaPopup);
+});
