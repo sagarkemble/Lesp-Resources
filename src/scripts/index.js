@@ -38,6 +38,7 @@ import {
   toggleFormState,
   resetForm,
   installPwaBtn,
+  installPwaPopup,
 } from "./login.js";
 import { showSessionsSection, loadSessionsSection } from "./sessions.js";
 import {
@@ -401,33 +402,11 @@ registerSW({
 let deferredPrompt;
 
 window.addEventListener("beforeinstallprompt", (e) => {
+  const installPwaPopup = document.getElementById("install-pwa-popup");
   fadeInEffect(installPwaPopup);
   e.preventDefault();
-
-  // Save the event for later use
   deferredPrompt = e;
-
-  // Show your custom install UI
-  showInstallPrompt();
 });
-export function showInstallPrompt() {
-  const installButton = document.getElementById("install");
-  installButton.hidden = false;
-
-  installButton.addEventListener("click", async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === "accepted") {
-        console.log("User accepted the install prompt");
-      } else {
-        console.log("User dismissed the install prompt");
-      }
-      deferredPrompt = null;
-      installButton.hidden = true;
-    }
-  });
-}
 installPwaBtn.addEventListener("click", async () => {
   if (deferredPrompt) {
     deferredPrompt.prompt();
