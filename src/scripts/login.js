@@ -83,9 +83,9 @@ loginForm.addEventListener("submit", async (e) => {
       }
     });
 });
-loginBtn.addEventListener("click", async () => {
-  showInstallPrompt();
-});
+// loginBtn.addEventListener("click", async () => {
+//   showInstallPrompt();
+// });
 export function resetForm() {
   emailInput.value = "";
   passwordInput.value = "";
