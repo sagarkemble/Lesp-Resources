@@ -401,6 +401,18 @@ let deferredPrompt;
 const installPwaPopup = document.querySelector(".install-pwa-popup-wrapper");
 const installPwaBtn = installPwaPopup.querySelector(".success-btn");
 const installPwaCloseBtn = installPwaPopup.querySelector(".close-popup-btn");
+const installPwaPopupTitle = installPwaPopup.querySelector(".popup-title");
+const installPwaDescription = installPwaPopup.querySelector(".description");
+if (window.matchMedia("(display-mode: standalone)").matches) {
+  console.log("Running as PWA");
+} else {
+  installPwaPopupTitle.textContent = "Install App";
+  installPwaDescription.textContent =
+    "We suggest you to use the site in the app for better experience.";
+  installPwaBtn.textContent = "Open";
+  console.log("Running in browser");
+}
+
 window.addEventListener("beforeinstallprompt", (e) => {
   fadeInEffect(installPwaPopup);
   // e.prompt();

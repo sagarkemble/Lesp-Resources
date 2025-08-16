@@ -39,10 +39,6 @@ const forgotPasswordLink = document.querySelector("#forgot-password-link");
 const loginBtn = document.querySelector(".login-btn");
 const loginBtnLoader = loginBtn.querySelector(".btn-loader");
 const loginBtnText = loginBtn.querySelector(".text");
-export const installPwaPopup = document.querySelector(
-  ".install-pwa-popup-wrapper",
-);
-export const installPwaBtn = installPwaPopup.querySelector(".success-btn");
 
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
