@@ -383,15 +383,14 @@
           class="header-icon hidden h-11 w-11 lg:h-12 lg:w-12"
         />
         <p
-          class="header-title flex hidden h-12 items-center text-center text-2xl font-semibold"
+          class="header-title hidden w-full items-center truncate text-2xl font-semibold"
         ></p>
-        <button class="button-hug edit-mode-toggle-btn ml-auto hidden">
+        <button class="button-hug edit-mode-toggle-btn ml-auto hidden shrink-0">
           Edit
         </button>
         <div class="admin-btn-wrapper ml-auto flex hidden gap-2">
-          <button class="button-hug visit-class-room-btn hidden">
-            View class
-          </button>
+          <button class="button-hug visit-class-room-btn hidden">View</button>
+
           <button class="button-hug admin-logout-btn">Logout</button>
         </div>
       </header>
@@ -462,7 +461,7 @@
                 class="h-[1.125rem] w-[1.125rem]"
                 alt=""
               />
-              <p class="points text-xl">130</p>
+              <p class="points text-xl">0</p>
             </div>
             <div class="medals flex items-center gap-3">
               <div class="gold-medal flex shrink-0 items-center gap-1">
@@ -472,7 +471,7 @@
                   alt=""
                 />
                 <span class="qty flex items-center"
-                  ><span class="text-xs">x</span>3</span
+                  ><span class="text-xs">x</span>0</span
                 >
               </div>
               <div class="silver-medal flex shrink-0 items-center gap-1">
@@ -482,7 +481,7 @@
                   alt=""
                 />
                 <span class="qty flex items-center"
-                  ><span class="text-xs">x</span>3</span
+                  ><span class="text-xs">x</span>0</span
                 >
               </div>
               <div class="bronze-medal flex shrink-0 items-center gap-1">
@@ -492,7 +491,7 @@
                   alt=""
                 />
                 <span class="qty flex items-center"
-                  ><span class="text-xs">x</span>3</span
+                  ><span class="text-xs">x</span>0</span
                 >
               </div>
             </div>
@@ -512,17 +511,37 @@
               class="account-details-btn wrapper just custom-hover flex cursor-pointer items-center gap-3"
             >
               <div
-                class="account-details text-text-tertiary flex h-5 w-5 items-center rounded-full bg-gradient-to-r text-center text-lg"
+                class="account-details text-text-tertiary flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-r text-center text-lg"
               >
                 <i class="fa-solid fa-user"></i>
               </div>
               Account details
             </div>
             <div
+              class="switch-class-btn-wrapper custom-hover flex hidden cursor-pointer items-center gap-3"
+            >
+              <div
+                class="switch-class-btn text-text-tertiary flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-r text-center text-lg"
+              >
+                <i class="fa-solid fa-repeat"></i>
+              </div>
+              Switch class
+            </div>
+            <div
+              class="admin-panel-btn-wrapper custom-hover flex hidden cursor-pointer items-center gap-3"
+            >
+              <div
+                class="admin-panel-btn text-text-tertiary flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-r text-center text-lg"
+              >
+                <i class="fa-solid fa-sliders"></i>
+              </div>
+              Admin Panel
+            </div>
+            <div
               class="logout-btn wrapper just flex cursor-pointer items-center gap-3"
             >
               <div
-                class="text-text-tertiary flex h-5 w-5 translate-x-0.5 items-center rounded-full bg-gradient-to-r text-center text-xl"
+                class="text-text-tertiary flex h-5 w-5 translate-x-0.5 items-center justify-center rounded-full bg-gradient-to-r text-center text-[1.2rem]"
               >
                 <i class="fa-solid fa-arrow-right-from-bracket"></i>
               </div>
@@ -585,7 +604,7 @@
                 class="h-[1.125rem] w-[1.125rem]"
                 alt=""
               />
-              <p class="points text-xl">130</p>
+              <p class="points text-xl">0</p>
             </div>
             <div class="medals flex items-center gap-3">
               <div class="gold-medal flex shrink-0 items-center gap-1">
@@ -595,7 +614,7 @@
                   alt=""
                 />
                 <span class="qty flex items-center"
-                  ><span class="text-xs">x</span>3</span
+                  ><span class="text-xs">x</span>0</span
                 >
               </div>
               <div class="silver-medal flex shrink-0 items-center gap-1">
@@ -605,7 +624,7 @@
                   alt=""
                 />
                 <span class="qty flex items-center">
-                  <span class="text-xs">x</span>3
+                  <span class="text-xs">x</span>0
                 </span>
               </div>
               <div class="bronze-medal flex shrink-0 items-center gap-1">
@@ -615,7 +634,7 @@
                   alt=""
                 />
                 <span class="qty flex items-center"
-                  ><span class="text-xs">x</span>3</span
+                  ><span class="text-xs">x</span>0</span
                 >
               </div>
             </div>
@@ -1647,12 +1666,12 @@
                 <div
                   class="rank-wrapper w-fit flex-col items-center text-center md:flex"
                 >
-                  <p class="rank text-2xl font-semibold">01</p>
+                  <p class="rank text-2xl font-semibold">--</p>
                   <p
                     class="wrapper text-text-link text-center text-xs leading-tight font-light"
                   >
                     Rank <br />
-                    out of <span class="total-students">70</span>
+                    out of <span class="total-students">00</span>
                   </p>
                 </div>
                 <div class="points-wrapper flex items-center gap-1">
@@ -1661,7 +1680,7 @@
                     class="h-5 w-5"
                     alt=""
                   />
-                  <p class="points text-2xl">136</p>
+                  <p class="points text-2xl">0</p>
                 </div>
                 <div
                   class="medal-wrapper flex w-fit shrink-0 items-center gap-4 text-sm"
@@ -1672,7 +1691,7 @@
                       src="https://ik.imagekit.io/yn9gz2n2g/others/gold.png?updatedAt=1751607550552"
                       alt=""
                     />
-                    <p class="qty">x3</p>
+                    <p class="qty">x0</p>
                   </div>
                   <div
                     class="silver-medal-wrapper flex w-fit items-center gap-1"
@@ -1682,7 +1701,7 @@
                       src="https://ik.imagekit.io/yn9gz2n2g/others/silver.png?updatedAt=1751607529476"
                       alt=""
                     />
-                    <p class="qty">x3</p>
+                    <p class="qty">x0</p>
                   </div>
                   <div
                     class="bronze-medal-wrapper flex w-fit items-center gap-1"
@@ -1692,7 +1711,7 @@
                       src="https://ik.imagekit.io/yn9gz2n2g/others/bronze.png?updatedAt=1751607503968"
                       alt=""
                     />
-                    <p class="qty">x3</p>
+                    <p class="qty">x0</p>
                   </div>
                 </div>
               </div>
@@ -1754,9 +1773,38 @@
           >
             <p class="container-title text-2xl font-semibold">Upcoming Test</p>
             <div
-              class="no-test bg-surface-2 hidden h-full w-full rounded-3xl p-6"
+              class="no-test bg-surface-2 flex hidden h-full w-full items-center justify-center rounded-3xl p-6"
             >
-              <p class="text-center">No upcoming tests scheduled</p>
+              <div
+                class="wrapper flex items-center justify-center gap-4 md:flex-col"
+              >
+                <span
+                  class="icon-wrapper no-test-icon z-40 h-[1.7rem] transform cursor-pointer lg:h-[2.2rem] lg:-translate-x-0.5"
+                >
+                  <svg
+                    width="17"
+                    height="22"
+                    viewBox="0 0 17 22"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-full w-full"
+                  >
+                    <path
+                      d="M2 4.27734H12.4004C12.7593 4.27745 13.0498 4.56881 13.0498 4.92773V18.7715C13.0498 19.1304 12.7593 19.4218 12.4004 19.4219H2C1.6411 19.4218 1.35059 19.1304 1.35059 18.7715V4.92773C1.35059 4.56881 1.6411 4.27745 2 4.27734Z"
+                      stroke-width="1.3"
+                    />
+                    <path d="M4.2002 13.9004H10.2002" stroke-linecap="round" />
+                    <path d="M4.2002 11.4004H10.2002" stroke-linecap="round" />
+                    <path d="M4.2002 8.90039H10.2002" stroke-linecap="round" />
+                    <path
+                      d="M3.40039 3.38524V2.20039C3.40039 1.48242 3.98242 0.900391 4.70039 0.900391H14.8004C15.5184 0.900391 16.1004 1.48242 16.1004 2.20039V16.0004C16.1004 16.7184 15.5184 17.3004 14.8004 17.3004H13.3857"
+                      stroke-width="1.3"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                </span>
+                <p class="text-center">No upcoming tests scheduled</p>
+              </div>
             </div>
             <div
               class="card bg-surface-2 editor-hover-pointer flex h-[21.25rem] w-full flex-col gap-4 rounded-3xl p-6 lg:gap-5"
@@ -1770,7 +1818,9 @@
                   />
                   <p class="title text-xl font-semibold">Test-01</p>
                 </div>
-                <p class="text-text-link link coming-soon-label text-xs">
+                <p
+                  class="text-text-link link coming-soon-label shrink-0 text-xs text-nowrap"
+                >
                   Coming soon
                 </p>
                 <a href="" class="join-btn hidden">
@@ -1801,7 +1851,7 @@
               Upcoming Sessions
             </p>
             <div
-              class="wrapper bg-surface-2 flex h-[21.25rem] w-full flex-col gap-4 rounded-3xl p-6 lg:gap-5"
+              class="wrapper bg-surface-2 flex w-full flex-col gap-4 rounded-3xl p-6 md:h-[21.25rem] lg:gap-5"
             >
               <div
                 class="swiper !h-full !w-full"
@@ -2446,7 +2496,7 @@
                 />
                 <p class="title text-xl font-semibold">Test-01</p>
               </div>
-              <p class="text-text-link link coming-soon-label text-xs">
+              <p class="text-text-link link coming-soon-label shrink-0 text-xs">
                 Coming soon
               </p>
               <a href="" class="join-btn editor-hover-pointer hidden">
@@ -3155,12 +3205,12 @@
           class="stats-card bg-surface-2 mr-auto ml-auto flex h-fit w-full max-w-[62.5rem] flex-col items-center gap-4 rounded-3xl p-6 md:flex-row md:justify-between md:gap-0 lg:justify-center lg:gap-12 lg:px-8"
         >
           <div class="rank-wrapper hidden flex-col items-center md:flex">
-            <p class="rank text-2xl font-semibold"></p>
+            <p class="rank text-2xl font-semibold">--</p>
             <p
               class="total-student text-text-link text-center text-xs leading-tight font-light"
             >
               Rank <br />
-              out of 70
+              out of
             </p>
           </div>
           <div class="image-name-wrapper flex items-center gap-3">
@@ -3169,18 +3219,18 @@
               alt=""
               class="w-h-12 user-pfp h-12"
             />
-            <p class="name text-2xl font-semibold">Sagar Kemble</p>
+            <p class="name text-2xl font-semibold"></p>
           </div>
           <div
             class="wrapper flex w-full max-w-[18.75rem] justify-between md:w-full"
           >
             <div class="rank-wrapper flex flex-col items-center md:hidden">
-              <p class="rank-sm text-2xl font-semibold"></p>
+              <p class="rank-sm text-2xl font-semibold">--</p>
               <p
                 class="total-student text-text-link text-center text-xs leading-tight font-light"
               >
                 Rank <br />
-                out of 70
+                out of
               </p>
             </div>
             <div class="points-wrapper flex items-center gap-1">
@@ -3190,7 +3240,7 @@
                 alt=""
               />
 
-              <p class="points text-2xl">136</p>
+              <p class="points text-2xl"></p>
             </div>
             <div class="medal-wrapper flex items-center gap-2 md:gap-8">
               <div class="gold-medal-wrapper flex items-center gap-1">
@@ -3199,7 +3249,7 @@
                   src="https://ik.imagekit.io/yn9gz2n2g/others/gold.png?updatedAt=1751607550552"
                   alt=""
                 />
-                <p class="qty">x 3</p>
+                <p class="qty">x 0</p>
               </div>
               <div class="silver-medal-wrapper flex items-center gap-1">
                 <img
@@ -3207,7 +3257,7 @@
                   src="https://ik.imagekit.io/yn9gz2n2g/others/silver.png?updatedAt=1751607529476"
                   alt=""
                 />
-                <p class="qty">x 3</p>
+                <p class="qty">x 0</p>
               </div>
               <div class="bronze-medal-wrapper flex items-center gap-1">
                 <img
@@ -3215,7 +3265,7 @@
                   src="https://ik.imagekit.io/yn9gz2n2g/others/bronze.png?updatedAt=1751607503968"
                   alt=""
                 />
-                <p class="qty">x `3</p>
+                <p class="qty">x 0</p>
               </div>
             </div>
           </div>
@@ -3881,7 +3931,7 @@
                     class="h-[1.125rem] w-[1.125rem]"
                     alt=""
                   />
-                  <p class="points text-xl">130</p>
+                  <p class="points text-xl">0</p>
                 </div>
                 <div class="medals flex items-center gap-3">
                   <div class="gold-medal flex items-center gap-1">
@@ -3891,7 +3941,7 @@
                       alt=""
                     />
                     <span class="qty flex items-center"
-                      ><span class="text-xs">x</span>3</span
+                      ><span class="text-xs">x</span>0</span
                     >
                   </div>
                   <div class="silver-medal flex items-center gap-1">
@@ -3901,7 +3951,7 @@
                       alt=""
                     />
                     <span class="qty flex items-center"
-                      ><span class="text-xs">x</span>3</span
+                      ><span class="text-xs">x</span>0</span
                     >
                   </div>
                   <div class="bronze-medal flex items-center gap-1">
@@ -3911,7 +3961,7 @@
                       alt=""
                     />
                     <span class="qty flex items-center"
-                      ><span class="text-xs">x</span>3</span
+                      ><span class="text-xs">x</span>0</span
                     >
                   </div>
                 </div>

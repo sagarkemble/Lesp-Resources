@@ -12,7 +12,9 @@ import {
   showConfirmationPopup,
   applyEditModeUI,
   initRouting,
+  showSelectClassPopup,
 } from "./index.js";
+import { initAdminRouting } from "./admin.js";
 import { deleteDriveFile, uploadDriveFile } from "./driveApi.js";
 import { headerIcon, headerTitle } from "./navigation.js";
 import { pfpSelectionPopup } from "./iconLibrary.js";
@@ -297,6 +299,12 @@ const DOM = {
     accountDetailsBtn: document.querySelector(
       ".menu-popup-wrapper .account-details-btn",
     ),
+    switchClassBtn: document.querySelector(
+      ".menu-popup-wrapper .switch-class-btn-wrapper",
+    ),
+    adminPanelBtn: document.querySelector(
+      ".menu-popup-wrapper .admin-panel-btn-wrapper",
+    ),
     logoutBtn: document.querySelector(".menu-popup-wrapper .logout-btn"),
     closePopupBtn: document.querySelector(
       ".menu-popup-wrapper .close-popup-btn",
@@ -391,9 +399,16 @@ export async function loadDashboard() {
     DOM.timeTablePopupSwiper.batchToggleBtn.textContent =
       batchList[currentBatchIndex].charAt(0).toUpperCase() +
       batchList[currentBatchIndex].slice(1);
-    // initStatsCard();
-    // initUserInfo();
-    DOM.noticeSwiper.swiper.update();
+    initStatsCard();
+    initUserInfo();
+    if (appState.userData.role === "teacher")
+      showElement(DOM.menuPopup.switchClassBtn);
+    else if (appState.userData.role === "admin")
+      showElement(DOM.menuPopup.adminPanelBtn);
+    else {
+      hideElement(DOM.menuPopup.adminPanelBtn);
+      hideElement(DOM.menuPopup.switchClassBtn);
+    }
     await initUpcomingTestCard();
     await loadTypeSelectorSubjects();
     renderTimeTablePopupSubjects();
@@ -404,7 +419,9 @@ export async function loadDashboard() {
   }
 }
 export async function showDashboard() {
-  headerTitle.textContent = `Hello ${appState.userData.firstName}`;
+  if (window.innerWidth > 500)
+    headerTitle.textContent = `Hello ${appState.userData.firstName}`;
+  else headerTitle.textContent = `Hi ${appState.userData.firstName}`;
   await hideSections();
   await applyEditModeUI();
   headerIcon.src = appState.userData.pfpLink;
@@ -515,6 +532,13 @@ function formatDateBasedOnProximity(rawDate) {
     return `${day}-${month}`;
   }
 }
+DOM.menuPopup.switchClassBtn.addEventListener("click", () => {
+  showSelectClassPopup(appState.userData);
+});
+DOM.menuPopup.adminPanelBtn.addEventListener("click", () => {
+  initAdminRouting(appState.userData);
+});
+
 // notice section
 DOM.addNoticeBtn.addEventListener("click", () => {
   fadeInEffect(DOM.noticePopup.popup);
@@ -541,6 +565,17 @@ DOM.noticePopup.inputs.file.addEventListener("change", () => {
   } else {
     showElement(DOM.noticePopup.fileAttachment.icon);
     DOM.noticePopup.fileAttachment.text.textContent = "Upload";
+  }
+});
+DOM.noticePopup.inputs.title.addEventListener("input", () => {
+  if (DOM.noticePopup.inputs.title.value.length == 21) {
+    DOM.noticePopup.errors.title.textContent = "Max 20 characters reached";
+
+    DOM.noticePopup.inputs.title.value =
+      DOM.noticePopup.inputs.title.value.slice(0, 20);
+    showElement(DOM.noticePopup.errors.title);
+  } else {
+    hideElement(DOM.noticePopup.errors.title);
   }
 });
 DOM.noticePopup.fileAttachment.inputWrapper.addEventListener("click", () => {
@@ -709,7 +744,7 @@ async function renderNoticeSlider() {
     icon.appendChild(iconInner);
 
     const title = document.createElement("p");
-    title.className = "slider-title text-xl font-semibold";
+    title.className = "slider-title text-xl font-semibold leading-tight";
     title.textContent =
       noticeData.title.charAt(0).toUpperCase() + noticeData.title.slice(1);
 
@@ -924,12 +959,12 @@ function resetNoticePopup() {
   hideElement(DOM.noticePopup.errors.file);
 }
 // upcoming session
-async function renderUpcomingSessions() {
+export async function renderUpcomingSessions() {
   const data = appState?.globalData?.sessionData?.upcomingSessionList || {};
   if (!data || Object.keys(data).length === 0) {
     return;
   }
-
+  DOM.upcomingSessions.swiper.removeAllSlides();
   for (const key in data) {
     const session = data[key];
     let { title, description, link, date, fromTime, toTime, hostUserId } =
@@ -948,10 +983,8 @@ async function renderUpcomingSessions() {
     if (!mentorData) continue;
 
     const name = `${mentorData.firstName} ${mentorData.lastName}`;
-    const mentorClass = getFormattedClass(
-      mentorData.semester,
-      mentorData.division,
-    );
+    const [sem, div] = mentorData.class.split("");
+    const mentorClass = getFormattedClass(sem, div);
     const pfp = mentorData.pfpLink;
 
     // Create Swiper Slide container
@@ -963,22 +996,22 @@ async function renderUpcomingSessions() {
     card.className = "card flex flex-col gap-4 lg:gap-5 w-full rounded-3xl";
 
     card.innerHTML = `
-      <div class="wrapper w-full flex items-center justify-between">
+      <div class="wrapper w-full flex items-center justify-between gap-2">
         <div class="flex items-center gap-2 lg:gap-3 icon-name-wrapper">
           <img
             src="${pfp}"
             class="h-11 w-11 object-cover rounded-full"
             alt="Mentor"
           />
-          <div class="wrapper">
-            <p class="text-xl">${name.charAt(0).toUpperCase() + name.slice(1)}</p>
+          <div class="wrapper w-full truncate">
+            <p class="text-xl w-full truncate">${name.charAt(0).toUpperCase() + name.slice(1)}</p>
             <p class="text-xs text-text-tertiary">${mentorClass}</p>
           </div>
         </div>
         ${
           link
             ? `<div><a href="${link}" target="_blank"><button class="button-hug mt-2">Join</button></a></div>`
-            : `<p class="status text-xs text-text-link">Coming soon</p>`
+            : `<p class="status shrink-0 text-xs text-text-link">Coming soon</p>`
         }
       </div>
 
@@ -1399,7 +1432,9 @@ DOM.timeTablePopupSwiper.batchToggleBtn.addEventListener("click", () => {
 });
 
 // upcoming test card
-function initUpcomingTestCard() {
+export function initUpcomingTestCard() {
+  console.log("from dashb board ", appState.divisionData);
+
   if (appState.divisionData.testData.upcomingTest.isVisible == false) {
     hideElement(DOM.upcomingTest.card);
     showElement(DOM.upcomingTest.noUpcomingTest);
@@ -1413,14 +1448,14 @@ function initUpcomingTestCard() {
     DOM.upcomingTest.cardDescription.textContent =
       data.description.charAt(0).toUpperCase() + data.description.slice(1);
     DOM.upcomingTest.cardDay.textContent = `Day : ${data.day.charAt(0).toUpperCase() + data.day.slice(1)}`;
-    DOM.upcomingTest.cardDuration.textContent = `Duration : ${data.duration}`;
+    DOM.upcomingTest.cardDuration.textContent = `Duration : ${data.duration} mins`;
     if (data.link) {
       DOM.upcomingTest.cardJoinBtn.href = data.link;
       DOM.upcomingTest.containerTitle.textContent = "Current Test";
       hideElement(DOM.upcomingTest.cardComingSoonLabel);
       showElement(DOM.upcomingTest.cardJoinBtn);
     } else {
-      DOM.upcomingTest.cardTitle.textContent = "Upcoming Test";
+      DOM.upcomingTest.containerTitle.textContent = "Upcoming Test";
       hideElement(DOM.upcomingTest.cardJoinBtn);
       showElement(DOM.upcomingTest.cardComingSoonLabel);
     }
@@ -1517,9 +1552,9 @@ window.addEventListener("resize", () => {
   }
 });
 function initUserInfo() {
-  const gold = Number(appState.userData.medalList.gold || 0);
-  const silver = Number(appState.userData.medalList.silver || 0);
-  const bronze = Number(appState.userData.medalList.bronze || 0);
+  const gold = Number(appState.userData.medalList?.gold || 0) || 0;
+  const silver = Number(appState.userData.medalList?.silver || 0) || 0;
+  const bronze = Number(appState.userData.medalList?.bronze || 0) || 0;
   const totalPoints = gold * 30 + silver * 20 + bronze * 10;
   DOM.menuPopup.userPfp.src = appState.userData.pfpLink;
   DOM.menuPopup.userName.textContent = `${appState.userData.firstName} ${appState.userData.lastName}`;
@@ -1530,29 +1565,53 @@ function initUserInfo() {
   DOM.menuPopup.points.textContent = totalPoints;
   DOM.accountDetailsPopup.userPfp.src = appState.userData.pfpLink;
   DOM.accountDetailsPopup.userName.textContent = `${appState.userData.firstName} ${appState.userData.lastName}`;
-  DOM.accountDetailsPopup.details.rollNo.innerHTML = `Roll No : <span class="text-text-secondary">${appState.userData.rollNumber}</span>`;
+  if (appState.userData.role === "student") {
+    DOM.accountDetailsPopup.details.division.innerHTML = `Division : <span class="text-text-secondary">${appState.userData.division}</span>`;
+    DOM.accountDetailsPopup.details.semester.innerHTML = `Semester : <span class="text-text-secondary">${appState.userData.semester}</span>`;
+    DOM.accountDetailsPopup.details.rollNo.innerHTML = `Roll No : <span class="text-text-secondary">${appState.userData.rollNumber}</span>`;
+    DOM.accountDetailsPopup.medals.gold.innerHTML = gold;
+    DOM.accountDetailsPopup.medals.silver.innerHTML = silver;
+    DOM.accountDetailsPopup.medals.bronze.innerHTML = bronze;
+    DOM.accountDetailsPopup.points.innerHTML = totalPoints;
+  } else if (appState.userData.role === "teacher") {
+    hideElement(DOM.accountDetailsPopup.details.division);
+    hideElement(DOM.accountDetailsPopup.details.rollNo);
+    let classes = Object.keys(appState.userData.assignedClasses).join(", ");
+    DOM.accountDetailsPopup.details.semester.innerHTML = `Assigned classes : <span class="text-text-secondary">${classes}</span>`;
+  } else {
+    hideElement(DOM.accountDetailsPopup.details.division);
+    hideElement(DOM.accountDetailsPopup.details.rollNo);
+    hideElement(DOM.accountDetailsPopup.details.semester);
+  }
   DOM.accountDetailsPopup.details.firstName.innerHTML = `First name : <span class="text-text-secondary">${appState.userData.firstName}</span>`;
   DOM.accountDetailsPopup.details.lastName.innerHTML = `Last name : <span class="text-text-secondary">${appState.userData.lastName}</span>`;
   DOM.accountDetailsPopup.details.email.innerHTML = `Email : <span class="text-text-secondary">${appState.userData.email}</span>`;
-  DOM.accountDetailsPopup.details.semester.innerHTML = `Semester : <span class="text-text-secondary">${appState.userData.semester}</span>`;
-  DOM.accountDetailsPopup.details.division.innerHTML = `Division : <span class="text-text-secondary">${appState.userData.division}</span>`;
-  DOM.accountDetailsPopup.medals.gold.innerHTML = gold;
-  DOM.accountDetailsPopup.medals.silver.innerHTML = silver;
-  DOM.accountDetailsPopup.medals.bronze.innerHTML = bronze;
-  DOM.accountDetailsPopup.points.innerHTML = totalPoints;
 }
 //stats card
 function initStatsCard() {
-  if (appState.userData.points === 0) {
-    DOM.statsCard.rank.textContent = "--";
+  if (
+    appState.userData.role === "teacher" ||
+    appState.userData.role === "admin"
+  ) {
+    DOM.statsCard.totalStudents.textContent = appState.totalStudents;
+    DOM.statsCard.points.textContent = 0;
+    DOM.statsCard.medals.gold.textContent = `x 0`;
+    DOM.statsCard.medals.silver.textContent = `x 0`;
+    DOM.statsCard.medals.bronze.textContent = `x 0`;
+    return;
   } else {
-    DOM.statsCard.rank.textContent = appState.userData.rank
-      .toString()
-      .padStart(2, "0");
+    if (appState.userData.points === 0 || !appState.userData.points) {
+      DOM.statsCard.rank.textContent = "--";
+    } else {
+      DOM.statsCard.rank.textContent = appState.userData.rank
+        .toString()
+        .padStart(2, "0");
+    }
+
+    DOM.statsCard.totalStudents.textContent = appState.totalStudents;
+    DOM.statsCard.points.textContent = appState.userData.points;
+    DOM.statsCard.medals.gold.textContent = `x ${appState.userData.medalList.gold || 0}`;
+    DOM.statsCard.medals.silver.textContent = `x ${appState.userData.medalList.silver || 0}`;
+    DOM.statsCard.medals.bronze.textContent = `x ${appState.userData.medalList.bronze || 0}`;
   }
-  DOM.statsCard.totalStudents.textContent = appState.totalStudents;
-  DOM.statsCard.points.textContent = appState.userData.points;
-  DOM.statsCard.medals.gold.textContent = `x ${appState.userData.medalList.gold || 0}`;
-  DOM.statsCard.medals.silver.textContent = `x ${appState.userData.medalList.silver || 0}`;
-  DOM.statsCard.medals.bronze.textContent = `x ${appState.userData.medalList.bronze || 0}`;
 }

@@ -315,7 +315,8 @@ async function showClassRoom() {
   showElement(DOM.visitClassRoomBtn);
   headerIcon.src =
     "https://ik.imagekit.io/yn9gz2n2g/others/semester.png?updatedAt=1751607364675";
-  headerTitle.textContent = adminAppState.activeDiv;
+  // headerTitle.textContent = adminAppState.activeDiv;
+  headerTitle.textContent = "FY-A";
   const studentRawData = await getStudentRawData();
   let sortedRollNoWiseStudentData = {};
   let teacherData = await getTeacherData();
@@ -574,8 +575,9 @@ DOM.visitClassRoomBtn.addEventListener("click", async () => {
   fadeInEffect(lottieLoadingScreen);
   localUserData.userData = adminAppState.userData;
   localUserData.isVisitingClass = true;
-  localUserData.userData.semester = Number(adminAppState.activeSem);
-  localUserData.userData.division = adminAppState.activeDiv;
+  localUserData.userData.class = `${adminAppState.activeSem}${
+    adminAppState.activeDiv
+  }`;
   initClass();
 });
 DOM.pickTeacherPopup.closePopupBtn.addEventListener("click", () => {

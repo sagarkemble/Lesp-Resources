@@ -26,7 +26,7 @@ import {
 } from "./firebase.js";
 import { appState, syncDbData } from "./appstate.js";
 import { showErrorSection } from "./error.js";
-import { TotpMultiFactorGenerator } from "firebase/auth/web-extension";
+import { renderUpcomingSessions } from "./dashboard.js";
 const DOM = {
   // Student Details Popup
   studentDetailsPopup: {
@@ -361,6 +361,7 @@ DOM.upcomingSessionPopup.successBtn.addEventListener("click", async () => {
   await syncDbData();
   hideSectionLoader();
   await loadSessionsSection();
+  await renderUpcomingSessions();
   showSessionsSection();
 });
 DOM.upcomingSessionPopup.deleteBtn.addEventListener("click", async () => {
@@ -462,7 +463,6 @@ function resetUpcomingSessionsPopup() {
 async function renderUpcomingSession() {
   let isLink = false;
   const data = appState?.globalData?.sessionData?.upcomingSessionList || {};
-  console.log("Upcoming sessions data from session:", data);
   if (!data || Object.keys(data).length === 0) {
     showElement(DOM.upcomingSessions.noUpcomingSession);
     return;
@@ -479,7 +479,6 @@ async function renderUpcomingSession() {
     const mentorData = await get(ref(db, `userData/${hostUserId}`))
       .then((snapshot) => {
         if (snapshot.exists()) {
-          console.log("Mentor data:", snapshot.val());
           return snapshot.val();
         } else {
           console.log("No mentor data available");
@@ -494,10 +493,8 @@ async function renderUpcomingSession() {
       });
 
     const name = `${mentorData.firstName} ${mentorData.lastName}`;
-    const mentorClass = getFormattedClass(
-      mentorData.semester,
-      mentorData.division,
-    );
+    const [sem, div] = mentorData.class.split("");
+    const mentorClass = getFormattedClass(sem, div);
     const pfp = mentorData.pfpLink;
     const card = document.createElement("div");
     card.className =
@@ -511,15 +508,15 @@ async function renderUpcomingSession() {
             class="h-[2.75rem] w-[2.75rem] object-cover rounded-full"
             alt="Mentor"
           />
-          <div class="wrapper">
-            <p class="text-xl">${name.charAt(0).toUpperCase() + name.slice(1)}</p>
+          <div class="wrapper w-full truncate">
+            <p class="text-xl truncate w-full">${name.charAt(0).toUpperCase() + name.slice(1)}</p>
             <p class="text-xs text-text-tertiary">${mentorClass}</p>
           </div>
         </div>
         ${
           link
             ? `<div><a href="${link}" target="_blank"><button class="button-hug mt-2">Join</button></a></div>`
-            : `<p class="status text-xs text-text-link">Coming soon</p>`
+            : `<p class="status text-xs text-text-link shrink-0">Coming soon</p>`
         }
 
       </div>
@@ -559,8 +556,6 @@ function getFormattedClass(sem, div) {
   return `${formattedSem}-${div}`;
 }
 function formatTime(dateObj) {
-  console.log("Formatting time: from session", dateObj);
-
   return dateObj
     .toLocaleTimeString("en-US", {
       hour: "2-digit",

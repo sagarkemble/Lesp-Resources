@@ -15,6 +15,7 @@ import { hideSections } from "./index.js";
 import { headerIcon, headerTitle } from "./navigation.js";
 import { appState, syncDbData } from "./appstate.js";
 import { deleteDriveFile, uploadDriveFile } from "./driveApi.js";
+import { initUpcomingTestCard as dashboardInitUpcomingTestCard } from "./dashboard.js";
 const testsSection = document.querySelector(".tests-section");
 const DOM = {
   testsSection: document.querySelector(".tests-section"),
@@ -279,6 +280,8 @@ DOM.upcomingTestPopup.successBtn.addEventListener("click", async () => {
   await syncDbData();
   hideSectionLoader();
   await loadTestSection();
+  console.log(appState.divisionData);
+  await dashboardInitUpcomingTestCard();
   showTestsSection();
 });
 DOM.upcomingTestPopup.inputs.duration.addEventListener("input", () => {
@@ -297,8 +300,6 @@ DOM.upcomingTest.card.addEventListener("click", () => {
   if (appState.divisionData.testData.upcomingTest.visible === true) {
     showElement(hideUpcomingTestBtn);
   }
-  console.log(appState.divisionData.testData.upcomingTest);
-
   DOM.upcomingTestPopup.inputs.title.value =
     appState.divisionData.testData.upcomingTest.title;
   DOM.upcomingTestPopup.inputs.description.value =
@@ -329,6 +330,7 @@ DOM.upcomingTestPopup.hideBtn.addEventListener("click", async () => {
   hideSectionLoader();
   resetUpcomingTestPopup();
   await loadTestSection();
+  await dashboardInitUpcomingTestCard();
   showTestsSection();
 });
 DOM.upcomingTestPopup.inputs.title.addEventListener("input", () => {
@@ -589,8 +591,6 @@ function renderPreviousTestCard() {
   const previousTestsdata =
     appState.divisionData.testData?.previousTestList || {};
   if (Object.keys(previousTestsdata).length === 0 || !previousTestsdata) {
-    console.log("this is called");
-    console.log(previousTestsdata);
     showElement(DOM.previousTest.noPreviousTest);
     return;
   }

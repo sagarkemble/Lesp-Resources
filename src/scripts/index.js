@@ -84,7 +84,7 @@ const selectClassPopupCloseButton =
   selectClassPopup.querySelector(".close-popup-btn");
 const selectClassCardContainer =
   selectClassPopup.querySelector(".card-container");
-async function showSelectClassPopup(user) {
+export async function showSelectClassPopup(user) {
   selectClassCardContainer.innerHTML = "";
   const classList = user.assignedClasses;
   if (Object.keys(classList).length === 1) {
@@ -157,7 +157,7 @@ export async function hideSectionLoader(duration = 200) {
 async function loadContent() {
   await loadTestSection();
   await loadSubjectSelectionList();
-  // await loadLeaderboardSection();
+  await loadLeaderboardSection();
   await loadSessionsSection();
   await loadDashboard();
 }
@@ -225,7 +225,6 @@ export async function initClass() {
     pfp.src = localUserData.userData.pfpLink;
   });
   const [Semester, Division] = localUserData.userData.class.split("");
-  console.log(Semester, Division);
   await initAppState(localUserData.userData, Semester, Division);
   await fadeInEffect(lottieLoadingScreen);
   if (
@@ -282,6 +281,7 @@ export async function initRouting() {
     await fadeOutEffect(lottieLoadingScreen);
     showPyq();
   } else {
+    history.pushState({}, "", "/?dashboard=''");
     setActiveNavIcon(dashboardIcon);
     await showDashboard();
     await fadeOutEffect(lottieLoadingScreen);

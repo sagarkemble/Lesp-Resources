@@ -802,8 +802,6 @@ DOM.itemPopup.successBtn.addEventListener("click", async () => {
     if (!uploaded) return;
     attachmentURL = uploaded.webViewLink;
     attachmentId = uploaded.fileId;
-    console.log("Uploaded file ID:", attachmentId);
-    console.log(attachmentId);
   } else {
     attachmentURL = link;
     if (link !== originalLink) {
@@ -1049,6 +1047,7 @@ DOM.submissionPopup.inputs.date.addEventListener("input", () => {
   hideElement(DOM.submissionPopup.fakeDatePlaceholder);
 });
 DOM.submissionPopup.successBtn.addEventListener("click", async () => {
+  console.log("clicked");
   hideElement(DOM.submissionPopup.errors.description);
   hideElement(DOM.submissionPopup.errors.title);
   let title = DOM.submissionPopup.inputs.title.value;
@@ -1077,7 +1076,9 @@ DOM.submissionPopup.successBtn.addEventListener("click", async () => {
   }
   if (isSubmissionEditing) {
     showSectionLoader("Updating submission...");
-    updateData(
+    console.log("called");
+
+    await updateData(
       `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/upcomingSubmissionData/${appState.activeSubject}/${selectedSubmissionId}`,
       {
         name: title,
@@ -1094,6 +1095,8 @@ DOM.submissionPopup.successBtn.addEventListener("click", async () => {
       },
     );
   }
+  console.log("updated");
+
   await fadeOutEffect(DOM.submissionPopup.popup);
   showSectionLoader("Syncing data...");
   await syncDbData();
@@ -1172,6 +1175,10 @@ function editUpcomingSubmission(submissionId) {
     appState.divisionData.upcomingSubmissionData[appState.activeSubject][
       submissionId
     ].name;
+  DOM.submissionPopup.inputs.date.value =
+    appState.divisionData.upcomingSubmissionData[appState.activeSubject][
+      submissionId
+    ].dueDate;
   isSubmissionEditing = true;
   selectedSubmissionId = submissionId;
   DOM.submissionPopup.popupTitle.textContent = "Edit Submission";
@@ -1193,7 +1200,6 @@ async function renderUpcomingSubmissions() {
   const deleteCutoffHour = 17;
   const deleteCutoffMinute = 30;
   for (const key in submissionData) {
-    console.log("entered here");
     let submission = submissionData[key];
     if (
       typeof submission.dueDate === "string" &&
@@ -1208,7 +1214,6 @@ async function renderUpcomingSubmissions() {
         deleteCutoffMinute,
       );
       if (now > deleteTime && appState.userData.role !== "student") {
-        console.log("this is old");
         await deleteData(
           `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/upcomingSubmissionData/${appState.activeSubject}/${key}`,
         );

@@ -76,6 +76,7 @@ const DOM = {
           crossFade: true,
         },
       }),
+      isSingleFlag: false,
       points: document.querySelector(
         ".leaderboard-top-ranks-container .first-winner-container .points",
       ),
@@ -96,6 +97,7 @@ const DOM = {
           crossFade: true,
         },
       }),
+      isSingleFlag: false,
       points: document.querySelector(
         ".leaderboard-top-ranks-container .second-winner-container .points",
       ),
@@ -116,6 +118,7 @@ const DOM = {
           crossFade: true,
         },
       }),
+      isSingleFlag: false,
       points: document.querySelector(
         ".leaderboard-top-ranks-container .third-winner-container .points",
       ),
@@ -140,19 +143,24 @@ const DOM = {
     },
   },
 };
-//dom elements are targeted only the js is remainng cause due to the less students
 let studentRawData = null;
 let sortedRollNoWiseStudentData = null;
 let rankWiseSortedData = null;
 export async function loadLeaderboardSection() {
   await unloadLeaderBoardSection();
   studentRawData = await getStudentRawData();
-  sortedRollNoWiseStudentData = Object.entries(studentRawData)
-    .sort(([, a], [, b]) => a.rollNumber - b.rollNumber)
-    .reduce((acc, [key, val]) => {
-      acc[key] = val;
-      return acc;
-    }, {});
+
+  if (studentRawData && Object.keys(studentRawData).length > 0) {
+    sortedRollNoWiseStudentData = Object.entries(studentRawData)
+      .sort(([, a], [, b]) => a.rollNumber - b.rollNumber)
+      .reduce((acc, [key, val]) => {
+        acc[key] = val;
+        return acc;
+      }, {});
+  } else {
+    sortedRollNoWiseStudentData = {}; // or leave undefined, depending on your needs
+  }
+
   const medalPoints = { bronze: 10, silver: 20, gold: 30 };
   rankWiseSortedData = Object.entries(sortedRollNoWiseStudentData).reduce(
     (acc, [userId, user]) => {
@@ -199,20 +207,21 @@ export async function showLeaderboardSection() {
   DOM.leaderboardTopper.first.swiper.update();
   DOM.leaderboardTopper.second.swiper.update();
   DOM.leaderboardTopper.third.swiper.update();
-  if (!DOM.leaderboardTopper.first.isSingleFlag) {
-    DOM.leaderboardTopper.first.swiper.autoplay.start();
-  }
-  if (!DOM.leaderboardTopper.second.isSingleFlag) {
-    DOM.leaderboardTopper.second.swiper.autoplay.start();
-  }
-  if (!DOM.leaderboardTopper.third.isSingleFlag) {
-    DOM.leaderboardTopper.third.swiper.autoplay.start();
-  }
+  if (DOM.leaderboardTopper.first.isSingleFlag)
+    DOM.leaderboardTopper.first.swiper.autoplay.stop();
+  else DOM.leaderboardTopper.first.swiper.autoplay.start();
+
+  if (DOM.leaderboardTopper.second.isSingleFlag)
+    DOM.leaderboardTopper.second.swiper.autoplay.stop();
+  else DOM.leaderboardTopper.second.swiper.autoplay.start();
+
+  if (DOM.leaderboardTopper.third.isSingleFlag)
+    DOM.leaderboardTopper.third.swiper.autoplay.stop();
+  else DOM.leaderboardTopper.third.swiper.autoplay.start();
 }
 function renderLeaderboardCards() {
   DOM.leaderboardCardContainer.innerHTML = "";
   const students = Object.values(rankWiseSortedData);
-  console.log("this is form the render leaderboard cards", students);
 
   students.sort((a, b) => b.totalPoints - a.totalPoints);
   let previousPts = null;
@@ -294,28 +303,33 @@ function initLeaderBoardTopper() {
   const students = Object.values(rankWiseSortedData);
   students.sort((a, b) => b.totalPoints - a.totalPoints);
 
-  // Get top 3 unique non-zero point values
+  //  top 3 unique non-zero point values
   const uniquePoints = [...new Set(students.map((s) => s.totalPoints))]
     .filter((pt) => pt > 0)
     .slice(0, 3);
 
-  // Group students by their rank based on point
+  //  students by their rank based on point
   const top3Groups = uniquePoints.map((points) =>
     students.filter((s) => s.totalPoints === points),
   );
-
-  // Loop over top 3 ranks
+  if (top3Groups.length === 0) {
+    DOM.leaderboardTopper.first.isSingleFlag = true;
+    DOM.leaderboardTopper.second.isSingleFlag = true;
+    DOM.leaderboardTopper.third.isSingleFlag = true;
+  }
+  // loop top 3 ranks
   top3Groups.forEach((group, i) => {
     const swiper = swipers[i];
     if (!swiper) return;
     podiumPoints[i].textContent = group[0].totalPoints;
-    if (group.length === 1) {
+    if (group.length <= 1) {
       const student = group[0];
       const slide = createWinnerSlide(student);
       swiper.removeAllSlides();
       swiper.appendSlide(slide);
-      swiper.params.autoplay.delay = 500000; // 500 seconds
-      swiper.autoplay.start(); // apply new delay
+      DOM.leaderboardTopper[["first", "second", "third"][i]].isSingleFlag =
+        true;
+      swiper.autoplay.stop();
       swiper.allowTouchMove = false;
     } else {
       swiper.removeAllSlides();
@@ -341,40 +355,44 @@ function createWinnerSlide(student) {
   `;
 }
 function initStats() {
+  const totalStudents = Object.keys(rankWiseSortedData).length;
+  DOM.statsCard.totalStudents.forEach((el) => {
+    el.innerHTML = `Rank <br /> out of ${totalStudents}`;
+  });
+  appState.totalStudents = totalStudents;
+
+  if (
+    appState.userData.role === "teacher" ||
+    appState.userData.role === "admin"
+  )
+    return;
   DOM.statsCard.name.textContent = `${appState.userData.firstName} ${appState.userData.lastName}`;
   DOM.statsCard.pfp.src = appState.userData.pfpLink;
   let userRank = 0;
   let student = null;
-  console.log("this is rank wise sorted data", rankWiseSortedData);
   for (const key in rankWiseSortedData) {
     if (rankWiseSortedData[key].userId === appState.userId) {
       student = rankWiseSortedData[key];
       userRank = userRank + 1;
-      console.log("this is user rank", student);
       break;
     }
+    userRank = userRank + 1;
   }
   const points = student.totalPoints || 0;
   if (points === 0) {
     DOM.statsCard.rank.textContent = "--";
     DOM.statsCard.rankSm.textContent = "--";
-    console.log("this is usiusuiuis uiui suiu ", DOM.statsCard.rank);
-    console.log("this is usiusuiuis uiui suiu ", DOM.statsCard.rankSm);
+    userRank = "--";
   } else {
     DOM.statsCard.rank.textContent = userRank.toString().padStart(2, "0");
     DOM.statsCard.rankSm.textContent = userRank.toString().padStart(2, "0");
   }
-  const totalStudents = Object.keys(rankWiseSortedData).length;
-  DOM.statsCard.totalStudents.forEach((el) => {
-    el.innerHTML = `Rank <br /> out of ${totalStudents}`;
-  });
   DOM.statsCard.points.textContent = points;
   DOM.statsCard.medals.gold.textContent = `x ${student.gold || 0}`;
   DOM.statsCard.medals.silver.textContent = `x ${student.silver || 0}`;
   DOM.statsCard.medals.bronze.textContent = `x ${student.bronze || 0}`;
   appState.userData.rank = userRank;
   appState.userData.points = points;
-  appState.totalStudents = totalStudents;
 }
 let currentEditingRank = null;
 DOM.previousTestWinner.first.container.addEventListener("click", () => {
@@ -475,7 +493,6 @@ async function updateRanks(key) {
 function initPreviousTestWinner() {
   const previousTestWinners =
     appState?.divisionData?.testData?.previousTestWinnerList || {};
-  console.log(previousTestWinners);
   if (!previousTestWinners || Object.keys(previousTestWinners).length === 0) {
     return;
   }
@@ -502,15 +519,14 @@ function getStudentRawData() {
   const usersRef = ref(db, "userData");
   const q = query(
     usersRef,
-    orderByChild("division"),
-    equalTo(appState.activeDiv),
+    orderByChild("class"),
+    equalTo(`${appState.activeSem}${appState.activeDiv}`),
   );
 
   return get(q).then((snapshot) => {
     if (snapshot.exists()) {
       return snapshot.val();
     } else {
-      console.log("No users found for div:", appState.activeDiv);
     }
   });
 }

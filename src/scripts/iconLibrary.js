@@ -501,7 +501,6 @@ pfpContainer.addEventListener("click", async (e) => {
     await fadeOutEffectOpacity(selectedPfpWrapper);
     selectedPfp.src = target.getAttribute("src");
     await fadeInEffectOpacity(selectedPfpWrapper);
-    console.log("Selected PFP:", selectedPfp);
   }
 });
 pfpSelectionPrevBtn.addEventListener("click", async () => {
@@ -512,7 +511,6 @@ pfpSelectionForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   appState.userData.pfpLink = selectedPfp.src;
   const userPfps = document.querySelectorAll(".user-pfp");
-  console.log("Selected PFP:", appState.userData.pfpLink);
 
   updateData(`userData/${appState.userData.userId}`, {
     pfpLink: appState.userData.pfpLink,

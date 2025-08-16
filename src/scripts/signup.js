@@ -203,7 +203,6 @@ DOM.classCodePopup.successBtn.addEventListener("click", async () => {
     return;
   }
 
-  console.log("Decrypted Data:", decryptedData);
   userObj.division = decryptedData.division;
   userObj.semester = Number(
     decryptedData.semester.replace("semester", "").trim(),
@@ -395,7 +394,6 @@ DOM.userCredentials.form.addEventListener("submit", async (e) => {
   let isError = false;
   if (!email) {
     DOM.userCredentials.errors.email.textContent = "Email is required";
-    console.log("this is executed ", email);
     showElement(DOM.userCredentials.errors.email);
     isError = true;
   }

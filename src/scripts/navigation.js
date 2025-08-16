@@ -79,11 +79,8 @@ testsIcon.addEventListener("click", () => {
   initRouting();
 });
 export function loadSubjectSelectionList() {
-  console.log(appState.subjectMetaData);
-
   for (const key in appState.subjectMetaData) {
     const subject = appState.subjectMetaData[key];
-    console.log(subject);
 
     const subjectCard = document.createElement("div");
     subjectCard.className =
