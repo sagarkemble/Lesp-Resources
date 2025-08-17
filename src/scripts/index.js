@@ -181,10 +181,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     resetPostHog();
     showSectionLoader("Loading...", false);
-    if (window.innerWidth < 1024 && !isIphone()) {
-      console.log("executed");
-      handleAppFlow();
-    }
     onAuthStateChanged(auth, async (userCredential) => {
       if (isNewUser.flag) return;
       try {
