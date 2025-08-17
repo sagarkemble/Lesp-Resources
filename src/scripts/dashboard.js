@@ -1460,7 +1460,8 @@ DOM.timeTablePopupSwiper.batchToggleBtn.addEventListener("click", () => {
 
 // upcoming test card
 export function initUpcomingTestCard() {
-  console.log("from dashb board ", appState.divisionData);
+  const isData = appState.divisionData?.testData?.upcomingTest;
+  if (!isData) return;
 
   if (appState.divisionData.testData.upcomingTest.isVisible == false) {
     hideElement(DOM.upcomingTest.card);

@@ -19,6 +19,7 @@ const DOM = {
   },
   openAppPopup: {
     popup: document.querySelector(".open-app-popup-wrapper"),
+    installP: document.querySelector(".open-app-popup-wrapper .install-pwa"),
     popupTitle: document.querySelector(".open-app-popup-wrapper .popup-title"),
     description: document.querySelector(".open-app-popup-wrapper .description"),
     successBtn: document.querySelector(".open-app-popup-wrapper .success-btn"),
@@ -27,6 +28,7 @@ const DOM = {
 
 // pwa config
 import { registerSW } from "virtual:pwa-register";
+import { set } from "firebase/database";
 registerSW({
   immediate: true,
   onNeedRefresh() {
@@ -36,8 +38,9 @@ registerSW({
     console.log("App ready to work offline.");
   },
 });
-let deferredPrompt;
-let isInstalling = false;
+let globalDeferredPrompt = null;
+let deferredPrompt = null;
+
 function isChrome() {
   const ua = navigator.userAgent;
   const uaData = navigator.userAgentData;
@@ -56,17 +59,16 @@ function handleAppFlow() {
     return;
   }
 
-  if (!isChrome()) {
-    console.log("Not Chrome → show other browser popup");
-    setTimeout(() => fadeInEffect(DOM.otherBrowserPopup.popup), 500);
-    return;
-  }
-
-  let deferredPrompt = null;
+  //   if (!isChrome()) {
+  //     console.log("Not Chrome → show other browser popup");
+  //     setTimeout(() => fadeInEffect(DOM.otherBrowserPopup.popup), 500);
+  //     return;
+  //   }
 
   window.addEventListener("beforeinstallprompt", (e) => {
     e.preventDefault();
     deferredPrompt = e;
+    globalDeferredPrompt = true;
     console.log("Chrome but not installed → show install popup");
     fadeInEffect(DOM.installPopup.popup);
     isInstalling = true;
@@ -92,7 +94,7 @@ function handleAppFlow() {
     if (isRunningAsPWA()) {
       console.log("Running as PWA");
     } else {
-      if (!isInstalling) {
+      if (deferredPrompt === null) {
         fadeInEffect(DOM.openAppPopup.popup);
         console.log("Running in browser");
       }
@@ -106,5 +108,20 @@ window.addEventListener("appinstalled", () => {
     hideSectionLoader();
     fadeInEffect(DOM.openAppPopup.popup);
     fadeOutEffect(DOM.installPopup.popup);
+    isInstalling = false;
   }, 20000);
+});
+DOM.openAppPopup.installP.addEventListener("click", async () => {
+  showSectionLoader("Loading...");
+  setTimeout(async () => {
+    if (deferredPrompt) {
+      await fadeOutEffect(DOM.openAppPopup.popup);
+      hideSectionLoader();
+      fadeInEffect(DOM.installPopup.popup);
+    } else {
+      fadeInEffect(DOM.openAppPopup.popup);
+      hideSectionLoader();
+      DOM.openAppPopup.installP.textContent = "App already installed";
+    }
+  }, 2000);
 });

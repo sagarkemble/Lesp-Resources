@@ -128,7 +128,7 @@ selectClassPopupCloseButton.addEventListener("click", async () => {
   await toggleFormState(false);
   hideElement(loginSection);
   hideElement(selectClassPopup);
-  await signOutUser();
+  signOutUser();
 });
 export let isNewUser = { flag: false };
 export async function showSectionLoader(

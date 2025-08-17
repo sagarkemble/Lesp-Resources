@@ -186,6 +186,8 @@ DOM.upcomingTest.scheduleBtn.addEventListener("click", async () => {
   fadeInEffect(DOM.upcomingTestPopup.popup);
 });
 function initUpcomingTestCard() {
+  const isData = appState.divisionData?.testData?.upcomingTest;
+  if (!isData) return;
   if (appState.divisionData.testData.upcomingTest.isVisible == false) {
     hideElement(DOM.upcomingTest.card);
     showElement(DOM.upcomingTest.noUpcomingTest);
