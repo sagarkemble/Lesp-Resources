@@ -63,7 +63,7 @@ function handleAppFlow() {
     hideSectionLoader();
     return;
   }
-  showSectionLoader();
+  showSectionLoader("Loading...", true);
   if (!isChrome()) {
     console.log("Not Chrome → show other browser popup");
     setTimeout(() => fadeInEffect(DOM.otherBrowserPopup.popup), 500);
