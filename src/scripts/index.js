@@ -59,7 +59,7 @@ import {
   trackUserLogout,
   resetPostHog,
 } from "./posthog.js";
-import { isIphone } from "./pwa.js";
+import { isIphone, handleAppFlow } from "./pwa.js";
 export const lottieLoadingScreen = document.querySelector(
   ".lottie-loading-screen",
 );
@@ -181,6 +181,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     resetPostHog();
     showSectionLoader("Loading...", false);
+    if (window.innerWidth < 1024 && !isIphone()) {
+      console.log("executed");
+      handleAppFlow();
+    }
     onAuthStateChanged(auth, async (userCredential) => {
       if (isNewUser.flag) return;
       try {

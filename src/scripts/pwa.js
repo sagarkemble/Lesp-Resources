@@ -58,16 +58,13 @@ function isChrome() {
 function isRunningAsPWA() {
   return window.matchMedia("(display-mode: standalone)").matches;
 }
-function handleAppFlow() {
+export async function handleAppFlow() {
   if (isRunningAsPWA()) {
-    hideSectionLoader();
     return;
   }
-  showSectionLoader("Loading...", true);
   if (!isChrome()) {
     console.log("Not Chrome → show other browser popup");
-    setTimeout(() => fadeInEffect(DOM.otherBrowserPopup.popup), 500);
-    hideSectionLoader();
+    await fadeInEffect(DOM.otherBrowserPopup.popup);
     return;
   }
 
@@ -76,7 +73,7 @@ function handleAppFlow() {
     deferredPrompt = e;
     globalDeferredPrompt = true;
     console.log("Chrome but not installed → show install popup");
-    showElement(DOM.installPopup.popup);
+    fadeInEffect(DOM.installPopup.popup);
     hideSectionLoader();
     isInstalling = true;
   });
@@ -84,7 +81,7 @@ function handleAppFlow() {
   // Click handler added only once
   DOM.installPopup.successBtn.addEventListener("click", async () => {
     if (!deferredPrompt) {
-      fadeOutEffect(DOM.installPopup.popup);
+      await fadeOutEffect(DOM.installPopup.popup);
       fadeInEffect(DOM.openAppPopup.popup);
       return;
     }
@@ -100,13 +97,12 @@ function handleAppFlow() {
     }
     deferredPrompt = null;
   });
-
   setTimeout(() => {
     if (isRunningAsPWA()) {
       console.log("Running as PWA");
     } else {
       if (deferredPrompt === null) {
-        showElement(DOM.openAppPopup.popup);
+        fadeInEffect(DOM.openAppPopup.popup);
         hideSectionLoader();
         console.log("Running in browser");
       }
@@ -117,14 +113,16 @@ export function isIphone() {
   return /iPhone/i.test(navigator.userAgent);
 }
 
-if (window.innerWidth < 1024 && !isIphone()) {
-  handleAppFlow();
-}
+// if (window.innerWidth < 1024 && !isIphone()) {
+//   console.log("executred");
+
+//   handleAppFlow();
+// }
 
 window.addEventListener("appinstalled", () => {
-  setTimeout(() => {
+  setTimeout(async () => {
     hideSectionLoader();
-    fadeInEffect(DOM.openAppPopup.popup);
+    await fadeInEffect(DOM.openAppPopup.popup);
     fadeOutEffect(DOM.installPopup.popup);
     isInstalling = false;
   }, 20000);
