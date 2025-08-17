@@ -6,6 +6,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="theme-color" content="#000000" />
     <title>Login</title>
     <link rel="stylesheet" href="src/style.css" />
@@ -467,6 +468,22 @@
             >Open in LESP App</a
           >
           <button class="success-btn button-fill relative mt-3">Install</button>
+        </div>
+      </div>
+      <!-- install pwa popup -->
+      <div
+        class="user-chrome-popup-wrapper fixed top-0 left-0 z-50 flex hidden h-full w-full items-center justify-center bg-[#00000080] backdrop-blur-xs transition-all duration-200"
+      >
+        <div
+          class="popup bg-surface-2 relative flex w-full max-w-[18.75rem] flex-col gap-4 rounded-3xl p-6"
+        >
+          <div class="wrapper flex w-full items-center justify-between">
+            <p class="popup-title text-2xl font-semibold">Open in chrome</p>
+          </div>
+          <p class="text-text-primary description">
+            We recommend user to use the application in chrome and download the
+            application for a better experience.
+          </p>
         </div>
       </div>
 

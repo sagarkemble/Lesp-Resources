@@ -403,36 +403,54 @@ const installPwaBtn = installPwaPopup.querySelector(".success-btn");
 const installPwaCloseBtn = installPwaPopup.querySelector(".close-popup-btn");
 const installPwaPopupTitle = installPwaPopup.querySelector(".popup-title");
 const installPwaDescription = installPwaPopup.querySelector(".description");
-if (window.matchMedia("(display-mode: standalone)").matches) {
-  console.log("Running as PWA");
-} else {
-  installPwaPopupTitle.textContent = "Install App";
-  installPwaDescription.textContent =
-    "We suggest you to use the site in the app for better experience.";
-  installPwaBtn.textContent = "Open";
-  fadeInEffect(installPwaPopup);
-  console.log("Running in browser");
-}
+// if (window.matchMedia("(display-mode: standalone)").matches) {
+//   console.log("Running as PWA");
+// } else {
+//   installPwaPopupTitle.textContent = "Install App";
+//   installPwaDescription.textContent =
+//     "We suggest you to use the site in the app for better experience.";
+//   installPwaBtn.textContent = "Open";
+//   fadeInEffect(installPwaPopup);
+//   console.log("Running in browser");
+// }
 
-window.addEventListener("beforeinstallprompt", (e) => {
-  fadeInEffect(installPwaPopup);
-  // e.prompt();
-  deferredPrompt = e;
-});
-installPwaBtn.addEventListener("click", async () => {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === "accepted") {
-      console.log("User accepted the install prompt");
-      fadeOutEffect(installPwaPopup);
-    } else {
-      console.log("User dismissed the install prompt");
-      fadeOutEffect(installPwaPopup);
-    }
-    deferredPrompt = null;
-  }
-});
-installPwaCloseBtn.addEventListener("click", () => {
-  fadeOutEffect(installPwaPopup);
-});
+// window.addEventListener("beforeinstallprompt", (e) => {
+//   fadeInEffect(installPwaPopup);
+//   // e.prompt();
+//   deferredPrompt = e;
+// });
+// installPwaBtn.addEventListener("click", async () => {
+//   if (deferredPrompt) {
+//     deferredPrompt.prompt();
+//     const { outcome } = await deferredPrompt.userChoice;
+//     if (outcome === "accepted") {
+//       console.log("User accepted the install prompt");
+//       fadeOutEffect(installPwaPopup);
+//     } else {
+//       console.log("User dismissed the install prompt");
+//       fadeOutEffect(installPwaPopup);
+//     }
+//     deferredPrompt = null;
+//   }
+// });
+// installPwaCloseBtn.addEventListener("click", () => {
+//   fadeOutEffect(installPwaPopup);
+// });
+// const userChromePopupWrapper = document.querySelector(
+//   ".user-chrome-popup-wrapper",
+// );
+// function isChrome() {
+//   const ua = navigator.userAgent;
+//   const uaData = navigator.userAgentData;
+//   if (uaData && uaData.brands) {
+//     return uaData.brands.some((b) => b.brand.includes("Chrome"));
+//   }
+//   return /Chrome/.test(ua) && !/Edg|OPR|Brave/.test(ua);
+// }
+
+// if (!isChrome()) {
+//   fadeInEffect(userChromePopupWrapper);
+// } else {
+//   // Chrome
+//   console.log("User is on Chrome");
+// }

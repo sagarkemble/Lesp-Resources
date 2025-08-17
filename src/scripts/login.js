@@ -42,7 +42,7 @@ const loginBtnText = loginBtn.querySelector(".text");
 
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  showInstallPrompt();
+  // showInstallPrompt();
   emailRelatedError.textContent = "";
   passwordRelatedError.textContent = "";
   loginFormRelatedError.textContent = "";
