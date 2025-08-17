@@ -107,7 +107,7 @@ export async function handleAppFlow() {
         console.log("Running in browser");
       }
     }
-  }, 10000);
+  }, 5000);
 }
 export function isIphone() {
   return /iPhone/i.test(navigator.userAgent);
