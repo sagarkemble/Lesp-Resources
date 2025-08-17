@@ -1514,12 +1514,7 @@ DOM.menuPopup.editPfpBtn.addEventListener("click", async () => {
 });
 DOM.menuPopup.logoutBtn.addEventListener("click", async () => {
   showSectionLoader("Logging out...");
-  await signOutUser().then(async () => {
-    await fadeOutEffect(document.body);
-    setTimeout(() => {
-      location.reload();
-    }, 500);
-  });
+  await signOutUser();
 });
 DOM.menuPopup.accountDetailsBtn.addEventListener("click", async () => {
   await fadeOutEffect(DOM.menuPopup.popup);
