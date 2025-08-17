@@ -417,7 +417,12 @@ async function deleteNotice(key, attachmentId) {
   await deleteData(
     `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/noticeData/subjectNoticeData/${appState.activeSubject}/${key}`,
   );
-  trackEditEvent(appState.activeSubject, "Deleted notice");
+  trackEditEvent(
+    appState.activeSem,
+    appState.activeDiv,
+    appState.activeSubject,
+    "Deleted notice",
+  );
   await showSectionLoader("Syncing data...");
   await syncDbData();
   await dashboardRenderUpcomingSubmissions();
@@ -524,7 +529,12 @@ DOM.noticePopup.successBtn.addEventListener("click", async () => {
       scope: appState.activeSubject,
     },
   );
-  trackEditEvent(appState.activeSubject, "Added notice");
+  trackEditEvent(
+    appState.activeSem,
+    appState.activeDiv,
+    appState.activeSubject,
+    "Added notice",
+  );
   await fadeOutEffect(DOM.noticePopup.popup);
   showSectionLoader("Syncing data...");
   resetAddNoticePopup();
@@ -580,14 +590,24 @@ DOM.categoryPopup.successBtn.addEventListener("click", async () => {
       `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList/${selectedCategoryId}/metaData`,
       { name: title },
     );
-    trackEditEvent(appState.activeSubject, "Edited category name to:" + title);
+    trackEditEvent(
+      appState.activeSem,
+      appState.activeDiv,
+      appState.activeSubject,
+      "Edited category name to:" + title,
+    );
   } else {
     showSectionLoader("Adding category...");
     await pushData(
       `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList`,
       { metaData: { name: title, isVisible: true } },
     );
-    trackCreateEvent(appState.activeSubject, "Added category:" + title);
+    trackCreateEvent(
+      appState.activeSem,
+      appState.activeDiv,
+      appState.activeSubject,
+      "Added category:" + title,
+    );
   }
   await fadeOutEffect(DOM.categoryPopup.popup);
   showSectionLoader("Syncing data...");
@@ -630,6 +650,8 @@ async function deleteCategory() {
     `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList/${selectedCategoryId}`,
   );
   trackDeleteEvent(
+    appState.activeSem,
+    appState.activeDiv,
     appState.activeSubject,
     "Deleted category:" + data.metaData.name,
   );
@@ -824,9 +846,19 @@ DOM.itemPopup.successBtn.addEventListener("click", async () => {
         link: attachmentURL,
         attachmentId,
       },
-      trackEditEvent(appState.activeSubject, "Updated item:" + title),
+      trackEditEvent(
+        appState.activeSem,
+        appState.activeDiv,
+        appState.activeSubject,
+        "Updated item:" + title,
+      ),
     );
-    trackEditEvent(appState.activeSubject, "Updated item:" + title);
+    trackEditEvent(
+      appState.activeSem,
+      appState.activeDiv,
+      appState.activeSubject,
+      "Updated item:" + title,
+    );
   } else {
     showSectionLoader("Adding item...");
     await pushData(
@@ -839,7 +871,12 @@ DOM.itemPopup.successBtn.addEventListener("click", async () => {
         isVisible: true,
       },
     );
-    trackCreateEvent(appState.activeSubject, "Added item:" + title);
+    trackCreateEvent(
+      appState.activeSem,
+      appState.activeDiv,
+      appState.activeSubject,
+      "Added item:" + title,
+    );
   }
   await fadeOutEffect(DOM.itemPopup.popup);
   showSectionLoader("Syncing data...");
@@ -864,7 +901,12 @@ DOM.itemPopup.editTools.unhideBtn.addEventListener("click", async () => {
   fadeOutEffect(DOM.itemPopup.popup);
   showSectionLoader("Syncing data...");
   await syncDbData();
-  trackEditEvent(appState.activeSubject, "Unhide item:" + title);
+  trackEditEvent(
+    appState.activeSem,
+    appState.activeDiv,
+    appState.activeSubject,
+    "Unhide item:" + title,
+  );
   resetAddItemPopup();
   hideSectionLoader();
   loadSubjectSection();
@@ -884,7 +926,12 @@ DOM.itemPopup.editTools.hideBtn.addEventListener("click", async () => {
   );
   fadeOutEffect(DOM.itemPopup.popup);
   showSectionLoader("Syncing data...");
-  trackEditEvent(appState.activeSubject, "Hide item:" + title);
+  trackEditEvent(
+    appState.activeSem,
+    appState.activeDiv,
+    appState.activeSubject,
+    "Hide item:" + title,
+  );
 
   await syncDbData();
   resetAddItemPopup();
@@ -923,7 +970,12 @@ DOM.itemPopup.editTools.deleteBtn.addEventListener("click", async () => {
   );
   fadeOutEffect(DOM.itemPopup.popup);
   showSectionLoader("Syncing data...");
-  trackDeleteEvent(appState.activeSubject, "Deleted item:" + title);
+  trackDeleteEvent(
+    appState.activeSem,
+    appState.activeDiv,
+    appState.activeSubject,
+    "Deleted item:" + title,
+  );
   await syncDbData();
   resetAddItemPopup();
   hideSectionLoader();
@@ -1092,7 +1144,14 @@ DOM.submissionPopup.successBtn.addEventListener("click", async () => {
         dueDate: date,
       },
     );
-    trackEditEvent(appState.activeSubject, "Edited submission:" + title);
+    trackEditEvent(
+      appState.activeSem,
+      appState.activeDiv,
+      appState.activeSem,
+      appState.activeDiv,
+      appState.activeSubject,
+      "Edited submission:" + title,
+    );
   } else {
     showSectionLoader("Creating submission...");
     await pushData(
@@ -1102,7 +1161,12 @@ DOM.submissionPopup.successBtn.addEventListener("click", async () => {
         dueDate: date,
       },
     );
-    trackCreateEvent(appState.activeSubject, "Created submission:" + title);
+    trackCreateEvent(
+      appState.activeSem,
+      appState.activeDiv,
+      appState.activeSubject,
+      "Created submission:" + title,
+    );
   }
   await fadeOutEffect(DOM.submissionPopup.popup);
   showSectionLoader("Syncing data...");
@@ -1124,6 +1188,8 @@ DOM.submissionPopup.deleteBtn.addEventListener("click", async () => {
   await fadeOutEffect(DOM.submissionPopup.popup);
   showSectionLoader("Syncing data...");
   trackDeleteEvent(
+    appState.activeSem,
+    appState.activeDiv,
     appState.activeSubject,
     "Deleted submission:" + selectedSubmissionId,
   );

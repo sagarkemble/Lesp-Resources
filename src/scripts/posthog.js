@@ -22,16 +22,21 @@ export function trackClass(semester, division) {
     division,
   });
 }
-export function trackSubjectPage(subject, semester, division) {
+export function trackSubjectPage(semester, division, subject) {
   posthog.capture(`Entered ${subject} page`, {
     type: "subject",
-    subject,
     semester,
     division,
+    subject,
   });
 }
-export function trackPage(page) {
-  posthog.capture(`Entered ${page} page`, { type: "page", page });
+export function trackPage(semester, division, page) {
+  posthog.capture(`Entered ${page} page`, {
+    type: "page",
+    semester,
+    division,
+    page,
+  });
 }
 export function trackSignup(email) {
   posthog.capture(`${email} signed up`, { type: "signup", email });
@@ -42,23 +47,29 @@ export function trackResetPassword(email) {
     email,
   });
 }
-export function trackEditEvent(page, description) {
+export function trackEditEvent(semester, division, page, description) {
   posthog.capture(`Edited ${page}:${description}`, {
     type: "edit",
+    semester,
+    division,
     page,
     description,
   });
 }
-export function trackCreateEvent(type, page, description) {
+export function trackCreateEvent(semester, division, page, description) {
   posthog.capture(`Created ${page}:${description}`, {
     type: "create",
+    semester,
+    division,
     page,
     description,
   });
 }
-export function trackDeleteEvent(page, description) {
+export function trackDeleteEvent(semester, division, page, description) {
   posthog.capture(`Deleted ${page}:${description}`, {
     type: "delete",
+    semester,
+    division,
     page,
     description,
   });

@@ -12,6 +12,7 @@ import {
 import { hideSections, showSectionLoader, hideSectionLoader } from "./index.js";
 import { headerIcon, headerTitle } from "./navigation.js";
 import { appState, syncDbData } from "./appstate.js";
+import { showErrorSection } from "./error.js";
 const DOM = {
   leaderboardSection: document.querySelector(".leaderboard-section"),
   leaderboardCardContainer: document.querySelector(

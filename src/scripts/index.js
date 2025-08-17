@@ -248,46 +248,50 @@ export async function initRouting() {
   const sessions = params.get("sessions");
   if (window.location.href.includes("login")) {
     await hideSections(false, false, false, false);
-    trackPage("Login");
+    trackPage(appState.activeSem, appState.activeDiv, "Login");
     showLoginSection();
   } else if (dashboard) {
     setActiveNavIcon(dashboardIcon);
-    trackPage("Dashboard");
+    trackPage(appState.activeSem, appState.activeDiv, "Dashboard");
     await showDashboard();
     await fadeOutEffect(lottieLoadingScreen);
   } else if (activeSubject) {
     appState.activeSubject = activeSubject;
     trackSubjectPage(
-      appState.activeSubject,
       appState.activeSem,
       appState.activeDiv,
+      appState.activeSubject,
     );
     setActiveNavIcon(subjectIcon);
     await loadSubjectSection();
     await fadeOutEffect(lottieLoadingScreen);
   } else if (leaderboard) {
     setActiveNavIcon(leaderboardIcon);
-    trackPage("Leaderboard");
+    trackPage(appState.activeSem, appState.activeDiv, "Leaderboard");
     await showLeaderboardSection();
     await fadeOutEffect(lottieLoadingScreen);
   } else if (tests) {
     setActiveNavIcon(testsIcon);
-    trackPage("Tests");
+    trackPage(appState.activeSem, appState.activeDiv, "Tests");
     await fadeOutEffect(lottieLoadingScreen);
     showTestsSection();
   } else if (sessions) {
     setActiveNavIcon(sessionsIcon);
     await fadeOutEffect(lottieLoadingScreen);
-    trackPage("Sessions");
+    trackPage(appState.activeSem, appState.activeDiv, "Sessions");
     showSessionsSection();
   } else if (pyq) {
     await fadeOutEffect(lottieLoadingScreen);
-    trackPage("Previous Year Questions");
+    trackPage(
+      appState.activeSem,
+      appState.activeDiv,
+      "Previous Year Questions",
+    );
     showPyq();
   } else {
     history.pushState({}, "", "/?dashboard=''");
     setActiveNavIcon(dashboardIcon);
-    trackPage("Dashboard");
+    trackPage(appState.activeSem, appState.activeDiv, "Dashboard");
     await showDashboard();
     await fadeOutEffect(lottieLoadingScreen);
   }
