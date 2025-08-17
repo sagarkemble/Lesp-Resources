@@ -201,7 +201,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           hideSectionLoader();
           initClass();
         } else {
-          await hideSectionLoader();
+          // await hideSectionLoader();
           await showLoginSection();
         }
       } catch (error) {

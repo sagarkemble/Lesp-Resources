@@ -55,7 +55,7 @@ function isRunningAsPWA() {
 }
 function handleAppFlow() {
   if (isRunningAsPWA()) {
-    console.log("Running as PWA");
+    hideSectionLoader();
     return;
   }
 
@@ -103,10 +103,16 @@ function handleAppFlow() {
         console.log("Running in browser");
       }
     }
-  }, 3000);
+  }, 5000);
+}
+function isIphone() {
+  return /iPhone/i.test(navigator.userAgent);
 }
 
-handleAppFlow();
+if (window.innerWidth < 1024 && !isIphone()) {
+  handleAppFlow();
+} else hideSectionLoader();
+
 window.addEventListener("appinstalled", () => {
   setTimeout(() => {
     hideSectionLoader();
