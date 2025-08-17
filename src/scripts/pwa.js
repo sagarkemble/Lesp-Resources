@@ -53,43 +53,49 @@ function isChrome() {
   return /Chrome/.test(ua) && !/Edg|OPR|Brave/.test(ua);
 }
 
+function isRunningAsPWA() {
+  return window.matchMedia("(display-mode: standalone)").matches;
+}
 function handleAppFlow() {
   if (isRunningAsPWA()) {
     console.log("Running as PWA");
     return;
   }
 
-  if (!isChrome()) {
-    console.log("Not Chrome → show other browser popup");
-    setTimeout(() => fadeInEffect(DOM.otherBrowserPopup.popup), 500);
-    return;
-  }
+  //   if (!isChrome()) {
+  //     console.log("Not Chrome → show other browser popup");
+  //     setTimeout(() => fadeInEffect(DOM.otherBrowserPopup.popup), 500);
+  //     return;
+  //   }
+
+  let deferredPrompt = null;
 
   window.addEventListener("beforeinstallprompt", (e) => {
     e.preventDefault();
     deferredPrompt = e;
     console.log("Chrome but not installed → show install popup");
     fadeInEffect(DOM.installPopup.popup);
-    DOM.installPopup.successBtn.addEventListener("click", () => {
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then((choiceResult) => {
-        if (choiceResult.outcome === "accepted") {
-          showSectionLoader("Installing App...");
-        } else {
-          console.log("PWA installation rejected");
-        }
-      });
-    });
-    // event when installation finished
-    window.addEventListener("appinstalled", () => {
-      hideSectionLoader();
-    });
-
     isInstalling = true;
   });
 
+  // Click handler added only once
+  DOM.installPopup.successBtn.addEventListener("click", async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    showSectionLoader("Installing App...");
+    const choiceResult = await deferredPrompt.userChoice;
+    if (choiceResult.outcome === "accepted") {
+      console.log("PWA installation accepted");
+      showSectionLoader("Installing App...");
+    } else {
+      console.log("PWA installation rejected");
+      hideSectionLoader();
+    }
+    deferredPrompt = null;
+  });
+
   setTimeout(() => {
-    if (window.matchMedia("(display-mode: standalone)").matches) {
+    if (isRunningAsPWA()) {
       console.log("Running as PWA");
     } else {
       if (!isInstalling) {
@@ -101,3 +107,8 @@ function handleAppFlow() {
 }
 
 handleAppFlow();
+window.addEventListener("appinstalled", () => {
+  setTimeout(() => {
+    hideSectionLoader();
+  }, 20000);
+});
