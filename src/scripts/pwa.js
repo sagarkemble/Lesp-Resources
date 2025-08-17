@@ -76,7 +76,11 @@ function handleAppFlow() {
 
   // Click handler added only once
   DOM.installPopup.successBtn.addEventListener("click", async () => {
-    if (!deferredPrompt) return;
+    if (!deferredPrompt) {
+      fadeOutEffect(DOM.installPopup.popup);
+      fadeInEffect(DOM.openAppPopup.popup);
+      return;
+    }
     deferredPrompt.prompt();
     showSectionLoader("Installing App...");
     const choiceResult = await deferredPrompt.userChoice;
