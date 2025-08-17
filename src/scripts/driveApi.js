@@ -3,11 +3,14 @@ import { showErrorSection } from "./error.js";
 export async function deleteDriveFile(attachmentId) {
   if (!attachmentId) return false;
   try {
-    const res = await fetch("https://vercel-server-neon-nu.vercel.app/delete", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: attachmentId }),
-    });
+    const res = await fetch(
+      "https://lesp-resources-api-server.vercel.app/delete",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: attachmentId }),
+      },
+    );
 
     const data = await res.json();
     console.log("Drive delete response:", data);
@@ -38,7 +41,7 @@ export async function uploadDriveFile(file, path) {
 
   try {
     const response = await fetch(
-      "https://vercel-server-neon-nu.vercel.app/upload",
+      "https://lesp-resources-api-server.vercel.app/upload",
       // "https://lesp-resources-gdrive-api.onrender.com/upload",
       {
         method: "POST",

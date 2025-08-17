@@ -20,7 +20,7 @@ export default defineConfig({
         protocol_handlers: [
           {
             protocol: "web+lesp",
-            url: "https://lesp-resources-v3.vercel.app/?q=%s",
+            url: "https://lespresources.in/?q=%s",
           },
         ],
         icons: [
