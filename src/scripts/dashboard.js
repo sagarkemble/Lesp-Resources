@@ -1,5 +1,4 @@
 import { appState, syncDbData } from "./appstate.js";
-
 import {
   fadeInEffect,
   fadeOutEffect,
@@ -18,7 +17,7 @@ import {
 import { initAdminRouting } from "./admin.js";
 import { deleteDriveFile, uploadDriveFile } from "./driveApi.js";
 import { headerIcon, headerTitle } from "./navigation.js";
-import { pfpSelectionPopup } from "./iconLibrary.js";
+import { pfpSelectionPopup } from "./avatars.js";
 import {
   app,
   pushData,
@@ -49,6 +48,7 @@ export const timeTablePopupSwiper = new Swiper("#time-table-popup-swiper", {
   },
 });
 const DOM = {
+  dashboardSection: document.querySelector(".dashboard-section"),
   addNoticeBtn: document.querySelector(".dashboard-section .add-notice-btn"),
   navPfp: document.querySelector(".navigation-user-pfp"),
   themeBtn: document.querySelector(".theme-btn"),
@@ -389,10 +389,10 @@ export async function loadDashboard() {
   try {
     loadTypeSelectorTimetablePopup();
     await unloadDashboard();
-    await renderNoticeSlider();
-    await renderUpcomingSubmissions();
-    await renderTimeTableSlides(DOM.timeTableSwiper.swiper);
-    await renderTimeTableSlides(timeTablePopupSwiper);
+    renderNoticeSlider();
+    renderUpcomingSubmissions();
+    renderTimeTableSlides(DOM.timeTableSwiper.swiper);
+    renderTimeTableSlides(timeTablePopupSwiper);
     await renderUpcomingSessions();
     batchList = Object.values(appState.divisionData.batchList);
     DOM.timeTableSwiper.batchToggleBtn.textContent =
@@ -411,14 +411,15 @@ export async function loadDashboard() {
       hideElement(DOM.menuPopup.adminPanelBtn);
       hideElement(DOM.menuPopup.switchClassBtn);
     }
-    await initUpcomingTestCard();
-    await loadTypeSelectorSubjects();
+    initUpcomingTestCard();
+    loadTypeSelectorSubjects();
     renderTimeTablePopupSubjects();
   } catch (error) {
     showErrorSection("Error loading dashboard:", error);
   }
 }
 export async function showDashboard() {
+  history.pushState({}, "", "/?dashboard=''");
   if (window.innerWidth > 500)
     headerTitle.textContent = `Hello ${appState.userData.firstName}`;
   else headerTitle.textContent = `Hi ${appState.userData.firstName}`;
@@ -427,7 +428,7 @@ export async function showDashboard() {
   headerIcon.src = appState.userData.pfpLink;
   if (window.innerWidth > 1024) hideElement(headerIcon);
   else showElement(headerIcon);
-  await fadeInEffect(dashboardSection);
+  await fadeInEffect(DOM.dashboardSection);
   DOM.upcomingSessions.swiper.update();
   DOM.upcomingSessions.swiper.autoplay.start();
   timeTablePopupSwiper.update();
@@ -438,7 +439,7 @@ export async function unloadDashboard() {
     "#timetable-subject-selection-drop-down",
   );
   DOM.noticeSwiper.swiper.removeAllSlides();
-  await fadeOutEffect(dashboardSection);
+  await fadeOutEffect(DOM.dashboardSection);
   subjectSelectionDropDown.innerHTML = "";
   DOM.upcomingSubmissions.cardContainer.innerHTML = "";
   DOM.timeTableSwiper.swiper.removeAllSlides();
@@ -556,7 +557,7 @@ DOM.menuPopup.adminPanelBtn.addEventListener("click", () => {
   initAdminRouting(appState.userData);
 });
 
-// notice section
+// notice section function and listener
 DOM.addNoticeBtn.addEventListener("click", () => {
   fadeInEffect(DOM.noticePopup.popup);
 });
@@ -707,9 +708,22 @@ DOM.noticePopup.successBtn.addEventListener("click", async () => {
   await loadDashboard();
   showDashboard();
 });
-
 function loadTypeSelectorSubjects() {
   DOM.noticePopup.inputs.scope.innerHTML = "";
+
+  const option = document.createElement("option");
+  option.value = "semester";
+  option.textContent = "For Semester";
+  const option2 = document.createElement("option");
+  option2.value = "department";
+  option2.textContent = "For Department";
+  const option3 = document.createElement("option");
+  option3.value = "division";
+  option3.textContent = "For Division";
+  DOM.noticePopup.inputs.scope.appendChild(option);
+  DOM.noticePopup.inputs.scope.appendChild(option2);
+  DOM.noticePopup.inputs.scope.appendChild(option3);
+
   for (const key in appState.subjectMetaData) {
     const element = appState.subjectMetaData[key];
     const option = document.createElement("option");
@@ -720,10 +734,10 @@ function loadTypeSelectorSubjects() {
 }
 function loadTypeSelectorTimetablePopup() {
   DOM.timeTablePopup.inputs.type.innerHTML = "";
-  DOM.timeTablePopup.inputs.type.innerHTML = "";
   const option = document.createElement("option");
   option.value = "lecture";
   option.textContent = "Lecture";
+
   DOM.timeTablePopup.inputs.type.appendChild(option);
   for (const key in appState.divisionData.batchList) {
     const element = appState.divisionData.batchList[key];
@@ -738,7 +752,7 @@ function loadTypeSelectorTimetablePopup() {
     DOM.timeTablePopup.inputs.type.appendChild(option2);
   }
 }
-export async function renderNoticeSlider() {
+export function renderNoticeSlider() {
   DOM.noticeSwiper.swiper.removeAllSlides();
   const noticeEntries = getFlatNoticeOrdered();
   if (!noticeEntries || Object.keys(noticeEntries).length === 0) {
@@ -985,7 +999,8 @@ function resetNoticePopup() {
   hideElement(DOM.noticePopup.errors.scope);
   hideElement(DOM.noticePopup.errors.file);
 }
-// upcoming session
+
+// upcoming session function and listener
 export async function renderUpcomingSessions() {
   const data = appState?.globalData?.sessionData?.upcomingSessionList || {};
   if (!data || Object.keys(data).length === 0) {
@@ -1002,7 +1017,6 @@ export async function renderUpcomingSessions() {
     const mentorData = await get(ref(db, `userData/${hostUserId}`))
       .then((snapshot) => (snapshot.exists() ? snapshot.val() : null))
       .catch((error) => {
-        console.error("Error fetching mentor data:", error);
         showErrorSection();
         return null;
       });
@@ -1111,7 +1125,8 @@ DOM.upcomingSessions.viewPreviousSessionsBtn.addEventListener("click", () => {
   history.pushState({}, "", '?sessions=""');
   initRouting();
 });
-// time table popup
+
+// time table popup function and listener
 let selectedDay = null;
 let selectedEntry = null;
 let isTimeTableEditing = false;
@@ -1278,7 +1293,7 @@ DOM.timeTablePopup.deleteBtn.addEventListener("click", async () => {
   await loadDashboard();
   await showDashboard();
 });
-async function renderTimeTableSlides(swiperInstance) {
+function renderTimeTableSlides(swiperInstance) {
   const daysOfWeek = [
     "sunday",
     "monday",
@@ -1458,7 +1473,7 @@ DOM.timeTablePopupSwiper.batchToggleBtn.addEventListener("click", () => {
   });
 });
 
-// upcoming test card
+// upcoming test card function and listener
 export function initUpcomingTestCard() {
   const isData = appState.divisionData?.testData?.upcomingTest;
   if (!isData) return;
@@ -1531,7 +1546,7 @@ document.addEventListener("click", (e) => {
       e.target === DOM.navPfp) ||
     (DOM.menuPopup.popup.classList.contains("hidden") &&
       e.target === headerIcon &&
-      !dashboardSection.classList.contains("hidden"))
+      !DOM.dashboardSection.classList.contains("hidden"))
   ) {
     fadeInEffect(DOM.menuPopup.popup);
   } else fadeOutEffect(DOM.menuPopup.popup);
@@ -1556,7 +1571,7 @@ DOM.statsCard.card.addEventListener("click", async () => {
   history.pushState({}, "", "/?leaderboard=''");
   initRouting();
 });
-// account details
+// account details function and listener
 DOM.accountDetailsPopup.closePopupBtn.addEventListener("click", async () => {
   await fadeOutEffect(DOM.accountDetailsPopup.popup);
   await fadeInEffect(DOM.menuPopup.popup);
@@ -1572,7 +1587,7 @@ DOM.accountDetailsPopup.editPfpBtn.addEventListener("click", async () => {
 window.addEventListener("resize", () => {
   if (
     window.innerWidth > 1024 &&
-    !dashboardSection.classList.contains("hidden")
+    !DOM.dashboardSection.classList.contains("hidden")
   ) {
     hideElement(headerIcon);
   } else {

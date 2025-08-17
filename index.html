@@ -8,7 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="theme-color" content="#000000" />
-    <title>Login</title>
+    <title>Lesp Resources</title>
+    <link rel="shortcut icon" href="/favicon.png" type="image/x-icon" />
     <link rel="stylesheet" href="src/style.css" />
     <script
       src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs"
@@ -41,9 +42,9 @@
   <body
     class="text-text-primary bg-surface flex min-h-full w-full transition-all duration-200"
   >
-    <!-- error section pending-->
+    <!-- error section -->
     <div
-      class="error-section bg-surface fixed z-[70] flex hidden h-full w-full flex-col items-center justify-center gap-4 transition-all duration-200"
+      class="error-section bg-surface fixed z-[100] flex hidden h-full w-full flex-col items-center justify-center gap-4 transition-all duration-200"
     >
       <img src="/error-images/error.png" alt="" class="max-w-[22.5rem]" />
       <div
@@ -59,7 +60,7 @@
     </div>
     <!-- initial loading screen -->
     <div
-      class="lottie-loading-screen bg-surface fixed top-0 left-0 z-60 flex hidden h-full w-full items-center justify-center py-4 transition-all duration-200"
+      class="lottie-loading-screen bg-surface fixed top-0 left-0 z-80 flex hidden h-full w-full items-center justify-center py-4 transition-all duration-200"
     >
       <div class="loading-wrapper flex max-w-40 flex-col items-center gap-4">
         <dotlottie-player
@@ -78,14 +79,14 @@
     </div>
     <!-- section loader -->
     <div
-      class="task-loader-wrapper fixed top-0 left-0 z-60 flex hidden h-full w-full flex-col items-center justify-center gap-2 rounded-3xl bg-[#00000080] backdrop-blur-xs transition-all duration-100"
+      class="task-loader-wrapper fixed top-0 left-0 z-80 flex hidden h-full w-full flex-col items-center justify-center gap-2 rounded-3xl bg-[#00000080] backdrop-blur-xs transition-all duration-100"
     >
       <div class="loader"></div>
       <p class="loader-status">Loading</p>
     </div>
     <!-- success screen -->
     <div
-      class="success-screen bg-surface fixed top-0 left-0 z-60 flex hidden h-full w-full items-center justify-center py-4 transition-all duration-300"
+      class="success-screen bg-surface fixed top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center py-4 transition-all duration-300"
     >
       <div class="success-wrapper flex items-center gap-1">
         <dotlottie-player
@@ -416,7 +417,7 @@
       </header>
       <!-- class room code -->
       <div
-        class="class-code-popup-wrapper fixed top-0 left-0 z-50 flex hidden h-full w-full items-center justify-center bg-[#00000080] backdrop-blur-xs transition-all duration-200"
+        class="class-code-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center bg-[#00000080] backdrop-blur-xs transition-all duration-200"
       >
         <div
           class="popup bg-surface-2 relative flex w-full max-w-[18.75rem] flex-col gap-4 rounded-3xl p-6"
@@ -449,7 +450,7 @@
       </div>
       <!-- install pwa popup -->
       <div
-        class="install-pwa-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center bg-[#00000080] backdrop-blur-xs transition-all duration-200"
+        class="install-pwa-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
       >
         <div
           class="popup bg-surface-2 relative flex w-full max-w-[18.75rem] flex-col gap-4 rounded-3xl p-6"
@@ -467,7 +468,7 @@
       </div>
       <!-- other-browser-popup -->
       <div
-        class="other-browser-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center bg-[#00000080] backdrop-blur-xs transition-all duration-200"
+        class="other-browser-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
       >
         <div
           class="popup bg-surface-2 relative flex w-full max-w-[18.75rem] flex-col gap-4 rounded-3xl p-6"
@@ -483,7 +484,7 @@
       </div>
       <!-- open app popup -->
       <div
-        class="open-app-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center bg-[#00000080] backdrop-blur-xs transition-all duration-200"
+        class="open-app-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
       >
         <div
           class="popup bg-surface-2 relative flex w-full max-w-[18.75rem] flex-col gap-4 rounded-3xl p-6"
@@ -508,7 +509,7 @@
       </div>
       <!-- menu popup  -->
       <div
-        class="menu-popup-wrapper fixed top-0 left-0 z-60 flex hidden h-full min-h-0 w-full items-start bg-[#00000080] backdrop-blur-xs transition-all duration-200 lg:top-3 lg:left-20 lg:h-fit lg:w-fit lg:bg-transparent"
+        class="menu-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full min-h-0 w-full items-start bg-[#00000080] backdrop-blur-xs transition-all duration-200 lg:top-3 lg:left-20 lg:h-fit lg:w-fit lg:bg-transparent"
       >
         <div
           class="popup bg-surface-2 lg:bg-surface lg:border-primary-500 relative mx-auto my-auto flex max-h-[90vh] w-[18.75rem] flex-col items-center gap-2 overflow-y-auto rounded-3xl p-5 shadow transition-all duration-300 lg:w-auto lg:rounded-2xl lg:border-2 lg:p-2"
@@ -634,7 +635,7 @@
       </div>
       <!-- theme popup -->
       <div
-        class="theme-popup-wrapper fixed left-0 z-60 flex hidden h-full min-h-0 w-full items-start bg-[#00000080] backdrop-blur-xs transition-all duration-200 lg:bottom-3 lg:left-20 lg:h-fit lg:w-fit lg:bg-transparent"
+        class="theme-popup-wrapper fixed left-0 z-40 flex hidden h-full min-h-0 w-full items-start bg-[#00000080] backdrop-blur-xs transition-all duration-200 lg:bottom-3 lg:left-20 lg:h-fit lg:w-fit lg:bg-transparent"
       >
         <div
           class="popup bg-surface-2 lg:bg-surface lg:border-surface-3 relative mx-auto my-auto flex max-h-[90vh] flex-col items-center gap-2 overflow-y-auto rounded-3xl p-5 shadow transition-all duration-300 lg:border-2"
@@ -652,7 +653,7 @@
       </div>
       <!-- account details popup -->
       <div
-        class="account-details-popup-wrapper fixed top-0 left-0 z-60 flex hidden h-full min-h-0 w-full items-start bg-[#00000080] backdrop-blur-xs transition-all duration-200"
+        class="account-details-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full min-h-0 w-full items-start bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
       >
         <div
           class="popup bg-surface-2 relative mx-auto my-auto flex max-h-[90vh] w-[18.75rem] flex-col items-center gap-2 overflow-y-auto rounded-3xl p-5 transition-all duration-300"
@@ -735,7 +736,7 @@
       </div>
       <!-- pfp selction popup  -->
       <div
-        class="pfp-selection-popup-wrapper fixed top-0 left-0 z-60 flex hidden h-full min-h-0 w-full items-start bg-[#00000080] px-4 backdrop-blur-xs transition-all duration-200"
+        class="pfp-selection-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full min-h-0 w-full items-start bg-[#00000080] p-4 px-4 backdrop-blur-xs transition-all duration-200"
       >
         <div
           class="mx-auto my-auto flex h-full max-h-[90vh] w-full max-w-[38rem] flex-col transition-all duration-300"
@@ -790,7 +791,7 @@
       </div>
       <!-- confirmation popup -->
       <div
-        class="confirmation-popup-wrapper fixed top-0 left-0 z-60 flex hidden h-full min-h-0 w-full items-center justify-center bg-[#00000080] backdrop-blur-xs transition-all duration-200"
+        class="confirmation-popup-wrapper fixed top-0 left-0 z-60 flex hidden h-full min-h-0 w-full items-center justify-center bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
       >
         <div
           class="confirmation-popup bg-surface-2 flex max-h-[90vh] w-fit max-w-[18.75rem] flex-col gap-4 overflow-y-auto rounded-3xl p-6"
@@ -851,9 +852,9 @@
           </div>
         </div>
       </div>
-      <!-- add time table popup pending-->
+      <!-- add time table popup -->
       <div
-        class="add-time-table-popup-wrapper fixed top-0 left-0 z-50 flex hidden h-full w-full items-center justify-center bg-[#00000080] backdrop-blur-xs transition-all duration-200"
+        class="add-time-table-popup-wrapper fixed top-0 left-0 z-60 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
       >
         <div
           class="popup bg-surface-2 relative flex max-h-[90vh] w-full max-w-80 flex-col gap-4 overflow-y-auto rounded-3xl p-6"
@@ -994,7 +995,7 @@
       </div>
       <!-- select class popup -->
       <div
-        class="select-class-popup-wrapper fixed top-0 left-0 z-50 flex hidden h-full w-full items-center justify-center bg-[#00000080] backdrop-blur-xs transition-all duration-200"
+        class="select-class-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
       >
         <div
           class="popup bg-surface-2 relative flex w-full max-w-[18.75rem] flex-col gap-4 rounded-3xl p-6"
@@ -1008,7 +1009,7 @@
           <div class="card-container flex flex-col gap-4"></div>
         </div>
       </div>
-      <!-- login-section pending-->
+      <!-- login-section -->
       <section
         class="login-section flex hidden h-full w-full flex-col items-center justify-center gap-2 transition-all duration-200"
       >
@@ -1469,7 +1470,7 @@
           >
         </div>
       </section>
-      <!-- reset password section pending-->
+      <!-- reset password section -->
       <section
         class="reset-password-section flex hidden h-full w-full flex-col items-center justify-center gap-2 transition-all duration-200"
       >
@@ -1512,10 +1513,10 @@
           </button>
         </form>
       </section>
-      <!-- readmore-popup pending-->
+      <!-- readmore-popup -->
       <div
         id="readmore-popup"
-        class="fixed inset-0 z-50 flex hidden items-center justify-center bg-black/60 backdrop-blur-sm transition-all duration-200"
+        class="fixed inset-0 z-40 flex hidden items-center justify-center bg-black/60 backdrop-blur-sm transition-all duration-200"
       >
         <div
           class="bg-surface-2 relative flex max-h-[90vh] w-full max-w-[37.5rem] flex-col gap-4 overflow-hidden rounded-2xl p-5 text-white"
@@ -1566,7 +1567,7 @@
       >
         <!-- warning popup -->
         <div
-          class="warning-popup-wrapper fixed top-0 left-0 z-60 flex hidden h-full w-full items-center justify-center bg-[#00000080] backdrop-blur-xs transition-all duration-100"
+          class="warning-popup-wrapper fixed top-0 left-0 z-60 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-100"
         >
           <div
             class="warning-popup bg-surface-2 flex h-fit max-h-[90vh] flex-col items-center justify-center gap-4 overflow-y-auto rounded-3xl p-6 lg:gap-5"
@@ -1579,7 +1580,7 @@
         </div>
         <!-- add notice popup -->
         <div
-          class="add-notice-popup-wrapper fixed top-0 left-0 z-50 flex hidden h-full w-full items-center justify-center bg-[#00000080] backdrop-blur-xs transition-all duration-200"
+          class="add-notice-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
         >
           <div
             class="popup bg-surface-2 relative flex max-h-[90vh] w-full max-w-[18.75rem] flex-col gap-4 overflow-y-auto rounded-3xl p-6"
@@ -1734,7 +1735,7 @@
         <div
           class="dashboard-diff-section-container flex w-full flex-col flex-wrap gap-4 md:flex-row lg:gap-5"
         >
-          <!-- stats upcoming test pyq wrapper pending -->
+          <!-- stats upcoming test pyq wrapper  -->
           <div
             class="stats-upcoming-test-PYQ-wrapper flex gap-4 lg:w-[21.5rem] lg:flex-col"
           >
@@ -1971,7 +1972,7 @@
       >
         <!-- warning popup -->
         <div
-          class="warning-popup-wrapper fixed top-0 left-0 z-60 flex hidden h-full w-full items-center justify-center bg-[#00000080] backdrop-blur-xs transition-all duration-100"
+          class="warning-popup-wrapper fixed top-0 left-0 z-60 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-100"
         >
           <div
             class="warning-popup bg-surface-2 flex h-fit max-h-[90vh] flex-col items-center justify-center gap-4 overflow-y-auto rounded-3xl p-6 lg:gap-5"
@@ -1984,7 +1985,7 @@
         </div>
         <!-- add notice popup -->
         <div
-          class="add-notice-popup-wrapper fixed top-0 left-0 z-50 flex hidden h-full w-full items-center justify-center bg-[#00000080] backdrop-blur-xs transition-all duration-200"
+          class="add-notice-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
         >
           <div
             class="popup bg-surface-2 relative flex max-h-[90vh] w-full max-w-[18.75rem] flex-col gap-4 overflow-y-auto rounded-3xl p-6"
@@ -2071,7 +2072,7 @@
         </div>
         <!-- add category popup -->
         <div
-          class="add-category-popup-wrapper fixed top-0 left-0 z-50 flex hidden h-full w-full items-center justify-center bg-[#00000080] backdrop-blur-xs transition-all duration-200"
+          class="add-category-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
         >
           <div
             class="popup bg-surface-2 relative flex w-full max-w-[18.75rem] flex-col gap-4 rounded-3xl p-6"
@@ -2102,7 +2103,7 @@
         </div>
         <!-- Add item Popup -->
         <div
-          class="add-item-popup-wrapper fixed top-0 left-0 z-50 flex hidden h-full w-full items-center justify-center bg-[#00000080] backdrop-blur-xs transition-all duration-200"
+          class="add-item-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
         >
           <div
             class="popup bg-surface-2 relative flex max-h-[90vh] w-full max-w-[18.75rem] flex-col gap-4 overflow-y-auto rounded-3xl p-6"
@@ -2195,7 +2196,7 @@
         </div>
         <!-- add submisssion popup -->
         <div
-          class="add-submission-popup-wrapper fixed top-0 left-0 z-50 flex hidden h-full w-full items-center justify-center bg-[#00000080] backdrop-blur-xs transition-all duration-200"
+          class="add-submission-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
         >
           <div
             class="popup bg-surface-2 relative flex max-h-[90vh] w-full max-w-[18.75rem] flex-col gap-4 overflow-y-auto rounded-3xl p-6"
@@ -2314,7 +2315,7 @@
       >
         <!-- edit upcoming test popup -->
         <div
-          class="edit-upcoming-test-popup-wrapper fixed top-0 left-0 z-50 flex hidden h-full w-full items-center justify-center bg-[#00000080] backdrop-blur-xs transition-all duration-200"
+          class="edit-upcoming-test-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
         >
           <div
             class="popup bg-surface-2 relative flex max-h-[90vh] w-full max-w-[18.75rem] flex-col gap-4 overflow-y-auto rounded-3xl p-6"
@@ -2415,7 +2416,7 @@
         </div>
         <!-- previous test popup -->
         <div
-          class="previous-test-popup-wrapper fixed top-0 left-0 z-50 flex hidden h-full w-full items-center justify-center bg-[#00000080] backdrop-blur-xs transition-all duration-200"
+          class="previous-test-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
         >
           <div
             class="popup bg-surface-2 relative flex max-h-[90vh] w-full max-w-[18.75rem] flex-col gap-4 overflow-y-auto rounded-3xl p-6"
@@ -2651,7 +2652,7 @@
       >
         <!-- are you sure popup -->
         <div
-          class="student-details-popup-wrapper fixed top-0 left-0 z-60 flex hidden h-full w-full items-center justify-center bg-[#00000080] backdrop-blur-xs transition-all duration-200"
+          class="student-details-popup-wrapper fixed top-0 left-0 z-60 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
         >
           <div
             class="popup bg-surface-2 flex max-h-[90vh] w-fit max-w-[18.75rem] flex-col gap-4 overflow-y-auto rounded-3xl p-6"
@@ -2671,7 +2672,7 @@
         </div>
         <!-- upcoming sessions popup -->
         <div
-          class="upcoming-session-popup-wrapper fixed top-0 left-0 z-50 flex hidden h-full min-h-0 w-full items-center justify-center bg-[#00000080] backdrop-blur-xs transition-all duration-200"
+          class="upcoming-session-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full min-h-0 w-full items-center justify-center bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
         >
           <div
             class="popup bg-surface-2 relative flex h-fit max-h-[90vh] min-h-0 w-full max-w-[18.75rem] flex-col gap-4 overflow-y-auto rounded-3xl p-6"
@@ -2836,7 +2837,7 @@
         </div>
         <!-- previous session popup -->
         <div
-          class="previous-session-popup-wrapper fixed top-0 left-0 z-50 flex hidden h-full w-full items-center justify-center bg-[#00000080] backdrop-blur-xs transition-all duration-200"
+          class="previous-session-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
         >
           <div
             class="popup bg-surface-2 relative flex max-h-[90vh] w-full max-w-[18.75rem] flex-col gap-4 overflow-y-auto rounded-3xl p-6"
@@ -3238,13 +3239,13 @@
           </div>
         </div>
       </section>
-      <!-- leaderboard section pending-->
+      <!-- leaderboard section -->
       <section
         class="leaderboard-section mr-auto ml-auto flex hidden h-full w-full max-w-[93.75rem] flex-col gap-4 transition-all duration-200 lg:gap-5"
       >
         <!-- popup -->
         <div
-          class="pick-leaderboard-student-popup-wrapper fixed top-0 left-0 z-50 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-5 backdrop-blur-xs transition-all duration-200"
+          class="pick-leaderboard-student-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
         >
           <div
             class="popup bg-surface-2 relative flex h-full w-full max-w-[25.0rem] flex-col gap-4 rounded-3xl p-6"
@@ -3298,7 +3299,7 @@
                 alt=""
               />
 
-              <p class="points text-2xl"></p>
+              <p class="points text-2xl">0</p>
             </div>
             <div class="medal-wrapper flex items-center gap-2 md:gap-8">
               <div class="gold-medal-wrapper flex items-center gap-1">
@@ -3346,7 +3347,7 @@
               >
                 <div class="winner-profile flex flex-col items-center gap-2">
                   <img
-                    src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m54.png?updatedAt=1751608964260"
+                    src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m33.png?updatedAt=1750952264914"
                     alt=""
                     class="pfp w-h-12 h-12"
                   />
@@ -3425,7 +3426,7 @@
               >
                 <div class="winner-profile flex flex-col items-center gap-2">
                   <img
-                    src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Memes/me2.png?updatedAt=1750954163478"
+                    src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Female/female58.png?updatedAt=1750986183312"
                     alt=""
                     class="pfp h-12 w-12"
                   />
@@ -3487,7 +3488,7 @@
                         class="winner-profile flex flex-col items-center gap-2"
                       >
                         <img
-                          src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m54.png?updatedAt=1751608964260"
+                          src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Female/female51.png?updatedAt=1750985978913"
                           alt=""
                           class="pfp h-12 w-12"
                         />
@@ -3538,23 +3539,7 @@
                         class="winner-profile flex flex-col items-center gap-2"
                       >
                         <img
-                          src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m54.png?updatedAt=1751608964260"
-                          alt=""
-                          class="pfp h-12 w-12"
-                        />
-                        <p
-                          class="winner-name w-24 truncate text-center font-semibold lg:w-32 xl:w-40"
-                        >
-                          Unranked
-                        </p>
-                      </div>
-                    </div>
-                    <div class="swiper-slide">
-                      <div
-                        class="winner-profile flex flex-col items-center gap-2"
-                      >
-                        <img
-                          src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m54.png?updatedAt=1751608964260"
+                          src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Female/female14.png?updatedAt=1750985461480"
                           alt=""
                           class="pfp h-12 w-12"
                         />
@@ -3606,7 +3591,7 @@
                         class="winner-profile flex flex-col items-center gap-2"
                       >
                         <img
-                          src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m54.png?updatedAt=1751608964260"
+                          src="https://ik.imagekit.io/yn9gz2n2g/Avatars/Male/m14.png?updatedAt=1750951353530"
                           alt=""
                           class="pfp h-12 w-12"
                         />
@@ -3656,7 +3641,7 @@
       >
         <!-- edit name popup -->
         <div
-          class="edit-name-popup-wrapper fixed top-0 left-0 z-50 flex hidden h-full w-full items-center justify-center bg-[#00000080] backdrop-blur-xs transition-all duration-200"
+          class="edit-name-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
         >
           <div
             class="popup bg-surface-2 relative flex w-full max-w-[18.75rem] flex-col gap-4 rounded-3xl p-6"
@@ -3702,7 +3687,7 @@
         </div>
         <!-- edit roll no popup -->
         <div
-          class="edit-roll-no-popup-wrapper fixed top-0 left-0 z-50 flex hidden h-full w-full items-center justify-center bg-[#00000080] backdrop-blur-xs transition-all duration-200"
+          class="edit-roll-no-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
         >
           <div
             class="popup bg-surface-2 relative flex w-full max-w-[18.75rem] flex-col gap-4 rounded-3xl p-6"
@@ -3730,7 +3715,7 @@
         </div>
         <!-- edit email popup -->
         <div
-          class="edit-email-popup-wrapper fixed top-0 left-0 z-50 flex hidden h-full w-full items-center justify-center bg-[#00000080] backdrop-blur-xs transition-all duration-200"
+          class="edit-email-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
         >
           <div
             class="popup bg-surface-2 relative flex w-full max-w-[18.75rem] flex-col gap-4 rounded-3xl p-6"
@@ -3758,7 +3743,7 @@
         </div>
         <!-- edit role popup -->
         <div
-          class="edit-role-popup-wrapper fixed top-0 left-0 z-50 flex hidden h-full w-full items-center justify-center bg-[#00000080] backdrop-blur-xs transition-all duration-200"
+          class="edit-role-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
         >
           <div
             class="popup bg-surface-2 relative flex w-full max-w-[18.75rem] flex-col gap-4 rounded-3xl p-6"
@@ -3789,7 +3774,7 @@
         </div>
         <!-- sem div popup -->
         <div
-          class="edit-sem-div-popup-wrapper fixed top-0 left-0 z-50 flex hidden h-full w-full items-center justify-center bg-[#00000080] backdrop-blur-xs transition-all duration-200"
+          class="edit-sem-div-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
         >
           <div
             class="popup bg-surface-2 relative flex w-full max-w-[18.75rem] flex-col gap-4 rounded-3xl p-6"
@@ -3838,7 +3823,7 @@
         </div>
         <!-- edit medal popup -->
         <div
-          class="edit-medal-popup-wrapper fixed top-0 left-0 z-50 flex hidden h-full w-full items-center justify-center bg-[#00000080] backdrop-blur-xs transition-all duration-200"
+          class="edit-medal-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
         >
           <div
             class="popup bg-surface-2 relative flex w-full max-w-[18.75rem] flex-col gap-4 rounded-3xl p-6"
@@ -3906,7 +3891,7 @@
         </div>
         <!--pick teacher popup -->
         <div
-          class="pick-teacher-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-5 backdrop-blur-xs transition-all duration-200"
+          class="pick-teacher-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
         >
           <div
             class="popup bg-surface-2 relative flex max-h-[80vh] w-full max-w-[25.0rem] flex-col gap-4 rounded-3xl p-6"
@@ -3922,7 +3907,7 @@
         </div>
         <!-- add user code popup -->
         <div
-          class="add-user-link-popup-wrapper absolute top-0 left-0 z-50 flex hidden h-full w-full items-center justify-center bg-[#00000080] backdrop-blur-xs transition-all duration-200"
+          class="add-user-link-popup-wrapper absolute top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
         >
           <div
             class="add-user-link-popup bg-surface-2 flex w-80 flex-col gap-4 rounded-3xl p-6 lg:gap-5"
@@ -3943,7 +3928,7 @@
         </div>
         <!-- individual user popup -->
         <div
-          class="individual-user-popup-wrapper fixed top-0 left-0 z-20 flex hidden h-full w-full flex-col items-center justify-center gap-4 bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
+          class="individual-user-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full w-full flex-col items-center justify-center gap-4 bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
         >
           <div
             class="popup bg-surface-2 relative flex max-h-[90vh] max-w-96 flex-col gap-4 rounded-3xl px-6 py-5 lg:gap-5"
@@ -4091,7 +4076,7 @@
     <script src="src/scripts/subject.js" type="module"></script>
     <script src="src/scripts/login.js" type="module"></script>
     <script src="src/scripts/navigation.js" type="module"></script>
-    <script src="src/scripts/iconLibrary.js" type="module"></script>
+    <script src="src/scripts/avatars.js" type="module"></script>
     <script src="src/scripts/tests.js" type="module"></script>
     <script src="src/scripts/sessions.js" type="module"></script>
     <script src="src/scripts/leaderboard.js" type="module"></script>

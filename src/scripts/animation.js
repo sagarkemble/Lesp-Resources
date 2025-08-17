@@ -1,6 +1,5 @@
 export async function fadeInEffect(element) {
   if (!element.classList.contains("hidden")) {
-    // console.log("containes hidden");
     return;
   }
   element.style.opacity = "0";
@@ -12,13 +11,11 @@ export async function fadeInEffect(element) {
   } else if (durationStr.endsWith("s")) {
     ms = parseFloat(durationStr) * 1000;
   }
-  // console.log("this is called");
   element.style.opacity = "1";
   await new Promise((resolve) => setTimeout(resolve, ms));
 }
 export async function fadeOutEffect(element) {
   if (element.classList.contains("hidden")) {
-    // console.log("containes hidden");
     return;
   }
   element.style.opacity = "0";

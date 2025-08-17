@@ -1,5 +1,5 @@
-import { showSectionLoader, hideSectionLoader } from "./index.js";
 import { showErrorSection } from "./error.js";
+
 export async function deleteDriveFile(attachmentId) {
   if (!attachmentId) return false;
   try {

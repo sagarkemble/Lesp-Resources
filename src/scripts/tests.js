@@ -17,6 +17,7 @@ import { appState, syncDbData } from "./appstate.js";
 import { deleteDriveFile, uploadDriveFile } from "./driveApi.js";
 import { initUpcomingTestCard as dashboardInitUpcomingTestCard } from "./dashboard.js";
 import { showErrorSection } from "./error.js";
+import { trackCreateEvent } from "./posthog.js";
 const DOM = {
   testsSection: document.querySelector(".tests-section"),
   upcomingTest: {
@@ -154,7 +155,6 @@ const DOM = {
     },
   },
 };
-
 export async function loadTestSection() {
   try {
     await unloadTestsSection();
@@ -176,9 +176,9 @@ async function unloadTestsSection() {
   await fadeOutEffect(DOM.testsSection);
   DOM.previousTest.cardContainer.innerHTML = "";
 }
-// upcoming test listner and functions
-DOM.upcomingTest.scheduleBtn.addEventListener("click", async () => {
-  await resetUpcomingTestPopup();
+// upcoming test  function and listener
+DOM.upcomingTest.scheduleBtn.addEventListener("click", () => {
+  resetUpcomingTestPopup();
   DOM.upcomingTestPopup.popupTitle.textContent = "Add test";
   hideElement(DOM.upcomingTestPopup.hideBtn);
   DOM.upcomingTestPopup.inputs.description.value =
@@ -276,13 +276,13 @@ DOM.upcomingTestPopup.successBtn.addEventListener("click", async () => {
       isVisible: true,
     },
   );
-  fadeOutEffect(DOM.upcomingTestPopup.popup);
-  showSectionLoader("Syncing data...");
+  await showSectionLoader("Syncing data...");
+  await fadeOutEffect(DOM.upcomingTestPopup.popup);
   resetUpcomingTestPopup();
   await syncDbData();
-  hideSectionLoader();
   await loadTestSection();
-  await dashboardInitUpcomingTestCard();
+  dashboardInitUpcomingTestCard();
+  await hideSectionLoader();
   showTestsSection();
 });
 DOM.upcomingTestPopup.inputs.duration.addEventListener("input", () => {
@@ -325,13 +325,13 @@ DOM.upcomingTestPopup.hideBtn.addEventListener("click", async () => {
       isVisible: false,
     },
   );
-  fadeOutEffect(DOM.upcomingTestPopup.popup);
-  showSectionLoader("Syncing data...");
+  await showSectionLoader("Syncing data...");
+  await fadeOutEffect(DOM.upcomingTestPopup.popup);
   await syncDbData();
-  hideSectionLoader();
   resetUpcomingTestPopup();
   await loadTestSection();
   await dashboardInitUpcomingTestCard();
+  await hideSectionLoader();
   showTestsSection();
 });
 DOM.upcomingTestPopup.inputs.title.addEventListener("input", () => {
@@ -372,7 +372,7 @@ function resetUpcomingTestPopup() {
   hideElement(DOM.upcomingTestPopup.errors.duration);
 }
 
-//previous tests
+//previous tests popup function and listener
 let isPreviousTestEditing = false;
 let previousTestEditingKey = null;
 DOM.previousTestPopup.closeBtn.addEventListener("click", async () => {
@@ -551,12 +551,12 @@ DOM.previousTestPopup.successBtn.addEventListener("click", async () => {
       },
     );
   }
-  showSectionLoader("Syncing data...");
+  await showSectionLoader("Syncing data...");
   await fadeOutEffect(DOM.previousTestPopup.popup);
   await syncDbData();
-  hideSectionLoader();
   resetPreviousTestPopup();
   await loadTestSection();
+  await hideSectionLoader();
   showTestsSection();
 });
 DOM.previousTestPopup.deleteBtn.addEventListener("click", async () => {
@@ -579,12 +579,12 @@ DOM.previousTestPopup.deleteBtn.addEventListener("click", async () => {
   await deleteData(
     `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/testData/previousTestList/${previousTestEditingKey}`,
   );
-  await hideSectionLoader();
   resetPreviousTestPopup();
-  fadeOutEffect(DOM.previousTestPopup.popup);
-  showSectionLoader("Syncing data...");
+  await showSectionLoader("Syncing data...");
+  await fadeOutEffect(DOM.previousTestPopup.popup);
   await syncDbData();
   await loadTestSection();
+  await hideSectionLoader();
   await hideSectionLoader();
   showTestsSection();
 });

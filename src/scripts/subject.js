@@ -235,17 +235,17 @@ const DOM = {
 };
 export async function loadSubjectSection() {
   try {
-    await unloadSubjectSection();
-    await renderNoticeSlider();
-    await renderUpcomingSubmissions();
-    await renderResources();
     headerIcon.src = appState.subjectMetaData[appState.activeSubject].iconLink;
     headerTitle.textContent =
       appState.subjectMetaData[appState.activeSubject].name;
+    await unloadSubjectSection();
+    renderNoticeSlider();
+    await renderUpcomingSubmissions();
+    renderResources();
     await hideSections();
+    await applyEditModeUI();
     DOM.noticeSwiper.swiper.slideTo(0, 0);
     DOM.noticeSwiper.swiper.update();
-    await applyEditModeUI();
     await fadeInEffect(DOM.subjectPageSection);
   } catch (err) {
     showErrorSection("Error loading subject section", err);
@@ -259,7 +259,8 @@ async function unloadSubjectSection() {
   DOM.noticeSwiper.swiper.removeAllSlides();
   DOM.upcomingSubmissions.cardContainer.innerHTML = "";
 }
-// notice related functions and var
+
+// notice related function and listener
 export function renderNoticeSlider() {
   const noticeEntries =
     appState.divisionData?.noticeData?.subjectNoticeData?.[
@@ -507,10 +508,6 @@ DOM.noticePopup.successBtn.addEventListener("click", async () => {
       file,
       `${appState.activeSem}/divisionData/division${appState.activeDiv}/noticeData/subjectNoticeData/${appState.activeSubject}`,
     );
-    if (!uploaded) {
-      showErrorSection();
-      return;
-    }
     attachmentURL = uploaded.webViewLink;
     attachmentId = uploaded.fileId;
   } else if (link) {
@@ -535,13 +532,13 @@ DOM.noticePopup.successBtn.addEventListener("click", async () => {
     appState.activeSubject,
     "Added notice",
   );
+  await showSectionLoader("Syncing data...");
   await fadeOutEffect(DOM.noticePopup.popup);
-  showSectionLoader("Syncing data...");
   resetAddNoticePopup();
   await syncDbData();
   await dashboardRenderNoticeSlider();
-  await hideSectionLoader();
-  loadSubjectSection();
+  await loadSubjectSection();
+  hideSectionLoader();
 });
 DOM.noticePopup.inputs.file.addEventListener("change", () => {
   const file = DOM.noticePopup.inputs.file.files[0];
@@ -570,7 +567,7 @@ function showWarningPopup(message) {
   });
 }
 
-// add category related var and fucntion
+// add category related function and listener
 let isCategoryEditing = false;
 let selectedCategoryId = null;
 DOM.editorBtn.addCategoryBtn.addEventListener("click", () => {
@@ -613,8 +610,8 @@ DOM.categoryPopup.successBtn.addEventListener("click", async () => {
   showSectionLoader("Syncing data...");
   resetAddCategoryPopup();
   await syncDbData();
+  await loadSubjectSection();
   hideSectionLoader();
-  loadSubjectSection();
 });
 DOM.categoryPopup.input.addEventListener("input", () => {
   if (DOM.categoryPopup.input.value.length == 21) {
@@ -657,8 +654,8 @@ async function deleteCategory() {
   );
   await showSectionLoader("Syncing data...");
   await syncDbData();
+  await loadSubjectSection();
   hideSectionLoader();
-  loadSubjectSection();
 }
 function resetAddCategoryPopup() {
   showElement(DOM.categoryPopup.successBtn);
@@ -696,11 +693,11 @@ async function toggleCategoryVisibility() {
   );
   await showSectionLoader("Syncing data...");
   await syncDbData();
+  await loadSubjectSection();
   hideSectionLoader();
-  loadSubjectSection();
 }
 
-// individual item var and function
+// individual item related function and listener
 let isItemEditing = false;
 let selectedItemId = null;
 let originalLink = "";
@@ -878,12 +875,12 @@ DOM.itemPopup.successBtn.addEventListener("click", async () => {
       "Added item:" + title,
     );
   }
+  await showSectionLoader("Syncing data...");
   await fadeOutEffect(DOM.itemPopup.popup);
-  showSectionLoader("Syncing data...");
   await syncDbData();
   resetAddItemPopup();
+  await loadSubjectSection();
   hideSectionLoader();
-  loadSubjectSection();
 });
 DOM.itemPopup.editTools.unhideBtn.addEventListener("click", async () => {
   const title =
@@ -898,8 +895,8 @@ DOM.itemPopup.editTools.unhideBtn.addEventListener("click", async () => {
     `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList/${selectedCategoryId}/itemList/${selectedItemId}`,
     { isVisible: true },
   );
-  fadeOutEffect(DOM.itemPopup.popup);
-  showSectionLoader("Syncing data...");
+  await showSectionLoader("Syncing data...");
+  await fadeOutEffect(DOM.itemPopup.popup);
   await syncDbData();
   trackEditEvent(
     appState.activeSem,
@@ -908,8 +905,8 @@ DOM.itemPopup.editTools.unhideBtn.addEventListener("click", async () => {
     "Unhide item:" + title,
   );
   resetAddItemPopup();
+  await loadSubjectSection();
   hideSectionLoader();
-  loadSubjectSection();
 });
 DOM.itemPopup.editTools.hideBtn.addEventListener("click", async () => {
   const title =
@@ -924,8 +921,8 @@ DOM.itemPopup.editTools.hideBtn.addEventListener("click", async () => {
     `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList/${selectedCategoryId}/itemList/${selectedItemId}`,
     { isVisible: false },
   );
-  fadeOutEffect(DOM.itemPopup.popup);
-  showSectionLoader("Syncing data...");
+  await showSectionLoader("Syncing data...");
+  await fadeOutEffect(DOM.itemPopup.popup);
   trackEditEvent(
     appState.activeSem,
     appState.activeDiv,
@@ -935,8 +932,8 @@ DOM.itemPopup.editTools.hideBtn.addEventListener("click", async () => {
 
   await syncDbData();
   resetAddItemPopup();
+  await loadSubjectSection();
   hideSectionLoader();
-  loadSubjectSection();
 });
 DOM.itemPopup.inputs.title.addEventListener("input", () => {
   if (DOM.itemPopup.inputs.title.value.length == 13) {
@@ -968,8 +965,8 @@ DOM.itemPopup.editTools.deleteBtn.addEventListener("click", async () => {
   deleteData(
     `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList/${selectedCategoryId}/itemList/${selectedItemId}`,
   );
-  fadeOutEffect(DOM.itemPopup.popup);
-  showSectionLoader("Syncing data...");
+  await showSectionLoader("Syncing data...");
+  await fadeOutEffect(DOM.itemPopup.popup);
   trackDeleteEvent(
     appState.activeSem,
     appState.activeDiv,
@@ -978,8 +975,8 @@ DOM.itemPopup.editTools.deleteBtn.addEventListener("click", async () => {
   );
   await syncDbData();
   resetAddItemPopup();
+  await loadSubjectSection();
   hideSectionLoader();
-  loadSubjectSection();
 });
 function renderResources() {
   const rawCategory =
@@ -1099,7 +1096,7 @@ function renderResources() {
     DOM.subjectPageSection.appendChild(container);
   }
 }
-// upcoming submission var and function
+// upcoming submission related function and listener
 let isSubmissionEditing = false;
 let selectedSubmissionId = null;
 DOM.upcomingSubmissions.addContentBtn.addEventListener("click", () => {
@@ -1168,13 +1165,13 @@ DOM.submissionPopup.successBtn.addEventListener("click", async () => {
       "Created submission:" + title,
     );
   }
+  await showSectionLoader("Syncing data...");
   await fadeOutEffect(DOM.submissionPopup.popup);
-  showSectionLoader("Syncing data...");
   await syncDbData();
   resetAddUpcomingSubmissionPopup();
-  hideSectionLoader();
   await dashboardRenderUpcomingSubmissions();
-  loadSubjectSection();
+  await loadSubjectSection();
+  hideSectionLoader();
 });
 DOM.submissionPopup.deleteBtn.addEventListener("click", async () => {
   const confirm = await showConfirmationPopup(
@@ -1185,8 +1182,8 @@ DOM.submissionPopup.deleteBtn.addEventListener("click", async () => {
   await deleteData(
     `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/upcomingSubmissionData/${appState.activeSubject}/${selectedSubmissionId}`,
   );
+  await showSectionLoader("Syncing data...");
   await fadeOutEffect(DOM.submissionPopup.popup);
-  showSectionLoader("Syncing data...");
   trackDeleteEvent(
     appState.activeSem,
     appState.activeDiv,
@@ -1196,8 +1193,8 @@ DOM.submissionPopup.deleteBtn.addEventListener("click", async () => {
   await syncDbData();
   resetAddUpcomingSubmissionPopup();
   await dashboardRenderUpcomingSubmissions();
+  await loadSubjectSection();
   hideSectionLoader();
-  loadSubjectSection();
 });
 DOM.submissionPopup.inputs.title.addEventListener("input", () => {
   if (DOM.submissionPopup.inputs.title.value.length == 13) {

@@ -227,17 +227,16 @@ export async function initAdminRouting(userData) {
   const sem = urlParams.get("sem");
   const div = urlParams.get("div");
   if (div) {
-    console.log("Div found");
     adminAppState.activeSem = sem;
     adminAppState.activeDiv = div;
-    await showClassRoom();
+    showClassRoom();
   } else if (sem) {
     adminAppState.activeSem = sem;
-    await showDivisionList();
+    showDivisionList();
   } else if (semesterList) {
-    await showSemesterList();
+    showSemesterList();
   } else {
-    await showSemesterList();
+    showSemesterList();
   }
 }
 //semester section
@@ -266,7 +265,6 @@ async function showSemesterList() {
     });
     DOM.semCardContainer.appendChild(card);
   }
-  history.pushState({}, "", "?semesterList=''");
   showElement(DOM.semesterList);
   hideSectionLoader(200);
 }
@@ -276,7 +274,7 @@ async function unloadSemesterList() {
 }
 //division section
 async function showDivisionList() {
-  showSectionLoader("Loading...", false);
+  await showSectionLoader("Loading...", false);
   await hideAdminDivisions();
   headerIcon.src =
     "https://ik.imagekit.io/yn9gz2n2g/others/semester.png?updatedAt=1751607364675";
@@ -294,7 +292,7 @@ async function showDivisionList() {
       history.pushState(
         { div: activeDiv },
         "",
-        `admin.html?sem=${encodeURIComponent(
+        `?sem=${encodeURIComponent(
           adminAppState.activeSem,
         )}&div=${encodeURIComponent(activeDiv)}`,
       );
@@ -311,17 +309,15 @@ async function unloadDivisionList() {
 }
 // class room section
 async function showClassRoom() {
-  showSectionLoader("Loading...", false);
+  await showSectionLoader("Loading...", false);
   await hideAdminDivisions();
   showElement(DOM.visitClassRoomBtn);
   headerIcon.src =
     "https://ik.imagekit.io/yn9gz2n2g/others/semester.png?updatedAt=1751607364675";
-  // headerTitle.textContent = adminAppState.activeDiv;
-  headerTitle.textContent = "FY-A";
+  headerTitle.textContent = adminAppState.activeDiv;
   const studentRawData = await getStudentRawData();
   let sortedRollNoWiseStudentData = {};
   let teacherData = await getTeacherData();
-  console.log(teacherData);
   if (studentRawData) {
     sortedRollNoWiseStudentData = Object.entries(studentRawData)
       .sort(([, a], [, b]) => a.rollNumber - b.rollNumber)
@@ -371,7 +367,6 @@ function getStudentRawData() {
       if (snapshot.exists()) {
         return snapshot.val();
       } else {
-        console.log("No users found for div:", adminAppState.activeDiv);
       }
     });
   } catch (error) {
@@ -438,7 +433,6 @@ function renderTeacherCardInPopup() {
 
     DOM.pickTeacherPopup.cardContainer.appendChild(card);
     card.addEventListener("click", () => {
-      console.log("clicked");
       addTeacherInClass(key);
     });
   }
@@ -528,7 +522,6 @@ function renderIndividualTeacherCard() {
   }
 }
 async function addTeacherInClass(teacherId) {
-  console.log("clicked");
   const isConfirm = await showConfirmationPopup(
     "Teacher will be added will have access to the class",
   );
@@ -538,11 +531,11 @@ async function addTeacherInClass(teacherId) {
   await updateData(`userData/${teacherId}/assignedClasses/`, {
     [key]: true,
   });
-  showSectionLoader("Syncing data...");
+  await showSectionLoader("Syncing data...");
   await syncAdminData();
   hideAdminDivisions();
   await hideSectionLoader();
-  await showClassRoom();
+  showClassRoom();
 }
 
 //add student link
@@ -645,7 +638,6 @@ function initIndividualUserPopup(isTeacher = false) {
     showElement(DOM.individualUserPopup.div);
     showElement(DOM.individualUserPopup.medalPointWrapper);
     hideElement(DOM.individualUserPopup.assignedClasses);
-    console.log(student);
     DOM.individualUserPopup.firstName.innerHTML = `
   <span class="text-text-primary">First Name:</span>
   <span class="text-text-secondary">${student.firstName}</span>
@@ -731,17 +723,17 @@ DOM.namePopup.successBtn.addEventListener("click", async () => {
     "This will change the name of the student. Are you sure?",
   );
   if (!isConfirmed) return;
-  showSectionLoader("Updating name...");
+  await showSectionLoader("Updating name...");
   await updateData(`userData/${activeUserId}`, {
     firstName: firstName,
     lastName: lastName,
   });
   await fadeOutEffect(DOM.namePopup.popup);
   await fadeOutEffect(DOM.individualUserPopup.popup);
-  showSectionLoader("Syncing data...");
+  await showSectionLoader("Syncing data...");
   await syncAdminData();
-  hideSectionLoader();
-  hideAdminDivisions();
+  await hideAdminDivisions();
+  await hideSectionLoader();
   await showClassRoom();
 });
 
@@ -805,10 +797,10 @@ DOM.rollNoPopup.successBtn.addEventListener("click", async () => {
   }
   await fadeOutEffect(DOM.rollNoPopup.popup);
   await fadeOutEffect(DOM.individualUserPopup.popup);
-  showSectionLoader("Syncing data...");
+  await showSectionLoader("Syncing data...");
   await syncAdminData();
-  hideSectionLoader();
-  hideAdminDivisions();
+  await hideAdminDivisions();
+  await hideSectionLoader();
   await showClassRoom();
 });
 
@@ -843,10 +835,10 @@ DOM.rolePopup.successBtn.addEventListener("click", async () => {
   }
   await fadeOutEffect(DOM.rolePopup.popup);
   await fadeOutEffect(DOM.individualUserPopup.popup);
-  showSectionLoader("Syncing data...");
+  await showSectionLoader("Syncing data...");
   await syncAdminData();
-  hideSectionLoader();
-  hideAdminDivisions();
+  await hideAdminDivisions();
+  await hideSectionLoader();
   await showClassRoom();
 });
 
@@ -895,10 +887,10 @@ DOM.semDivPopup.successBtn.addEventListener("click", async () => {
   }
   await fadeOutEffect(DOM.semDivPopup.popup);
   await fadeOutEffect(DOM.individualUserPopup.popup);
-  showSectionLoader("Syncing data...");
+  await showSectionLoader("Syncing data...");
   await syncAdminData();
-  hideSectionLoader();
-  hideAdminDivisions();
+  await hideAdminDivisions();
+  await hideSectionLoader();
   await showClassRoom();
 });
 
@@ -953,9 +945,9 @@ DOM.medalPopup.successBtn.addEventListener("click", async () => {
   }
   await fadeOutEffect(DOM.medalPopup.popup);
   await fadeOutEffect(DOM.individualUserPopup.popup);
-  showSectionLoader("Syncing data...");
+  await showSectionLoader("Syncing data...");
   await syncAdminData();
-  hideSectionLoader();
-  hideAdminDivisions();
+  await hideAdminDivisions();
+  await hideSectionLoader();
   await showClassRoom();
 });

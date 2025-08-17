@@ -6,6 +6,8 @@ import {
 } from "./animation.js";
 import { appState } from "./appstate";
 import { updateData } from "./firebase.js";
+import { headerIcon } from "./navigation.js";
+import { trackPfpChange } from "./posthog.js";
 export const commonPfpLinks = [
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Common/common153.png?updatedAt=1754971040747",
   "https://ik.imagekit.io/yn9gz2n2g/Avatars/Common/common154.png?updatedAt=1754971126428",
@@ -518,8 +520,10 @@ pfpSelectionForm.addEventListener("submit", async (e) => {
   userPfps.forEach((pfp) => {
     pfp.src = appState.userData.pfpLink;
   });
+  headerIcon.src = appState.userData.pfpLink;
   await fadeOutEffect(pfpSelectionPopup);
   await fadeInEffect(menuPopup);
+  trackPfpChange(appState.activeSem, appState.activeDiv, "Changed PFP");
 });
 const malePfpArr = [];
 const femalePfpArr = [];

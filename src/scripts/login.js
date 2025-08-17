@@ -26,7 +26,7 @@ const swiper = new Swiper("#login-section-swiper", {
     crossFade: true,
   },
 });
-// login section
+// login var function and listner
 export const loginSection = document.querySelector(".login-section");
 const loginForm = document.querySelector("#login-form");
 const emailInput = document.querySelector("#email-input");
@@ -39,7 +39,6 @@ const forgotPasswordLink = document.querySelector("#forgot-password-link");
 const loginBtn = document.querySelector(".login-btn");
 const loginBtnLoader = loginBtn.querySelector(".btn-loader");
 const loginBtnText = loginBtn.querySelector(".text");
-
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   // showInstallPrompt();
@@ -66,11 +65,9 @@ loginForm.addEventListener("submit", async (e) => {
       return signInWithEmailAndPassword(auth, email, password);
     })
     .then(async (userCredential) => {
-      console.log("User signed in:", userCredential.user);
       history.pushState({}, "", "/");
     })
     .catch((error) => {
-      console.error("Login failed:", error.message);
       if (error.code === "auth/invalid-credential") {
         toggleFormState(false);
         loginFormRelatedError.textContent = "Invalid email or password.";
@@ -100,14 +97,13 @@ export async function showLoginSection() {
   await fadeInEffect(loginSection);
   swiper.update();
   swiper.autoplay.start();
-  history.pushState({}, "", "?login");
 }
 export async function showResetPasswordSection() {
+  history.pushState({}, "", "?resetPassword");
   await hideSections(false, false, false, false);
   await fadeInEffect(resetPasswordSection);
-  history.pushState({}, "", "?resetPassword");
 }
-// reset password var and listner
+// reset password var , function and listner
 const resetPasswordSection = document.querySelector(".reset-password-section");
 const resetPasswordForm = document.querySelector("#reset-password-form");
 const registeredEmailInput = document.querySelector("#registered-email-input");

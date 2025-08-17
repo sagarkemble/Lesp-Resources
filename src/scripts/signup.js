@@ -6,7 +6,7 @@ import {
   fadeInEffectOpacity,
   fadeOutEffectOpacity,
 } from "./animation";
-import { malePfpLinks, femalePfpLinks, commonPfpLinks } from "./iconLibrary";
+import { malePfpLinks, femalePfpLinks, commonPfpLinks } from "./avatars.js";
 import {
   getDatabase,
   auth,
@@ -234,10 +234,11 @@ function decryptObj(formattedStr) {
     const str = atob(cleaned);
     return JSON.parse(str);
   } catch (error) {
-    console.error("Decryption failed:", error.message);
     return null;
   }
 }
+
+// intro section functions and listeners
 async function preloadIntroImages() {
   const images = [
     document.querySelector(".intro-img-1"),
@@ -258,33 +259,33 @@ async function preloadIntroImages() {
 }
 DOM.intro.nextBtns[1].addEventListener("click", async () => {
   await fadeOutEffect(DOM.intro.images[1]);
-  await fadeInEffect(DOM.intro.images[2]);
+  fadeInEffect(DOM.intro.images[2]);
 });
 DOM.intro.nextBtns[2].addEventListener("click", async () => {
   await fadeOutEffect(DOM.intro.images[2]);
-  await fadeInEffect(DOM.intro.images[3]);
+  fadeInEffect(DOM.intro.images[3]);
 });
 DOM.intro.nextBtns[3].addEventListener("click", async () => {
   await fadeOutEffect(DOM.intro.images[3]);
-  await fadeInEffect(DOM.intro.images[4]);
+  fadeInEffect(DOM.intro.images[4]);
 });
 DOM.intro.nextBtns[4].addEventListener("click", async () => {
   await fadeOutEffect(DOM.intro.section);
-  await fadeInEffect(DOM.userDetails.section);
+  fadeInEffect(DOM.userDetails.section);
 });
 DOM.intro.previousBtns[2].addEventListener("click", async () => {
   await fadeOutEffect(DOM.intro.images[2]);
-  await fadeInEffect(DOM.intro.images[1]);
+  fadeInEffect(DOM.intro.images[1]);
 });
 DOM.intro.previousBtns[3].addEventListener("click", async () => {
   await fadeOutEffect(DOM.intro.images[3]);
-  await fadeInEffect(DOM.intro.images[2]);
+  fadeInEffect(DOM.intro.images[2]);
 });
 DOM.intro.previousBtns[4].addEventListener("click", async () => {
   await fadeOutEffect(DOM.intro.images[4]);
-  await fadeInEffect(DOM.intro.images[3]);
+  fadeInEffect(DOM.intro.images[3]);
 });
-// student details form
+// student details listener
 DOM.userDetails.inputs.rollNumber.addEventListener("input", (e) => {
   if (e.target.value.length > 6) {
     DOM.userDetails.errors.rollNumber.textContent =
@@ -354,7 +355,7 @@ DOM.userDetails.form.addEventListener("submit", async (e) => {
   }
   if (isError) {
     await fadeOutEffect(DOM.userDetails.btnLoader);
-    await fadeInEffectOpacity(DOM.userDetails.btnText);
+    fadeInEffectOpacity(DOM.userDetails.btnText);
     DOM.userDetails.nextBtn.disabled = false;
     return;
   } else {
@@ -372,7 +373,7 @@ DOM.userDetails.form.addEventListener("submit", async (e) => {
     DOM.userDetails.nextBtn.disabled = false;
   }
 });
-// students credentials
+// students credentials listener
 DOM.userCredentials.previousBtn.addEventListener("click", async () => {
   await fadeOutEffect(DOM.userCredentials.section);
   fadeInEffect(DOM.userDetails.section);
@@ -444,7 +445,7 @@ DOM.userCredentials.form.addEventListener("submit", async (e) => {
 
   if (isError) {
     await fadeOutEffect(DOM.userCredentials.btnLoader);
-    await fadeInEffectOpacity(DOM.userCredentials.btnText);
+    fadeInEffectOpacity(DOM.userCredentials.btnText);
     DOM.userCredentials.nextBtn.disabled = false;
     DOM.userCredentials.previousBtn.disabled = false;
     return;
@@ -458,7 +459,7 @@ DOM.userCredentials.form.addEventListener("submit", async (e) => {
   DOM.userCredentials.nextBtn.disabled = false;
   DOM.userCredentials.previousBtn.disabled = false;
 });
-//pfp selection section
+//pfp selection listeners
 DOM.pfpSelection.femaleToggleBtn.addEventListener("click", async () => {
   DOM.pfpSelection.femaleToggleBtn.classList.add("bg-surface-3");
   DOM.pfpSelection.maleToggleBtn.classList.remove("bg-surface-3");
@@ -531,16 +532,48 @@ DOM.pfpSelection.pfpContainer.addEventListener("click", async (e) => {
 });
 DOM.pfpSelection.previousBtn.addEventListener("click", async () => {
   await fadeOutEffect(DOM.pfpSelection.section);
-  await fadeInEffect(DOM.userCredentials.section);
+  fadeInEffect(DOM.userCredentials.section);
 });
 DOM.pfpSelection.form.addEventListener("submit", async (e) => {
   e.preventDefault();
   userObj.pfpLink = DOM.pfpSelection.selectedPfp.src;
   await fadeOutEffect(DOM.pfpSelection.section);
   initSummaryForm();
-  await fadeInEffect(DOM.summaryForm.section);
+  fadeInEffect(DOM.summaryForm.section);
 });
-//summary form
+function renderPfpWrapper() {
+  renderImage("malePfp", malePfpLinks);
+  renderImage("femalePfp", femalePfpLinks);
+  renderImage("commonfp", commonPfpLinks);
+}
+function renderImage(className, link) {
+  link.forEach((element) => {
+    const pfp = document.createElement("img");
+    pfp.src = element;
+    // pfp.loading = "lazy";
+    pfp.classList.add(
+      "h-full",
+      "w-full",
+      "pfp",
+      "cursor-pointer",
+      `${className}`,
+    );
+    if (className === "malePfp") DOM.pfpSelection.pfpArr.male.push(pfp);
+    if (className === "femalePfp") {
+      pfp.classList.add("hidden");
+      DOM.pfpSelection.pfpArr.female.push(pfp);
+    }
+    if (
+      className === "commonfp" ||
+      className === "memePfp" ||
+      className === "cartoonPfp"
+    )
+      DOM.pfpSelection.pfpArr.common.push(pfp);
+    DOM.pfpSelection.pfpContainer.appendChild(pfp);
+  });
+}
+renderPfpWrapper();
+//summary form functions and listeners
 function initSummaryForm() {
   const userFullName = `${
     userObj.firstName.charAt(0).toUpperCase() + userObj.firstName.slice(1)
@@ -554,7 +587,7 @@ function initSummaryForm() {
 }
 DOM.summaryForm.previousBtn.addEventListener("click", async () => {
   await fadeOutEffect(DOM.summaryForm.section);
-  await fadeInEffect(DOM.pfpSelection.section);
+  fadeInEffect(DOM.pfpSelection.section);
 });
 DOM.summaryForm.form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -590,38 +623,6 @@ DOM.summaryForm.form.addEventListener("submit", async (e) => {
   DOM.summaryForm.nextBtn.disabled = false;
   DOM.summaryForm.previousBtn.disabled = false;
 });
-function renderPfpWrapper() {
-  renderImage("malePfp", malePfpLinks);
-  renderImage("femalePfp", femalePfpLinks);
-  renderImage("commonfp", commonPfpLinks);
-}
-function renderImage(className, link) {
-  link.forEach((element) => {
-    const pfp = document.createElement("img");
-    pfp.src = element;
-    // pfp.loading = "lazy";
-    pfp.classList.add(
-      "h-full",
-      "w-full",
-      "pfp",
-      "cursor-pointer",
-      `${className}`,
-    );
-    if (className === "malePfp") DOM.pfpSelection.pfpArr.male.push(pfp);
-    if (className === "femalePfp") {
-      pfp.classList.add("hidden");
-      DOM.pfpSelection.pfpArr.female.push(pfp);
-    }
-    if (
-      className === "commonfp" ||
-      className === "memePfp" ||
-      className === "cartoonPfp"
-    )
-      DOM.pfpSelection.pfpArr.common.push(pfp);
-    DOM.pfpSelection.pfpContainer.appendChild(pfp);
-  });
-}
-renderPfpWrapper();
 async function writeUserData() {
   if (userObj.role === "teacher") {
     userObj.class = null;
@@ -637,6 +638,7 @@ async function writeUserData() {
       showErrorSection("Error writing user data:", error);
     });
 }
+// success screen lottie player
 DOM.successLottiePlayer.addEventListener("complete", async () => {
   DOM.successWrapper.style.gap = "8px";
   await setTimeout(() => {

@@ -54,7 +54,7 @@ export function getUserData(userId) {
       }
     })
     .catch((error) => {
-      console.error(error.message);
+      showErrorSection("Error fetching user data:", error);
       return null;
     });
 }
@@ -68,7 +68,7 @@ function getSemesterGlobalData(semester) {
       }
     })
     .catch((error) => {
-      console.error(error.message);
+      showErrorSection("Error fetching semester global data:", error);
       return null;
     });
 }

@@ -5,7 +5,6 @@ import {
   hideElement,
   showElement,
 } from "./animation";
-
 const DOM = {
   otherBrowserPopup: {
     popup: document.querySelector(".other-browser-popup-wrapper"),
@@ -30,7 +29,6 @@ const DOM = {
     successBtn: document.querySelector(".open-app-popup-wrapper .success-btn"),
   },
 };
-
 // pwa config
 import { registerSW } from "virtual:pwa-register";
 import { set } from "firebase/database";
@@ -43,9 +41,7 @@ registerSW({
     console.log("App ready to work offline.");
   },
 });
-let globalDeferredPrompt = null;
 let deferredPrompt = null;
-
 function isChrome() {
   const ua = navigator.userAgent;
   const uaData = navigator.userAgentData;
@@ -54,7 +50,6 @@ function isChrome() {
   }
   return /Chrome/.test(ua) && !/Edg|OPR|Brave/.test(ua);
 }
-
 function isRunningAsPWA() {
   return window.matchMedia("(display-mode: standalone)").matches;
 }
@@ -115,13 +110,10 @@ export async function handleAppFlow() {
 export function isIphone() {
   return /iPhone/i.test(navigator.userAgent);
 }
-
 if (window.innerWidth < 1024 && !isIphone()) {
   console.log("executed");
-
   handleAppFlow();
 }
-
 window.addEventListener("appinstalled", () => {
   setTimeout(async () => {
     hideSectionLoader();

@@ -151,7 +151,6 @@ export async function loadLeaderboardSection() {
   try {
     await unloadLeaderBoardSection();
     studentRawData = await getStudentRawData();
-
     if (studentRawData && Object.keys(studentRawData).length > 0) {
       sortedRollNoWiseStudentData = Object.entries(studentRawData)
         .sort(([, a], [, b]) => a.rollNumber - b.rollNumber)
@@ -387,6 +386,7 @@ function initStats() {
   if (points === 0) {
     DOM.statsCard.rank.textContent = "--";
     DOM.statsCard.rankSm.textContent = "--";
+    DOM.statsCard.points.textContent = "0";
     userRank = "--";
   } else {
     DOM.statsCard.rank.textContent = userRank.toString().padStart(2, "0");
@@ -478,6 +478,7 @@ function renderStudentCardInPopup() {
   });
 }
 async function updateRanks(key) {
+  showSectionLoader("Updating rank...");
   if (key === null) {
     await updateData(
       `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/testData/previousTestWinnerList`,
@@ -491,8 +492,8 @@ async function updateRanks(key) {
   fadeOutEffect(DOM.studentSelectorPopup.popup);
   showSectionLoader("Syncing data...");
   await syncDbData();
-  hideSectionLoader();
   await loadLeaderboardSection();
+  await hideSectionLoader();
   showLeaderboardSection();
 }
 function initPreviousTestWinner() {

@@ -218,7 +218,7 @@ export async function showSessionsSection() {
   fadeInEffect(sessionsSection);
 }
 
-//upcoming sessions
+//upcoming sessions functions and listeners
 let isUpcomingSessionEditing = false;
 let selectedUpcomingSessionId = null;
 DOM.upcomingSessions.addContentBtn.addEventListener("click", () => {
@@ -359,13 +359,13 @@ DOM.upcomingSessionPopup.successBtn.addEventListener("click", async () => {
       hostUserId: userId,
     });
   }
-  showSectionLoader("Syncing data...");
+  await showSectionLoader("Syncing data...");
   await fadeOutEffect(DOM.upcomingSessionPopup.popup);
   resetUpcomingSessionsPopup();
   await syncDbData();
-  hideSectionLoader();
   await loadSessionsSection();
   await renderUpcomingSessions();
+  await hideSectionLoader();
   showSessionsSection();
 });
 DOM.upcomingSessionPopup.deleteBtn.addEventListener("click", async () => {
@@ -381,8 +381,8 @@ DOM.upcomingSessionPopup.deleteBtn.addEventListener("click", async () => {
     await fadeOutEffect(DOM.upcomingSessionPopup.popup);
     resetUpcomingSessionsPopup();
     await syncDbData();
-    hideSectionLoader();
     await loadSessionsSection();
+    await hideSectionLoader();
     showSessionsSection();
   }
 });
@@ -485,13 +485,11 @@ async function renderUpcomingSession() {
         if (snapshot.exists()) {
           return snapshot.val();
         } else {
-          console.log("No mentor data available");
           showErrorSection();
           return;
         }
       })
       .catch((error) => {
-        console.error("Error fetching mentor data:", error);
         showErrorSection();
         return;
       });
@@ -587,8 +585,7 @@ function editUpcomingSessionCard(id) {
   fadeInEffect(DOM.upcomingSessionPopup.popup);
 }
 
-//previous sessions
-// ===== STATE =====
+//previous sessions functions and listeners
 let isPreviousSessionEditing = false;
 let selectedPreviousSessionId = null;
 DOM.previousSessionPopup.inputs.date.addEventListener("input", () => {
@@ -728,12 +725,12 @@ DOM.previousSessionPopup.successBtn.addEventListener("click", async () => {
       link,
     });
   }
-  showSectionLoader("Syncing data...");
+  await showSectionLoader("Syncing data...");
   await fadeOutEffect(DOM.previousSessionPopup.popup);
   resetPreviousSessionsPopup();
   await syncDbData();
-  hideSectionLoader();
   await loadSessionsSection();
+  await hideSectionLoader();
   showSessionsSection();
 });
 DOM.previousSessionPopup.inputs.fromTime.addEventListener("click", () => {
@@ -827,7 +824,6 @@ async function renderPreviousSession() {
         return null;
       })
       .catch((error) => {
-        console.error("Error fetching mentor data:", error);
         showErrorSection();
         return null;
       });
@@ -879,7 +875,6 @@ async function renderPreviousSession() {
     });
   }
 }
-
 function editPreviousSessionCard(id) {
   showElement(DOM.previousSessionPopup.deleteBtn);
   isPreviousSessionEditing = true;
@@ -907,12 +902,12 @@ DOM.previousSessionPopup.deleteBtn.addEventListener("click", async () => {
     await deleteData(
       `globalData/sessionData/previousSessionList/${selectedPreviousSessionId}`,
     );
-    showSectionLoader("Syncing data...");
+    await showSectionLoader("Syncing data...");
     await fadeOutEffect(DOM.previousSessionPopup.popup);
     resetPreviousSessionsPopup();
     await syncDbData();
-    hideSectionLoader();
     await loadSessionsSection();
+    await hideSectionLoader();
     showSessionsSection();
   }
 });

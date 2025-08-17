@@ -5,7 +5,6 @@ posthog.init("phc_3kfgkf3DWYBNyPopj8wCwBiGBsjHTLslCYrcAPxR6lo", {
   person_profiles: "identified_only",
 });
 export function trackLoginUser(uid, userEmail) {
-  console.log("User logged in:", userEmail);
   posthog.identify(uid, { email: userEmail });
 }
 export function trackUserLogout(email) {
@@ -71,6 +70,14 @@ export function trackDeleteEvent(semester, division, page, description) {
     semester,
     division,
     page,
+    description,
+  });
+}
+export function trackPfpChange(semester, division, description) {
+  posthog.capture(`Event: ${description}`, {
+    type: "edit",
+    semester,
+    division,
     description,
   });
 }
