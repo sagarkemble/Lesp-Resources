@@ -930,9 +930,12 @@ DOM.itemPopup.editTools.deleteBtn.addEventListener("click", async () => {
   loadSubjectSection();
 });
 function renderResources() {
-  const categoryData =
+  const rawCategory =
     appState.subjectData?.[appState.activeSubject]?.containerList || {};
-
+  const categoryData = Object.fromEntries(
+    Object.entries(rawCategory).reverse(),
+  );
+  Object.values(categoryData).reverse();
   if (!categoryData || !Object.keys(categoryData).length) {
     return;
   }
