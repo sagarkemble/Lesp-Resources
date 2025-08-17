@@ -1,5 +1,10 @@
 import { hideSectionLoader, showSectionLoader } from "./index.js";
-import { fadeInEffect, fadeOutEffect, hideElement } from "./animation";
+import {
+  fadeInEffect,
+  fadeOutEffect,
+  hideElement,
+  showElement,
+} from "./animation";
 
 const DOM = {
   otherBrowserPopup: {
@@ -62,6 +67,7 @@ function handleAppFlow() {
   if (!isChrome()) {
     console.log("Not Chrome → show other browser popup");
     setTimeout(() => fadeInEffect(DOM.otherBrowserPopup.popup), 500);
+    hideSectionLoader();
     return;
   }
 
@@ -70,7 +76,8 @@ function handleAppFlow() {
     deferredPrompt = e;
     globalDeferredPrompt = true;
     console.log("Chrome but not installed → show install popup");
-    fadeInEffect(DOM.installPopup.popup);
+    showElement(DOM.installPopup.popup);
+    hideSectionLoader();
     isInstalling = true;
   });
 
@@ -99,7 +106,8 @@ function handleAppFlow() {
       console.log("Running as PWA");
     } else {
       if (deferredPrompt === null) {
-        fadeInEffect(DOM.openAppPopup.popup);
+        showElement(DOM.openAppPopup.popup);
+        hideSectionLoader();
         console.log("Running in browser");
       }
     }

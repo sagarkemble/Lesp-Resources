@@ -202,7 +202,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           hideSectionLoader();
           initClass();
         } else {
-          if (window.innerWidth > 1024 && isIphone()) {
+          if (window.innerWidth > 1024 || isIphone()) {
             hideSectionLoader();
           }
           // await hideSectionLoader();
