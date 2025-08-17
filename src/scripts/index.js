@@ -59,6 +59,7 @@ import {
   trackUserLogout,
   resetPostHog,
 } from "./posthog.js";
+import { isIphone } from "./pwa.js";
 export const lottieLoadingScreen = document.querySelector(
   ".lottie-loading-screen",
 );
@@ -201,6 +202,9 @@ document.addEventListener("DOMContentLoaded", async () => {
           hideSectionLoader();
           initClass();
         } else {
+          if (window.innerWidth > 1024 && isIphone()) {
+            hideSectionLoader();
+          }
           // await hideSectionLoader();
           await showLoginSection();
         }

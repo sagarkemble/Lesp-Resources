@@ -105,13 +105,13 @@ function handleAppFlow() {
     }
   }, 5000);
 }
-function isIphone() {
+export function isIphone() {
   return /iPhone/i.test(navigator.userAgent);
 }
 
 if (window.innerWidth < 1024 && !isIphone()) {
   handleAppFlow();
-} else hideSectionLoader();
+}
 
 window.addEventListener("appinstalled", () => {
   setTimeout(() => {
