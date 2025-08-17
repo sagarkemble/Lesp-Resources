@@ -52,10 +52,6 @@ function isChrome() {
   return /Chrome/.test(ua) && !/Edg|OPR|Brave/.test(ua);
 }
 
-function isRunningAsPWA() {
-  return window.matchMedia("(display-mode: standalone)").matches;
-}
-
 function handleAppFlow() {
   if (isRunningAsPWA()) {
     console.log("Running as PWA");
@@ -87,7 +83,7 @@ function handleAppFlow() {
         console.log("Running in browser");
       }
     }
-  }, 1000);
+  }, 3000);
 }
 
 handleAppFlow();
