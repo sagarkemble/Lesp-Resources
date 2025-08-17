@@ -62,11 +62,11 @@ function handleAppFlow() {
     return;
   }
 
-  //   if (!isChrome()) {
-  //     console.log("Not Chrome → show other browser popup");
-  //     setTimeout(() => fadeInEffect(DOM.otherBrowserPopup.popup), 500);
-  //     return;
-  //   }
+  if (!isChrome()) {
+    console.log("Not Chrome → show other browser popup");
+    setTimeout(() => fadeInEffect(DOM.otherBrowserPopup.popup), 500);
+    return;
+  }
 
   let deferredPrompt = null;
 
