@@ -7,9 +7,6 @@ const DOM = {
   },
   installPopup: {
     popup: document.querySelector(".install-pwa-popup-wrapper"),
-    closeBtn: document.querySelector(
-      ".install-pwa-popup-wrapper .close-popup-btn",
-    ),
     popupTitle: document.querySelector(
       ".install-pwa-popup-wrapper .popup-title",
     ),
@@ -22,9 +19,6 @@ const DOM = {
   },
   openAppPopup: {
     popup: document.querySelector(".open-app-popup-wrapper"),
-    closeBtn: document.querySelector(
-      ".open-app-popup-wrapper .close-popup-btn",
-    ),
     popupTitle: document.querySelector(".open-app-popup-wrapper .popup-title"),
     description: document.querySelector(".open-app-popup-wrapper .description"),
     successBtn: document.querySelector(".open-app-popup-wrapper .success-btn"),
