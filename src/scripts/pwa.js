@@ -66,7 +66,6 @@ export async function handleAppFlow() {
   window.addEventListener("beforeinstallprompt", async (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    globalDeferredPrompt = true;
     console.log("Chrome but not installed → show install popup");
     if (DOM.installPopup.popup.style.display !== "none") {
       await fadeOutEffect(DOM.installPopup.popup);
