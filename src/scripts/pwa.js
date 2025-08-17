@@ -110,5 +110,7 @@ handleAppFlow();
 window.addEventListener("appinstalled", () => {
   setTimeout(() => {
     hideSectionLoader();
+    fadeInEffect(DOM.openAppPopup.popup);
+    fadeOutEffect(DOM.installPopup.popup);
   }, 20000);
 });
