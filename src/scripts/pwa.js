@@ -1,4 +1,5 @@
-import { fadeInEffect, fadeOutEffect } from "./animation";
+import { hideSectionLoader, showSectionLoader } from "./index.js";
+import { fadeInEffect, fadeOutEffect, hideElement } from "./animation";
 
 const DOM = {
   otherBrowserPopup: {
@@ -71,9 +72,22 @@ function handleAppFlow() {
     fadeInEffect(DOM.installPopup.popup);
     DOM.installPopup.successBtn.addEventListener("click", () => {
       deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === "accepted") {
+          showSectionLoader("Installing App...");
+        } else {
+          console.log("PWA installation rejected");
+        }
+      });
     });
+    // event when installation finished
+    window.addEventListener("appinstalled", () => {
+      hideSectionLoader();
+    });
+
     isInstalling = true;
   });
+
   setTimeout(() => {
     if (window.matchMedia("(display-mode: standalone)").matches) {
       console.log("Running as PWA");
