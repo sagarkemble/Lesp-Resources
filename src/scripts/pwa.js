@@ -72,7 +72,6 @@ export async function handleAppFlow() {
     }
     fadeInEffect(DOM.installPopup.popup);
     hideSectionLoader();
-    isInstalling = true;
   });
 
   // Click handler added only once
@@ -118,7 +117,6 @@ window.addEventListener("appinstalled", () => {
     hideSectionLoader();
     await fadeInEffect(DOM.openAppPopup.popup);
     fadeOutEffect(DOM.installPopup.popup);
-    isInstalling = false;
   }, 20000);
 });
 DOM.openAppPopup.installP.addEventListener("click", async () => {
