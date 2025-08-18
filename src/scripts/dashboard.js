@@ -479,6 +479,8 @@ export function renderUpcomingSubmissions() {
       "flex-col",
       "lg:gap-3",
       "py-5",
+      "cursor-pointer",
+      "custom-hover",
     );
 
     const date = formatDateBasedOnProximity(submission.dueDate);
@@ -503,7 +505,10 @@ export function renderUpcomingSubmissions() {
         </p>
       </div>
     `;
-
+    card.addEventListener("click", () => {
+      history.pushState({}, "", `?subject=${submission.subjectName}`);
+      initRouting();
+    });
     DOM.upcomingSubmissions.cardContainer.appendChild(card);
   });
 }
