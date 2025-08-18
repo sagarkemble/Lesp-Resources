@@ -137,4 +137,7 @@ DOM.openAppPopup.installP.addEventListener("click", async () => {
 });
 DOM.openAppPopup.successBtn.addEventListener("click", () => {
   window.open(window.location.origin, "_blank");
+  setTimeout(() => {
+    window.location.href = "/";
+  }, 200);
 });
