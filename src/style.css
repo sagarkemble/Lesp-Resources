@@ -250,7 +250,7 @@ input[type="number"] {
 .grid-auto-fit {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(15.625rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(8.75rem, 1fr));
 }
 .grid-auto-fit > * {
   white-space: nowrap;
