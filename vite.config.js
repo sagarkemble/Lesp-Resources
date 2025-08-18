@@ -12,7 +12,7 @@ export default defineConfig({
       includeAssets: ["favicon.ico", "robots.txt"],
       manifest: {
         name: "Lesp resources",
-        id: "/",
+        id: "app.lesp.resources",
         scope: "/",
         start_url: "/",
         short_name: "Lesp",
