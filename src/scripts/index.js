@@ -225,7 +225,8 @@ export async function initClass() {
     await fadeInEffect(lottieLoadingScreen);
     if (
       localUserData.userData.role === "admin" ||
-      localUserData.userData.role === "teacher"
+      localUserData.userData.role === "teacher" ||
+      localUserData.userData.role === "editor"
     )
       showElement(editModeToggleButton);
     else hideElement(editModeToggleButton);
