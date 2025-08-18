@@ -13,6 +13,7 @@ export default defineConfig({
       manifest: {
         name: "Lesp resources",
         id: "/",
+        scope: "/",
         start_url: "/",
         short_name: "Lesp",
         description: "Lesp resources PWA",
