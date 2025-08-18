@@ -35,9 +35,6 @@ export async function uploadDriveFile(file, path) {
   const formData = new FormData();
   formData.append("file", file);
   formData.append("path", path);
-
-  //   showSectionLoader("Uploading file...");
-
   try {
     const response = await fetch(uploadUrl, {
       method: "POST",
