@@ -19,12 +19,7 @@ export default defineConfig({
         theme_color: "#000000",
         background_color: "#000000",
         display: "standalone",
-        protocol_handlers: [
-          {
-            protocol: "web+lesp",
-            url: "https://lespresources.in/?q=%s",
-          },
-        ],
+
         icons: [
           {
             src: "android/android-launchericon-512-512.png",
