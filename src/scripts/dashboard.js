@@ -1064,7 +1064,7 @@ export async function renderUpcomingSessions() {
       </div>
 
       <div class="duration-date-wrapper text-xs font-light flex flex-col gap-1">
-        <p class="day">${formatDate(date)} at ${formatTime(toTime)}</p>
+        <p class="day">${formatDate(date)} at ${formatTime(fromTime)}</p>
         <p class="duration">Duration : ${duration}</p>
       </div>
     `;
