@@ -12,6 +12,8 @@ export default defineConfig({
       includeAssets: ["favicon.ico", "robots.txt"],
       manifest: {
         name: "Lesp resources",
+        id: "/",
+        start_url: "/",
         short_name: "Lesp",
         description: "Lesp resources PWA",
         theme_color: "#000000",
