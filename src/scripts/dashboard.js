@@ -1604,8 +1604,9 @@ function initUserInfo() {
   DOM.accountDetailsPopup.userPfp.src = appState.userData.pfpLink;
   DOM.accountDetailsPopup.userName.textContent = `${appState.userData.firstName} ${appState.userData.lastName}`;
   if (appState.userData.role === "student") {
-    DOM.accountDetailsPopup.details.division.innerHTML = `Division : <span class="text-text-secondary">${appState.userData.division}</span>`;
-    DOM.accountDetailsPopup.details.semester.innerHTML = `Semester : <span class="text-text-secondary">${appState.userData.semester}</span>`;
+    const [sem, div] = appState.userData.class.split("");
+    DOM.accountDetailsPopup.details.division.innerHTML = `Division : <span class="text-text-secondary">${div}</span>`;
+    DOM.accountDetailsPopup.details.semester.innerHTML = `Semester : <span class="text-text-secondary">${sem}</span>`;
     DOM.accountDetailsPopup.details.rollNo.innerHTML = `Roll No : <span class="text-text-secondary">${appState.userData.rollNumber}</span>`;
     DOM.accountDetailsPopup.medals.gold.innerHTML = gold;
     DOM.accountDetailsPopup.medals.silver.innerHTML = silver;
