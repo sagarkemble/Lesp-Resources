@@ -136,8 +136,7 @@ DOM.openAppPopup.installP.addEventListener("click", async () => {
   }, 2000);
 });
 DOM.openAppPopup.successBtn.addEventListener("click", () => {
-  const appLink = "lesp://open";
-  window.location.href = appLink;
+  window.open(window.location.origin, "_blank");
   setTimeout(() => {
     window.location.href = "/";
   }, 2000);
