@@ -230,6 +230,7 @@ export async function initClass() {
     )
       showElement(editModeToggleButton);
     else hideElement(editModeToggleButton);
+
     await hideSections();
     await loadContent();
     await applyEditModeUI();
