@@ -1473,6 +1473,7 @@ function initTimeTableBatch() {
       wrapper.style.display = "none";
     }
   });
+  currentBatchIndex = 0;
 }
 
 DOM.timeTablePopupSwiper.batchToggleBtn.addEventListener("click", () => {
