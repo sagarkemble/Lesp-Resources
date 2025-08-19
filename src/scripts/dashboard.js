@@ -1465,23 +1465,7 @@ function switchBatch() {
   });
 }
 DOM.timeTablePopupSwiper.batchToggleBtn.addEventListener("click", () => {
-  currentBatchIndex = (currentBatchIndex + 1) % batchList.length;
-
-  const selectedBatch = batchList[currentBatchIndex];
-  DOM.timeTablePopupSwiper.batchToggleBtn.textContent =
-    selectedBatch.charAt(0).toUpperCase() + selectedBatch.slice(1);
-  DOM.timeTableSwiper.batchToggleBtn.textContent =
-    selectedBatch.charAt(0).toUpperCase() + selectedBatch.slice(1);
-  document.querySelectorAll(".wrapper[data-batch]").forEach((wrapper) => {
-    if (
-      wrapper.dataset.batch === "all" ||
-      wrapper.dataset.batch === selectedBatch
-    ) {
-      showElement(wrapper);
-    } else {
-      hideElement(wrapper);
-    }
-  });
+  switchBatch();
 });
 
 // upcoming test card function and listener
