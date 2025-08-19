@@ -3,11 +3,11 @@ import { hideSections, hideSectionLoader, lottieLoadingScreen } from "./index";
 const DOM = {
   offline: {
     section: document.querySelector(".offline-section"),
+    img: new Image(),
   },
 };
 const errorSection = document.querySelector(".error-section");
 import * as Sentry from "@sentry/browser";
-
 Sentry.init({
   dsn: "https://f123aee0ee34252e12f97d64f9127ba3@o4509854772297728.ingest.us.sentry.io/4509854774394880",
   // Setting this option to true will send default PII data to Sentry.
@@ -33,3 +33,4 @@ export async function isOffline() {
     return;
   }
 }
+DOM.offline.img.src = "/error-images/offline.png";
