@@ -3,7 +3,7 @@ import { hideSections, hideSectionLoader, lottieLoadingScreen } from "./index";
 const DOM = {
   offline: {
     section: document.querySelector(".offline-section"),
-    img: new Image(),
+    img: document.querySelector(".offline-section img"),
   },
 };
 const errorSection = document.querySelector(".error-section");
@@ -33,4 +33,8 @@ export async function isOffline() {
     return;
   }
 }
-DOM.offline.img.src = "/error-images/offline.png";
+const offlineImgCache = new Image();
+offlineImgCache.src = "/error-images/offline.png";
+offlineImgCache.onload = () => {
+  DOM.offline.img.src = offlineImgCache.src;
+};
