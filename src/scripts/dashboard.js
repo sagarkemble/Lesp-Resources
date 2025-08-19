@@ -411,8 +411,9 @@ export async function loadDashboard() {
       hideElement(DOM.menuPopup.adminPanelBtn);
       hideElement(DOM.menuPopup.switchClassBtn);
     }
-    initTimeTableBatch();
-
+    currentBatchIndex = -1;
+    switchBatch();
+    currentBatchIndex = 0;
     initUpcomingTestCard();
     loadTypeSelectorSubjects();
     renderTimeTablePopupSubjects();
@@ -1443,6 +1444,9 @@ function renderTimeTableSlides(swiperInstance) {
 }
 let currentBatchIndex = 0;
 DOM.timeTableSwiper.batchToggleBtn.addEventListener("click", () => {
+  switchBatch();
+});
+function switchBatch() {
   currentBatchIndex = (currentBatchIndex + 1) % batchList.length;
   const selectedBatch = batchList[currentBatchIndex];
   DOM.timeTableSwiper.batchToggleBtn.textContent =
@@ -1459,23 +1463,7 @@ DOM.timeTableSwiper.batchToggleBtn.addEventListener("click", () => {
       wrapper.style.display = "none";
     }
   });
-});
-function initTimeTableBatch() {
-  currentBatchIndex = (currentBatchIndex + 1) % batchList.length;
-  const selectedBatch = batchList[currentBatchIndex];
-  document.querySelectorAll(".wrapper[data-batch]").forEach((wrapper) => {
-    if (
-      wrapper.dataset.batch === "all" ||
-      wrapper.dataset.batch === selectedBatch
-    ) {
-      wrapper.style.display = "";
-    } else {
-      wrapper.style.display = "none";
-    }
-  });
-  currentBatchIndex = 0;
 }
-
 DOM.timeTablePopupSwiper.batchToggleBtn.addEventListener("click", () => {
   currentBatchIndex = (currentBatchIndex + 1) % batchList.length;
 
