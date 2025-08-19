@@ -50,7 +50,7 @@ import {
   getUserData,
   adminAppState,
 } from "./appstate.js";
-import { showErrorSection } from "./error.js";
+import { isOffline, showErrorSection } from "./error.js";
 import {
   trackLoginUser,
   trackClass,
@@ -125,6 +125,7 @@ export async function showSelectClassPopup(user) {
 }
 
 selectClassPopupCloseButton.addEventListener("click", async () => {
+  await isOffline();
   await showSectionLoader("Loading...", false);
   await toggleFormState(false);
   hideElement(loginSection);
@@ -179,6 +180,7 @@ export async function showConfirmationPopup(
 }
 document.addEventListener("DOMContentLoaded", async () => {
   try {
+    await isOffline();
     resetPostHog();
     showSectionLoader("Loading...", false);
     onAuthStateChanged(auth, async (userCredential) => {

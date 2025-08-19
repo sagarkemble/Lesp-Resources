@@ -14,6 +14,7 @@ import {
   browserLocalPersistence,
   setPersistence,
 } from "./firebase.js";
+import { isOffline } from "./error.js";
 const swiper = new Swiper("#login-section-swiper", {
   direction: "horizontal",
   loop: true,
@@ -41,7 +42,7 @@ const loginBtnLoader = loginBtn.querySelector(".btn-loader");
 const loginBtnText = loginBtn.querySelector(".text");
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  // showInstallPrompt();
+  await isOffline();
   emailRelatedError.textContent = "";
   passwordRelatedError.textContent = "";
   loginFormRelatedError.textContent = "";

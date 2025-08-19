@@ -110,7 +110,7 @@ export function isIphone() {
 }
 if (window.innerWidth < 1024 && !isIphone()) {
   console.log("executed");
-  // handleAppFlow();
+  handleAppFlow();
 }
 window.addEventListener("appinstalled", () => {
   setTimeout(async () => {

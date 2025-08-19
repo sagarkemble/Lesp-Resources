@@ -1,5 +1,10 @@
 import { fadeInEffect, fadeOutEffect } from "./animation";
 import { hideSections, hideSectionLoader, lottieLoadingScreen } from "./index";
+const DOM = {
+  offline: {
+    section: document.querySelector(".offline-section"),
+  },
+};
 const errorSection = document.querySelector(".error-section");
 import * as Sentry from "@sentry/browser";
 
@@ -16,4 +21,15 @@ export async function showErrorSection(errorMsg, error) {
   await fadeInEffect(errorSection);
   Sentry.captureException(error);
   console.error(errorMsg, error);
+}
+export async function isOffline() {
+  if (!navigator.onLine) {
+    fadeInEffect(DOM.offline.section);
+    await new Promise((resolve) => setTimeout(resolve, 60000));
+    window.location.reload();
+    return;
+  } else {
+    fadeOutEffect(DOM.offline.section);
+    return;
+  }
 }
