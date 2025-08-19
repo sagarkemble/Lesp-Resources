@@ -411,6 +411,8 @@ export async function loadDashboard() {
       hideElement(DOM.menuPopup.adminPanelBtn);
       hideElement(DOM.menuPopup.switchClassBtn);
     }
+    initTimeTableBatch();
+
     initUpcomingTestCard();
     loadTypeSelectorSubjects();
     renderTimeTablePopupSubjects();
@@ -1458,6 +1460,21 @@ DOM.timeTableSwiper.batchToggleBtn.addEventListener("click", () => {
     }
   });
 });
+function initTimeTableBatch() {
+  currentBatchIndex = (currentBatchIndex + 1) % batchList.length;
+  const selectedBatch = batchList[currentBatchIndex];
+  document.querySelectorAll(".wrapper[data-batch]").forEach((wrapper) => {
+    if (
+      wrapper.dataset.batch === "all" ||
+      wrapper.dataset.batch === selectedBatch
+    ) {
+      wrapper.style.display = "";
+    } else {
+      wrapper.style.display = "none";
+    }
+  });
+}
+
 DOM.timeTablePopupSwiper.batchToggleBtn.addEventListener("click", () => {
   currentBatchIndex = (currentBatchIndex + 1) % batchList.length;
 
