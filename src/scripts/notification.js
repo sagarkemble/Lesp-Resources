@@ -252,7 +252,6 @@ DOM.updates.successBtn.addEventListener("click", () => {
 });
 window.addEventListener("beforeunload", () => {
   if (localStorage.getItem("rememberMe") === null) {
-    alert("You have unsaved changes. Are you sure you want to leave?");
     const payload = JSON.stringify({
       token,
       topics: subscribedTopics,

@@ -75,7 +75,7 @@ const confirmationDescription = confirmationPopup.querySelector(".description");
 const confirmationTitle = confirmationPopup.querySelector(".title");
 const confirmButton = confirmationPopup.querySelector(".confirm-btn");
 const cancelButton = confirmationPopup.querySelector(".cancel-btn");
-
+let authStateInitialized = false;
 export let localUserData = {
   userData: undefined,
   isVisitingClass: false,
@@ -187,8 +187,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     resetPostHog();
     showSectionLoader("Loading...", false);
     onAuthStateChanged(auth, async (userCredential) => {
-      if (isNewUser.flag) return;
-      history.pushState({}, "", "/");
+      if (authStateInitialized || isNewUser.flag) return;
       try {
         if (userCredential) {
           const user = await getUserData(userCredential.uid);
@@ -399,14 +398,14 @@ window.addEventListener("popstate", () => {
     initRouting();
   }
 });
-// In your main app's JavaScript file (e.g., index.js)
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker
-    .register("/firebase-messaging-sw.js") // Ensure this path is correct relative to your app's root
-    .then((registration) => {
-      console.log("Service Worker registered successfully:", registration);
-    })
-    .catch((error) => {
-      console.error("Service Worker registration failed:", error);
-    });
-}
+
+// if ("serviceWorker" in navigator) {
+//   navigator.serviceWorker
+//     .register("/firebase-messaging-sw.js")
+//     .then((registration) => {
+//       console.log("Service Worker registered successfully:", registration);
+//     })
+//     .catch((error) => {
+//       console.error("Service Worker registration failed:", error);
+//     });
+// }
