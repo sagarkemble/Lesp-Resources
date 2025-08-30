@@ -20,11 +20,13 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 function saveNotificationToDB(data) {
-  const request = indexedDB.open("notificationDB", 2);
+  const request = indexedDB.open("notificationDB", 2); // Ensure version is correct
 
   request.onupgradeneeded = (event) => {
     const db = event.target.result;
+
     if (!db.objectStoreNames.contains("notifications")) {
+      console.log("Creating object store 'notifications'");
       db.createObjectStore("notifications", {
         keyPath: "id",
         autoIncrement: true,
@@ -35,27 +37,23 @@ function saveNotificationToDB(data) {
   request.onsuccess = (event) => {
     const db = event.target.result;
 
-    // Check if the object store exists before creating transaction
-    if (db.objectStoreNames.contains("notifications")) {
-      const tx = db.transaction("notifications", "readwrite");
-      const store = tx.objectStore("notifications");
+    // Start a transaction to add data to 'notifications' object store
+    const tx = db.transaction("notifications", "readwrite");
+    const store = tx.objectStore("notifications");
 
-      const addRequest = store.add(data);
+    const addRequest = store.add(data);
 
-      addRequest.onsuccess = () => {
-        console.log("Notification saved successfully");
-      };
+    addRequest.onsuccess = () => {
+      console.log("Notification saved successfully");
+    };
 
-      addRequest.onerror = (err) => {
-        console.error("Failed to add notification:", err);
-      };
+    addRequest.onerror = (err) => {
+      console.error("Failed to add notification:", err);
+    };
 
-      tx.onerror = (err) => {
-        console.error("Transaction failed:", err);
-      };
-    } else {
-      console.error("Object store 'notifications' not found");
-    }
+    tx.onerror = (err) => {
+      console.error("Transaction failed:", err);
+    };
   };
 
   request.onerror = (err) => {
