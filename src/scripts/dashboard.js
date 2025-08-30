@@ -1742,7 +1742,10 @@ DOM.sendNotification.successBtn.addEventListener("click", async () => {
     hasError = true;
   }
   if (hasError) return;
+  showSectionLoader("Sending notification...");
+  fadeOutEffect(DOM.sendNotification.popup);
   sendNotification(title, description, type);
+  hideSectionLoader();
 });
 function resetSendNotification() {
   DOM.sendNotification.inputs.title.value = "";

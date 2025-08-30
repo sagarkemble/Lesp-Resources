@@ -188,6 +188,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     showSectionLoader("Loading...", false);
     onAuthStateChanged(auth, async (userCredential) => {
       if (isNewUser.flag) return;
+      history.pushState({}, "", "/");
       try {
         if (userCredential) {
           const user = await getUserData(userCredential.uid);
