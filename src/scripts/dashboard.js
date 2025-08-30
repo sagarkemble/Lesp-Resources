@@ -1744,6 +1744,8 @@ DOM.sendNotification.successBtn.addEventListener("click", async () => {
   if (hasError) return;
   showSectionLoader("Sending notification...");
   fadeOutEffect(DOM.sendNotification.popup);
+  console.log("Notification sent:", { title, description, type });
+
   sendNotification(title, description, type);
   hideSectionLoader();
 });

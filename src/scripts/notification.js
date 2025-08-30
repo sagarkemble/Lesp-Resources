@@ -174,7 +174,7 @@ export async function sendNotification(title, message, scope) {
 // Fetch notifications
 function getNotifications() {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open("notificationDB", 1);
+    const request = indexedDB.open("notificationDB", 2);
 
     request.onupgradeneeded = (event) => {
       resolve([]);
@@ -204,7 +204,7 @@ function getNotifications() {
 // Clear notifications
 function clearNotifications() {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open("notificationDB", 1);
+    const request = indexedDB.open("notificationDB", 2);
     request.onsuccess = (event) => {
       const db = event.target.result;
       const tx = db.transaction("notifications", "readwrite");

@@ -20,7 +20,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 function saveNotificationToDB(data) {
-  const request = indexedDB.open("notificationDB", 1);
+  const request = indexedDB.open("notificationDB", 2);
 
   request.onupgradeneeded = (event) => {
     const db = event.target.result;
@@ -34,14 +34,35 @@ function saveNotificationToDB(data) {
 
   request.onsuccess = (event) => {
     const db = event.target.result;
-    const tx = db.transaction("notifications", "readwrite");
-    tx.objectStore("notifications").add(data);
+
+    // Check if the object store exists before creating transaction
+    if (db.objectStoreNames.contains("notifications")) {
+      const tx = db.transaction("notifications", "readwrite");
+      const store = tx.objectStore("notifications");
+
+      const addRequest = store.add(data);
+
+      addRequest.onsuccess = () => {
+        console.log("Notification saved successfully");
+      };
+
+      addRequest.onerror = (err) => {
+        console.error("Failed to add notification:", err);
+      };
+
+      tx.onerror = (err) => {
+        console.error("Transaction failed:", err);
+      };
+    } else {
+      console.error("Object store 'notifications' not found");
+    }
   };
 
   request.onerror = (err) => {
-    console.error("Failed to save notification:", err);
+    console.error("Failed to open database:", err);
   };
 }
+
 messaging.onBackgroundMessage((payload) => {
   console.log("called");
   console.log("Received background message ", payload);
