@@ -152,6 +152,7 @@ export default defineConfig({
           },
         ],
       },
+      swSrc: "public/firebase-messaging-sw.js",
     }),
   ],
 

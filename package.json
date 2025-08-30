@@ -22,6 +22,7 @@
     "firebase": "^12.0.0",
     "googleapis": "^150.0.1",
     "posthog-js": "^1.260.1",
-    "tailwindcss": "^4.1.11"
+    "tailwindcss": "^4.1.11",
+    "workbox-precaching": "^7.3.0"
   }
 }
