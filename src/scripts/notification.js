@@ -174,7 +174,7 @@ export async function sendNotification(title, message, scope) {
 // Fetch notifications
 function getNotifications() {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open("notificationDB", 2);
+    const request = indexedDB.open("notificationDB", 3);
 
     request.onupgradeneeded = (event) => {
       resolve([]);
@@ -202,16 +202,44 @@ function getNotifications() {
 }
 
 // Clear notifications
+// function clearNotifications() {
+//   return new Promise((resolve, reject) => {
+//     const request = indexedDB.open("notificationDB", 2);
+//     request.onsuccess = (event) => {
+//       const db = event.target.result;
+//       const tx = db.transaction("notifications", "readwrite");
+//       tx.objectStore("notifications").clear();
+//       tx.oncomplete = () => resolve();
+//       tx.onerror = (err) => reject(err);
+//     };
+//   });
+// }
 function clearNotifications() {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open("notificationDB", 2);
+    const request = indexedDB.open("notificationDB", 3);
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains("notifications")) {
+        db.createObjectStore("notifications", {
+          keyPath: "id",
+          autoIncrement: true,
+        });
+      }
+    };
     request.onsuccess = (event) => {
       const db = event.target.result;
+      if (!db.objectStoreNames.contains("notifications")) {
+        // Nothing to clear; resolve gracefully
+        resolve();
+        return;
+      }
       const tx = db.transaction("notifications", "readwrite");
       tx.objectStore("notifications").clear();
       tx.oncomplete = () => resolve();
       tx.onerror = (err) => reject(err);
+      tx.onabort = (err) => reject(err);
     };
+    request.onerror = (err) => reject(err);
   });
 }
 
