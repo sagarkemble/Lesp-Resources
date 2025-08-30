@@ -40,12 +40,19 @@ const forgotPasswordLink = document.querySelector("#forgot-password-link");
 const loginBtn = document.querySelector(".login-btn");
 const loginBtnLoader = loginBtn.querySelector(".btn-loader");
 const loginBtnText = loginBtn.querySelector(".text");
+
+export const isSubscribe = {
+  subscribe: false,
+};
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   await isOffline();
   emailRelatedError.textContent = "";
   passwordRelatedError.textContent = "";
   loginFormRelatedError.textContent = "";
+  if (keepLoginCheckBox.checked) {
+    localStorage.setItem("rememberMe", "true");
+  }
   const persistenceType = keepLoginCheckBox.checked
     ? browserLocalPersistence
     : inMemoryPersistence;
@@ -66,6 +73,7 @@ loginForm.addEventListener("submit", async (e) => {
       return signInWithEmailAndPassword(auth, email, password);
     })
     .then(async (userCredential) => {
+      isSubscribe.subscribe = true;
       history.pushState({}, "", "/");
     })
     .catch((error) => {
@@ -81,7 +89,6 @@ loginForm.addEventListener("submit", async (e) => {
       }
     });
 });
-
 export function resetForm() {
   emailInput.value = "";
   passwordInput.value = "";

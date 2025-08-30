@@ -1,0 +1,340 @@
+import { fadeInEffect, fadeOutEffect } from "./animation";
+import {
+  getToken,
+  onMessage,
+  app,
+  getMessaging,
+  messaging,
+  update,
+  set,
+} from "./firebase.js";
+import { appState } from "./appstate";
+import { isSubscribe } from "./login.js";
+import { trackAllowNotification } from "./posthog.js";
+const DOM = {
+  allowNotification: {
+    popup: document.querySelector(".allow-notification-popup-wrapper"),
+    successBtn: document.querySelector(
+      ".allow-notification-popup-wrapper .success-btn",
+    ),
+    closeBtn: document.querySelector(
+      ".allow-notification-popup-wrapper .close-popup-btn",
+    ),
+  },
+  allowInSettings: {
+    popup: document.querySelector(".allow-notification-settings-popup-wrapper"),
+    successBtn: document.querySelector(
+      ".allow-notification-settings-popup-wrapper .success-btn",
+    ),
+    closeBtn: document.querySelector(
+      ".allow-notification-settings-popup-wrapper .close-popup-btn",
+    ),
+  },
+  updates: {
+    popup: document.querySelector(".updates-popup-wrapper"),
+    successBtn: document.querySelector(".updates-popup-wrapper .success-btn"),
+    cardContainer: document.querySelector(
+      ".updates-popup-wrapper .card-container",
+    ),
+  },
+};
+
+let token;
+let subscribedTopics = [];
+export async function requestNotificationPermission() {
+  if (Notification.permission === "granted") {
+    token = await getToken(messaging, {
+      vapidKey:
+        "BP2FM9upp84r_zB6MSRn4OWOgiUt5qUzjEP0z863cBbQF7O7OypOL3Cc-rwcb6QVpqbpSC5L67tfoUn3jg7jlyQ",
+    });
+    subscribe();
+  } else {
+    fadeInEffect(DOM.allowNotification.popup);
+  }
+}
+DOM.allowNotification.successBtn.addEventListener("click", async () => {
+  await Notification.requestPermission().then(async (permission) => {
+    if (permission === "granted") {
+      fadeOutEffect(DOM.allowNotification.popup);
+      token = await getToken(messaging, {
+        vapidKey:
+          "BP2FM9upp84r_zB6MSRn4OWOgiUt5qUzjEP0z863cBbQF7O7OypOL3Cc-rwcb6QVpqbpSC5L67tfoUn3jg7jlyQ",
+      });
+      trackAllowNotification("User allowed notifications");
+      subscribe(token);
+      return;
+    }
+  });
+  if (Notification.permission === "denied") {
+    fadeInEffect(DOM.allowInSettings.popup);
+  }
+});
+DOM.allowNotification.closeBtn.addEventListener("click", () => {
+  fadeOutEffect(DOM.allowNotification.popup);
+});
+DOM.allowInSettings.closeBtn.addEventListener("click", () => {
+  fadeOutEffect(DOM.allowInSettings.popup);
+});
+export function setOnMessageListener() {
+  onMessage(messaging, (payload) => {
+    if (Notification.permission === "granted") {
+      const { title, body } = payload.data;
+      showToast(title, body);
+    }
+  });
+}
+function showToast(title, body) {
+  const container = document.getElementById("toast-container");
+  const toast = document.createElement("div");
+  toast.className =
+    "toaster bg-surface-2 border-surface-3 custom-hover flex items-center justify-center gap-4 rounded-2xl border p-4 px-6 lg:gap-5 cursor-pointer w-full lg:w-fit pointer-events-auto lg:max-w-[30rem]";
+  toast.style.cssText = `
+    transform: translateX(100%);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  `;
+  toast.innerHTML = `
+    <i class="fa-solid fa-bell text-text-secondary text-xl"></i>
+    <div class="wrapper flex flex-col gap-0.5">
+      <p class="title text-sm font-semibold">${title}</p>
+      <p class="body text-text-secondary text-sm line-clamp-4">${body}</p>
+      <p class=" text-text-tertiary text-xs">Reload to see new updates</p>
+
+    </div>
+  `;
+  container.prepend(toast);
+  const height = toast.offsetHeight + 8;
+  const others = container.querySelectorAll(".toaster:not(:first-child)");
+  others.forEach((el) => {
+    el.style.transition = "none";
+    el.style.transform = `translateY(-${height}px)`;
+    el.offsetHeight;
+    el.style.transition = "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)";
+  });
+  requestAnimationFrame(() => {
+    toast.style.transform = "translateX(0)";
+    toast.style.opacity = "1";
+    others.forEach((el) => {
+      el.style.transform = "translateY(0)";
+    });
+  });
+  toast.addEventListener("touchstart", () => hideToast(toast));
+  toast.addEventListener("click", () => hideToast(toast));
+  setTimeout(() => hideToast(toast), 5000);
+}
+function hideToast(toast) {
+  const height = toast.offsetHeight + 8; // spacing
+  const container = document.getElementById("toast-container");
+  const allToasts = Array.from(container.querySelectorAll(".toaster"));
+  const index = allToasts.indexOf(toast);
+  const below = allToasts.slice(index + 1);
+
+  toast.style.transform = "translateX(100%)";
+  toast.style.opacity = "0";
+
+  below.forEach((el) => {
+    el.style.transition = "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)";
+    el.style.transform = `translateY(-${height}px)`;
+  });
+
+  setTimeout(() => {
+    toast.remove();
+
+    below.forEach((el) => {
+      el.style.transition = "none";
+      el.style.transform = "translateY(0)";
+      el.offsetHeight;
+      el.style.transition = "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)";
+    });
+  }, 300);
+}
+export async function sendNotification(title, message, scope) {
+  scope = String(scope);
+  let topics = [];
+  if (scope === "global") {
+    topics.push(
+      "1A",
+      "1B",
+      "2A",
+      "2B",
+      "3A",
+      "3B",
+      "4A",
+      "4B",
+      "5A",
+      "5B",
+      "6A",
+      "6B",
+    );
+  } else if (scope === "semester") {
+    const sem = appState.activeSem;
+    topics.push(`${sem}A`, `${sem}B`);
+  } else if (scope === "division") {
+    const sem = appState.activeSem;
+    const div = appState.activeDiv;
+    topics.push(`${sem}${div}`);
+  }
+  await fetch("https://lesp-resources-fcm-server.vercel.app/send", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      topics: topics,
+      title: title,
+      body: message,
+    }),
+  });
+}
+// Fetch notifications
+function getNotifications() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open("notificationDB", 1);
+
+    request.onupgradeneeded = (event) => {
+      resolve([]);
+    };
+
+    request.onsuccess = (event) => {
+      const db = event.target.result;
+
+      if (!db.objectStoreNames.contains("notifications")) {
+        resolve([]);
+        return;
+      }
+
+      const tx = db.transaction("notifications", "readonly");
+      const store = tx.objectStore("notifications");
+      const getAllReq = store.getAll();
+      getAllReq.onsuccess = () => resolve(getAllReq.result);
+      getAllReq.onerror = (err) => reject(err);
+    };
+
+    request.onerror = () => {
+      resolve([]);
+    };
+  });
+}
+
+// Clear notifications
+function clearNotifications() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open("notificationDB", 1);
+    request.onsuccess = (event) => {
+      const db = event.target.result;
+      const tx = db.transaction("notifications", "readwrite");
+      tx.objectStore("notifications").clear();
+      tx.oncomplete = () => resolve();
+      tx.onerror = (err) => reject(err);
+    };
+  });
+}
+
+export async function showStoredNotification() {
+  const notifications = await getNotifications();
+  if (!notifications || notifications.length === 0) {
+    return;
+  }
+
+  notifications.forEach((n) => {
+    const card = document.createElement("div");
+    card.className =
+      "card bg-surface-2 border-surface-3 custom-hover flex cursor-pointer flex-col items-start justify-between rounded-xl border p-3 md:px-4";
+    card.innerHTML = `
+      <p class="title font-semibold">${n.title}</p>
+      <p class="description text-text-secondary line-clamp-3">${n.body}</p>
+    `;
+    DOM.updates.cardContainer.appendChild(card);
+  });
+  await fadeInEffect(DOM.updates.popup);
+  await clearNotifications();
+}
+DOM.updates.successBtn.addEventListener("click", () => {
+  fadeOutEffect(DOM.updates.popup);
+});
+window.addEventListener("beforeunload", () => {
+  if (localStorage.getItem("rememberMe") === null) {
+    alert("You have unsaved changes. Are you sure you want to leave?");
+    const payload = JSON.stringify({
+      token,
+      topics: subscribedTopics,
+    });
+    navigator.sendBeacon(
+      "https://lesp-resources-fcm-server.vercel.app/unsubscribe",
+      payload,
+    );
+  }
+});
+export function unsubscribeFCM() {
+  if (localStorage.getItem("rememberMe") === null) {
+    const payload = JSON.stringify({
+      token,
+      topics: subscribedTopics,
+    });
+    navigator.sendBeacon(
+      "https://lesp-resources-fcm-server.vercel.app/unsubscribe",
+      payload,
+    );
+  }
+}
+export async function subscribe() {
+  if (!token) {
+    token = await getToken(messaging, {
+      vapidKey:
+        "BP2FM9upp84r_zB6MSRn4OWOgiUt5qUzjEP0z863cBbQF7O7OypOL3Cc-rwcb6QVpqbpSC5L67tfoUn3jg7jlyQ",
+    });
+  }
+  let userRole = appState.userData.role;
+  let topicArr = [];
+  let semesterSet = new Set();
+  if (userRole === "student" || userRole === "editor") {
+    topicArr.push(
+      appState.userData.class,
+      `semester${appState.activeSem}`,
+      "global",
+    );
+  } else if (userRole === "teacher") {
+    for (const key in appState.userData.assignedClasses) {
+      const semester = key[0];
+      semesterSet.add(`semester${semester}`);
+    }
+    topicArr.push(...Array.from(semesterSet));
+    for (const key in appState.userData.assignedClasses) {
+      topicArr.push(key);
+    }
+    topicArr.push("global");
+  } else if (userRole === "admin") {
+    topicArr.push(
+      "1A",
+      "1B",
+      "2A",
+      "2B",
+      "3A",
+      "3B",
+      "4A",
+      "4B",
+      "5A",
+      "5B",
+      "6A",
+      "6B",
+      "global",
+      "semester1",
+      "semester2",
+      "semester3",
+      "semester4",
+      "semester5",
+      "semester6",
+    );
+  }
+  subscribedTopics = topicArr;
+  if (isSubscribe.subscribe) {
+    await fetch("https://lesp-resources-fcm-server.vercel.app/subscribe", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        token: token.trim(),
+        topics: topicArr,
+      }),
+    }).then(() => {
+      isSubscribe.subscribe = false;
+    });
+  }
+}

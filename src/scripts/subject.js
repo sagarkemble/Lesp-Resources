@@ -25,6 +25,7 @@ import {
   trackDeleteEvent,
   trackEditEvent,
 } from "./posthog.js";
+import { sendNotification } from "./notification.js";
 const DOM = {
   subjectPageSection: document.querySelector(".subject-page-section"),
   noticeSwiper: {
@@ -538,6 +539,7 @@ DOM.noticePopup.successBtn.addEventListener("click", async () => {
   await syncDbData();
   await dashboardRenderNoticeSlider();
   await loadSubjectSection();
+  sendNotification(title, description, "division");
   hideSectionLoader();
 });
 DOM.noticePopup.inputs.file.addEventListener("change", () => {
@@ -674,6 +676,11 @@ function editCategory() {
   isCategoryEditing = true;
   DOM.categoryPopup.successBtn.textContent = "Edit";
   DOM.categoryPopup.popupTitle.textContent = "Edit Category";
+  sendNotification(
+    "Category Edited",
+    "category edited",
+    appState.userData.class,
+  );
   fadeInEffect(DOM.categoryPopup.popup);
 }
 async function toggleCategoryVisibility() {
@@ -880,6 +887,8 @@ DOM.itemPopup.successBtn.addEventListener("click", async () => {
   await syncDbData();
   resetAddItemPopup();
   await loadSubjectSection();
+  sendNotification(appState.activeSubject, `${title} added`, "division");
+
   hideSectionLoader();
 });
 DOM.itemPopup.editTools.unhideBtn.addEventListener("click", async () => {
@@ -953,6 +962,10 @@ DOM.itemPopup.editTools.deleteBtn.addEventListener("click", async () => {
     "Are you sure you want to delete this item?",
   );
   if (!confirm) return;
+  let name =
+    appState.subjectData[appState.activeSubject].containerList[
+      selectedCategoryId
+    ].itemList[selectedItemId].name;
   if (
     appState.subjectData[appState.activeSubject].containerList[
       selectedCategoryId
@@ -971,7 +984,7 @@ DOM.itemPopup.editTools.deleteBtn.addEventListener("click", async () => {
     appState.activeSem,
     appState.activeDiv,
     appState.activeSubject,
-    "Deleted item:" + title,
+    "Deleted item:" + name,
   );
   await syncDbData();
   resetAddItemPopup();
@@ -1171,6 +1184,12 @@ DOM.submissionPopup.successBtn.addEventListener("click", async () => {
   resetAddUpcomingSubmissionPopup();
   await dashboardRenderUpcomingSubmissions();
   await loadSubjectSection();
+  sendNotification(
+    appState.activeSubject,
+    `${title} submission on ${formatDateBasedOnProximity(date)}`,
+    "division",
+  );
+
   hideSectionLoader();
 });
 DOM.submissionPopup.deleteBtn.addEventListener("click", async () => {

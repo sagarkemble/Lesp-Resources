@@ -572,7 +572,10 @@ function encryptObj(obj) {
   return encoded;
 }
 
-DOM.logOutBtn.addEventListener("click", signOutUser);
+DOM.logOutBtn.addEventListener("click", () => {
+  localStorage.removeItem("rememberMe");
+  signOutUser();
+});
 DOM.visitClassRoomBtn.addEventListener("click", async () => {
   fadeInEffect(lottieLoadingScreen);
   localUserData.userData = adminAppState.userData;

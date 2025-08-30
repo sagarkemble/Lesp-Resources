@@ -59,7 +59,10 @@ import {
   trackUserLogout,
   resetPostHog,
 } from "./posthog.js";
-import { isIphone, handleAppFlow } from "./pwa.js";
+import {
+  requestNotificationPermission,
+  showStoredNotification,
+} from "./notification.js";
 export const lottieLoadingScreen = document.querySelector(
   ".lottie-loading-screen",
 );
@@ -72,7 +75,7 @@ const confirmationDescription = confirmationPopup.querySelector(".description");
 const confirmationTitle = confirmationPopup.querySelector(".title");
 const confirmButton = confirmationPopup.querySelector(".confirm-btn");
 const cancelButton = confirmationPopup.querySelector(".cancel-btn");
-const lgUserPfp = document.querySelector(".navigation-user-pfp");
+
 export let localUserData = {
   userData: undefined,
   isVisitingClass: false,
@@ -238,6 +241,8 @@ export async function initClass() {
     await applyEditModeUI();
     trackClass(Semester, Division);
     resetForm();
+    requestNotificationPermission();
+    showStoredNotification();
     initRouting();
   } catch (error) {
     showErrorSection("Error initializing class:", error);
@@ -393,3 +398,14 @@ window.addEventListener("popstate", () => {
     initRouting();
   }
 });
+// In your main app's JavaScript file (e.g., index.js)
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker
+    .register("/firebase-messaging-sw.js") // Ensure this path is correct relative to your app's root
+    .then((registration) => {
+      console.log("Service Worker registered successfully:", registration);
+    })
+    .catch((error) => {
+      console.error("Service Worker registration failed:", error);
+    });
+}

@@ -831,9 +831,10 @@ async function renderPreviousSession() {
     if (!mentorData) continue;
 
     const name = `${mentorData.firstName} ${mentorData.lastName}`;
+    const {semester,division} = mentorData.class.split("");
     const mentorClass = getFormattedClass(
-      mentorData.semester,
-      mentorData.division,
+      semester,
+      division,
     );
     const pfp = mentorData.pfpLink;
     const card = document.createElement("div");

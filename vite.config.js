@@ -156,14 +156,13 @@ export default defineConfig({
   ],
 
   server: {
-    allowedHosts: ["98cdf4b73089.ngrok-free.app"],
+    allowedHosts: ["87a6fe2d8ffb.ngrok-free.app"],
   },
 
   build: {
     rollupOptions: {
       input: {
         main: resolve(__dirname, "index.html"),
-        signup: resolve(__dirname, "nested/signup.html"), // Add this line
       },
     },
   },

@@ -8,12 +8,12 @@ const DOM = {
 };
 const errorSection = document.querySelector(".error-section");
 import * as Sentry from "@sentry/browser";
-Sentry.init({
-  dsn: "https://f123aee0ee34252e12f97d64f9127ba3@o4509854772297728.ingest.us.sentry.io/4509854774394880",
-  // Setting this option to true will send default PII data to Sentry.
-  // For example, automatic IP address collection on events
-  sendDefaultPii: true,
-});
+// Sentry.init({
+//   dsn: "https://f123aee0ee34252e12f97d64f9127ba3@o4509854772297728.ingest.us.sentry.io/4509854774394880",
+//   // Setting this option to true will send default PII data to Sentry.
+//   // For example, automatic IP address collection on events
+//   sendDefaultPii: true,
+// });
 export async function showErrorSection(errorMsg, error) {
   await hideSections(false, false, false, false);
   await hideSectionLoader();

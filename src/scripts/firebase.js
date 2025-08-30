@@ -13,7 +13,6 @@ import {
 import {
   getDatabase,
   ref,
-  connectDatabaseEmulator,
   set,
   get,
   child,
@@ -25,10 +24,13 @@ import {
   query,
   orderByChild,
 } from "firebase/database";
+import { getToken, onMessage, getMessaging } from "firebase/messaging";
+
 import { getAnalytics, logEvent, setUserId } from "firebase/analytics";
 import { showErrorSection } from "./error";
 import { resetForm } from "./login";
 import { trackUserLogout } from "./posthog";
+import { setOnMessageListener } from "./notification";
 const firebaseConfig = {
   apiKey: "AIzaSyDM6R7E9NRG1FjBsu8v_T9QdKth0LUeLDU",
   authDomain: "lesp-resources-350d1.firebaseapp.com",
@@ -43,6 +45,8 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const analytics = getAnalytics(app);
 const db = getDatabase(app);
+const messaging = getMessaging();
+setOnMessageListener();
 // firebase functions
 export function deleteData(path) {
   return remove(ref(db, path))
@@ -122,4 +126,8 @@ export {
   setUserId,
   analytics,
   logEvent,
+  getMessaging,
+  messaging,
+  getToken,
+  onMessage,
 };

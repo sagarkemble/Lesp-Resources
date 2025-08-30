@@ -100,16 +100,14 @@ export async function handleAppFlow() {
       if (deferredPrompt === null) {
         fadeInEffect(DOM.openAppPopup.popup);
         hideSectionLoader();
-        console.log("Running in browser");
       }
     }
-  }, 5000);
+  }, 10000);
 }
 export function isIphone() {
   return /iPhone/i.test(navigator.userAgent);
 }
 if (window.innerWidth < 1024 && !isIphone()) {
-  console.log("executed");
   handleAppFlow();
 }
 window.addEventListener("appinstalled", () => {

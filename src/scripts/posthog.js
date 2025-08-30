@@ -75,9 +75,15 @@ export function trackDeleteEvent(semester, division, page, description) {
 }
 export function trackPfpChange(semester, division, description) {
   posthog.capture(`Event: ${description}`, {
-    type: "edit",
+    type: "PFP change",
     semester,
     division,
+    description,
+  });
+}
+export function trackAllowNotification(description) {
+  posthog.capture(`Event: ${description}`, {
+    type: "allowed notification",
     description,
   });
 }

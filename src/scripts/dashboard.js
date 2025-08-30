@@ -31,7 +31,7 @@ import {
 } from "./firebase.js";
 import { renderNoticeSlider as subjectRenderNoticeSlider } from "./subject.js";
 import { showErrorSection } from "./error.js";
-
+import { sendNotification, unsubscribeFCM } from "./notification.js";
 const dashboardSection = document.querySelector(".dashboard-section");
 export const timeTablePopupSwiper = new Swiper("#time-table-popup-swiper", {
   direction: "horizontal",
@@ -49,6 +49,9 @@ export const timeTablePopupSwiper = new Swiper("#time-table-popup-swiper", {
 });
 const DOM = {
   dashboardSection: document.querySelector(".dashboard-section"),
+  sendNotificationBtn: document.querySelector(
+    ".dashboard-section .send-notification-btn",
+  ),
   addNoticeBtn: document.querySelector(".dashboard-section .add-notice-btn"),
   navPfp: document.querySelector(".navigation-user-pfp"),
   themeBtn: document.querySelector(".theme-btn"),
@@ -60,6 +63,43 @@ const DOM = {
     cardContainer: document.querySelector(
       ".dashboard-section .upcoming-submissions .card-container",
     ),
+  },
+  sendNotification: {
+    popup: document.querySelector(
+      ".dashboard-section .send-notification-popup-wrapper",
+    ),
+    popupTitle: document.querySelector(
+      ".dashboard-section .send-notification-popup-wrapper .popup-title",
+    ),
+    closeBtn: document.querySelector(
+      ".dashboard-section .send-notification-popup-wrapper .close-popup-btn",
+    ),
+    successBtn: document.querySelector(
+      ".dashboard-section .send-notification-popup-wrapper .success-btn",
+    ),
+    fakeScopePlaceholder: document.querySelector(
+      ".dashboard-section .send-notification-popup-wrapper .scope-placeholder",
+    ),
+    inputs: {
+      title: document.querySelector("#dashboard-section-notification-title"),
+      description: document.querySelector(
+        "#dashboard-section-notification-description",
+      ),
+      scope: document.querySelector(
+        "#dashboard-section-notification-scope-input",
+      ),
+    },
+    errors: {
+      title: document.querySelector(
+        ".dashboard-section .send-notification-popup-wrapper .title-error",
+      ),
+      description: document.querySelector(
+        ".dashboard-section .send-notification-popup-wrapper .description-error",
+      ),
+      scope: document.querySelector(
+        ".dashboard-section .send-notification-popup-wrapper .scope-error",
+      ),
+    },
   },
   themePopup: {
     popup: document.querySelector(".theme-popup-wrapper"),
@@ -248,7 +288,6 @@ const DOM = {
         ".dashboard-section .add-notice-popup-wrapper .scope-error",
       ),
     },
-
     fileAttachment: {
       icon: document.querySelector(
         ".dashboard-section .add-notice-popup-wrapper .upload-icon",
@@ -619,6 +658,7 @@ DOM.noticePopup.successBtn.addEventListener("click", async () => {
   const type = DOM.noticePopup.inputs.scope.value;
   const link = DOM.noticePopup.inputs.link.value.trim();
   let hasError = false;
+  let topic;
   if (!title) {
     DOM.noticePopup.errors.title.textContent = "Title is required";
     showElement(DOM.noticePopup.errors.title);
@@ -688,22 +728,26 @@ DOM.noticePopup.successBtn.addEventListener("click", async () => {
   let isSubNotice = false;
   if (type === "department") {
     await pushData(`globalData/noticeList`, obj);
+    topic = "global";
   } else if (type === "division") {
     await pushData(
       `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/noticeData/divisionNoticeList`,
       obj,
     );
+    topic = "division";
   } else if (type === "semester") {
     await pushData(
       `semesterList/${appState.activeSem}/semesterGlobalData/noticeList`,
       obj,
     );
+    topic = "semester";
   } else {
     obj.scope = type;
     await pushData(
       `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/noticeData/subjectNoticeData/${type}`,
       obj,
     );
+    topic = "division";
     isSubNotice = true;
   }
   await fadeOutEffect(DOM.noticePopup.popup);
@@ -711,14 +755,13 @@ DOM.noticePopup.successBtn.addEventListener("click", async () => {
   await showSectionLoader("Syncing data...");
   await syncDbData();
   if (isSubNotice) await subjectRenderNoticeSlider();
-
   await hideSectionLoader();
   await loadDashboard();
+  sendNotification(title, description, topic);
   showDashboard();
 });
 function loadTypeSelectorSubjects() {
   DOM.noticePopup.inputs.scope.innerHTML = "";
-
   const option = document.createElement("option");
   option.value = "semester";
   option.textContent = "For Semester";
@@ -728,10 +771,9 @@ function loadTypeSelectorSubjects() {
   const option3 = document.createElement("option");
   option3.value = "division";
   option3.textContent = "For Division";
-  DOM.noticePopup.inputs.scope.appendChild(option);
-  DOM.noticePopup.inputs.scope.appendChild(option2);
   DOM.noticePopup.inputs.scope.appendChild(option3);
-
+  DOM.noticePopup.inputs.scope.appendChild(option2);
+  DOM.noticePopup.inputs.scope.appendChild(option);
   for (const key in appState.subjectMetaData) {
     const element = appState.subjectMetaData[key];
     const option = document.createElement("option");
@@ -739,6 +781,7 @@ function loadTypeSelectorSubjects() {
     option.textContent = `${element.name} notice`;
     DOM.noticePopup.inputs.scope.appendChild(option);
   }
+  DOM.noticePopup.inputs.scope.value = "";
 }
 function loadTypeSelectorTimetablePopup() {
   DOM.timeTablePopup.inputs.type.innerHTML = "";
@@ -1509,6 +1552,8 @@ DOM.menuPopup.editPfpBtn.addEventListener("click", async () => {
 });
 DOM.menuPopup.logoutBtn.addEventListener("click", async () => {
   showSectionLoader("Logging out...");
+  unsubscribeFCM();
+  localStorage.removeItem("rememberMe");
   await signOutUser();
 });
 DOM.menuPopup.accountDetailsBtn.addEventListener("click", async () => {
@@ -1648,4 +1693,63 @@ function initStatsCard() {
     DOM.statsCard.medals.silver.textContent = `x ${appState.userData.medalList.silver || 0}`;
     DOM.statsCard.medals.bronze.textContent = `x ${appState.userData.medalList.bronze || 0}`;
   }
+}
+//send notification
+DOM.sendNotificationBtn.addEventListener("click", () => {
+  fadeInEffect(DOM.sendNotification.popup);
+});
+DOM.sendNotification.closeBtn.addEventListener("click", async () => {
+  await fadeOutEffect(DOM.sendNotification.popup);
+  resetSendNotification();
+});
+DOM.sendNotification.inputs.scope.addEventListener("change", () => {
+  hideElement(DOM.sendNotification.fakeScopePlaceholder);
+});
+DOM.sendNotification.inputs.title.addEventListener("input", () => {
+  if (DOM.sendNotification.inputs.title.value.length == 21) {
+    DOM.sendNotification.errors.title.textContent = "Max 20 characters reached";
+
+    DOM.sendNotification.inputs.title.value =
+      DOM.sendNotification.inputs.title.value.slice(0, 20);
+    showElement(DOM.sendNotification.errors.title);
+  } else {
+    hideElement(DOM.sendNotification.errors.title);
+  }
+});
+DOM.sendNotification.successBtn.addEventListener("click", async () => {
+  hideElement(DOM.sendNotification.errors.title);
+  hideElement(DOM.sendNotification.errors.description);
+  hideElement(DOM.sendNotification.errors.scope);
+  const title = DOM.sendNotification.inputs.title.value.trim();
+  const description = DOM.sendNotification.inputs.description.value.trim();
+  const type = DOM.sendNotification.inputs.scope.value;
+  let hasError = false;
+  let topic;
+  if (!title) {
+    DOM.sendNotification.errors.title.textContent = "Title is required";
+    showElement(DOM.sendNotification.errors.title);
+    hasError = true;
+  }
+  if (!type) {
+    DOM.sendNotification.errors.scope.textContent = "Scope is required";
+    showElement(DOM.sendNotification.errors.scope);
+    hasError = true;
+  }
+  if (!description) {
+    DOM.sendNotification.errors.description.textContent =
+      "Description is required";
+    showElement(DOM.sendNotification.errors.description);
+    hasError = true;
+  }
+  if (hasError) return;
+  sendNotification(title, description, type);
+});
+function resetSendNotification() {
+  DOM.sendNotification.inputs.title.value = "";
+  DOM.sendNotification.inputs.description.value = "";
+  DOM.sendNotification.inputs.scope.value = "";
+  showElement(DOM.sendNotification.fakeScopePlaceholder);
+  hideElement(DOM.sendNotification.errors.title);
+  hideElement(DOM.sendNotification.errors.description);
+  hideElement(DOM.sendNotification.errors.scope);
 }
