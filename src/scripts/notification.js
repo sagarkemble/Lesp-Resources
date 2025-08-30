@@ -152,23 +152,10 @@ export async function sendNotification(title, message, scope) {
   scope = String(scope);
   let topics = [];
   if (scope === "global") {
-    topics.push(
-      "1A",
-      "1B",
-      "2A",
-      "2B",
-      "3A",
-      "3B",
-      "4A",
-      "4B",
-      "5A",
-      "5B",
-      "6A",
-      "6B",
-    );
+    topics.push("global");
   } else if (scope === "semester") {
     const sem = appState.activeSem;
-    topics.push(`${sem}A`, `${sem}B`);
+    topics.push(`semester${sem}`);
   } else if (scope === "division") {
     const sem = appState.activeSem;
     const div = appState.activeDiv;
