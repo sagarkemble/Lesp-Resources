@@ -20,21 +20,17 @@ const messaging = firebase.messaging();
 
 async function openNotificationDB() {
   return new Promise((resolve, reject) => {
-    // Step 1: Open DB without specifying version to get the current version
     let request = indexedDB.open("notificationDB");
 
     request.onsuccess = (event) => {
       let db = event.target.result;
 
-      // Step 2: Check if object store exists
       if (db.objectStoreNames.contains("notifications")) {
-        resolve(db); // store exists, use it
+        resolve(db);
       } else {
-        // store missing → upgrade needed
         const newVersion = db.version + 1;
         db.close();
 
-        // Step 3: Reopen with version + 1 to trigger onupgradeneeded
         let upgradeRequest = indexedDB.open("notificationDB", newVersion);
 
         upgradeRequest.onupgradeneeded = (e) => {
