@@ -47,8 +47,8 @@ export async function requestNotificationPermission() {
       vapidKey:
         "BP2FM9upp84r_zB6MSRn4OWOgiUt5qUzjEP0z863cBbQF7O7OypOL3Cc-rwcb6QVpqbpSC5L67tfoUn3jg7jlyQ",
     });
-    subscribe();
     isSubscribe.subscribe = true;
+    subscribe();
   } else {
     fadeInEffect(DOM.allowNotification.popup);
   }
