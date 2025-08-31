@@ -1552,8 +1552,8 @@ DOM.menuPopup.editPfpBtn.addEventListener("click", async () => {
 });
 DOM.menuPopup.logoutBtn.addEventListener("click", async () => {
   showSectionLoader("Logging out...");
-  unsubscribeFCM();
   localStorage.removeItem("rememberMe");
+  unsubscribeFCM();
   await signOutUser();
 });
 DOM.menuPopup.accountDetailsBtn.addEventListener("click", async () => {

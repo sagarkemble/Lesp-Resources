@@ -161,7 +161,7 @@ export async function sendNotification(title, message, scope) {
     const div = appState.activeDiv;
     topics.push(`${sem}${div}`);
   }
-  await fetch("https://lesp-resources-fcm-server.vercel.app/send", {
+  await fetch("http://localhost:3000/send", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -171,15 +171,9 @@ export async function sendNotification(title, message, scope) {
     }),
   });
 }
-// Fetch notifications
-function getNotifications() {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open("notificationDB", 3);
-
-    request.onupgradeneeded = (event) => {
-      resolve([]);
-    };
-
+async function getNotifications() {
+  return new Promise((resolve) => {
+    const request = indexedDB.open("notificationDB");
     request.onsuccess = (event) => {
       const db = event.target.result;
 
@@ -190,76 +184,57 @@ function getNotifications() {
 
       const tx = db.transaction("notifications", "readonly");
       const store = tx.objectStore("notifications");
+
       const getAllReq = store.getAll();
       getAllReq.onsuccess = () => resolve(getAllReq.result);
-      getAllReq.onerror = (err) => reject(err);
+      getAllReq.onerror = () => resolve([]);
     };
 
-    request.onerror = () => {
-      resolve([]);
-    };
+    request.onerror = () => resolve([]);
   });
 }
+async function clearNotifications() {
+  return new Promise((resolve) => {
+    const request = indexedDB.open("notificationDB");
 
-// Clear notifications
-// function clearNotifications() {
-//   return new Promise((resolve, reject) => {
-//     const request = indexedDB.open("notificationDB", 2);
-//     request.onsuccess = (event) => {
-//       const db = event.target.result;
-//       const tx = db.transaction("notifications", "readwrite");
-//       tx.objectStore("notifications").clear();
-//       tx.oncomplete = () => resolve();
-//       tx.onerror = (err) => reject(err);
-//     };
-//   });
-// }
-function clearNotifications() {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open("notificationDB", 3);
-    request.onupgradeneeded = (event) => {
-      const db = event.target.result;
-      if (!db.objectStoreNames.contains("notifications")) {
-        db.createObjectStore("notifications", {
-          keyPath: "id",
-          autoIncrement: true,
-        });
-      }
-    };
     request.onsuccess = (event) => {
       const db = event.target.result;
-      if (!db.objectStoreNames.contains("notifications")) {
-        // Nothing to clear; resolve gracefully
-        resolve();
-        return;
-      }
+      if (!db.objectStoreNames.contains("notifications")) return resolve();
+
       const tx = db.transaction("notifications", "readwrite");
-      tx.objectStore("notifications").clear();
-      tx.oncomplete = () => resolve();
-      tx.onerror = (err) => reject(err);
-      tx.onabort = (err) => reject(err);
+      const store = tx.objectStore("notifications");
+
+      const clearReq = store.clear();
+      clearReq.onsuccess = () => {
+        console.log("Notifications cleared from IndexedDB.");
+        resolve();
+      };
+      clearReq.onerror = () => resolve();
     };
-    request.onerror = (err) => reject(err);
+
+    request.onerror = () => resolve();
   });
 }
-
 export async function showStoredNotification() {
   const notifications = await getNotifications();
-  if (!notifications || notifications.length === 0) {
-    return;
-  }
+  if (!notifications || notifications.length === 0) return;
+  console.log("Retrieved notifications:", notifications);
 
   notifications.forEach((n) => {
     const card = document.createElement("div");
     card.className =
       "card bg-surface-2 border-surface-3 custom-hover flex cursor-pointer flex-col items-start justify-between rounded-xl border p-3 md:px-4";
     card.innerHTML = `
-      <p class="title font-semibold">${n.title}</p>
-      <p class="description text-text-secondary line-clamp-3">${n.body}</p>
+      <p class="title font-semibold">${n.data.title}</p>
+      <p class="description text-text-secondary line-clamp-3">${n.data.body}</p>
     `;
     DOM.updates.cardContainer.appendChild(card);
   });
+
+  // Apply fade-in effect
   await fadeInEffect(DOM.updates.popup);
+
+  // Clear notifications safely after displaying
   await clearNotifications();
 }
 DOM.updates.successBtn.addEventListener("click", () => {
@@ -279,14 +254,13 @@ window.addEventListener("beforeunload", () => {
 });
 export function unsubscribeFCM() {
   if (localStorage.getItem("rememberMe") === null) {
+    console.log("Unsubscribing from FCM");
+
     const payload = JSON.stringify({
       token,
       topics: subscribedTopics,
     });
-    navigator.sendBeacon(
-      "https://lesp-resources-fcm-server.vercel.app/unsubscribe",
-      payload,
-    );
+    navigator.sendBeacon("http://localhost:3000/unsubscribe", payload);
   }
 }
 export async function subscribe() {
@@ -340,7 +314,7 @@ export async function subscribe() {
   }
   subscribedTopics = topicArr;
   if (isSubscribe.subscribe) {
-    await fetch("https://lesp-resources-fcm-server.vercel.app/subscribe", {
+    await fetch("http://localhost:3000/subscribe", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
