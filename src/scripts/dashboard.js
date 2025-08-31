@@ -429,7 +429,7 @@ export async function loadDashboard() {
     loadTypeSelectorTimetablePopup();
     await unloadDashboard();
     renderNoticeSlider();
-    renderUpcomingSubmissions();
+    // renderUpcomingSubmissions();
     renderTimeTableSlides(DOM.timeTableSwiper.swiper);
     renderTimeTableSlides(timeTablePopupSwiper);
     await renderUpcomingSessions();
