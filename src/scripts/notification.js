@@ -243,31 +243,41 @@ DOM.updates.successBtn.addEventListener("click", () => {
   fadeOutEffect(DOM.updates.popup);
 });
 window.addEventListener("beforeunload", () => {
-  if (localStorage.getItem("rememberMe") === null) {
-    const payload = JSON.stringify({
+  if (
+    localStorage.getItem("rememberMe") === null &&
+    token &&
+    subscribedTopics.length > 0
+  ) {
+    const payload = {
       token,
       topics: subscribedTopics,
-    });
+    };
     navigator.sendBeacon(
       "https://lesp-resources-fcm-server.vercel.app/unsubscribe",
-      payload,
+      new Blob([JSON.stringify(payload)], { type: "application/json" }),
     );
   }
 });
+
 export function unsubscribeFCM() {
-  if (localStorage.getItem("rememberMe") === null) {
+  if (
+    localStorage.getItem("rememberMe") === null &&
+    token &&
+    subscribedTopics.length > 0
+  ) {
     console.log("Unsubscribing from FCM");
 
-    const payload = JSON.stringify({
+    const payload = {
       token,
       topics: subscribedTopics,
-    });
+    };
     navigator.sendBeacon(
       "https://lesp-resources-fcm-server.vercel.app/unsubscribe",
-      payload,
+      new Blob([JSON.stringify(payload)], { type: "application/json" }),
     );
   }
 }
+
 export async function subscribe() {
   if (!token) {
     token = await getToken(messaging, {
