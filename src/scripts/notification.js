@@ -161,7 +161,7 @@ export async function sendNotification(title, message, scope) {
     const div = appState.activeDiv;
     topics.push(`${sem}${div}`);
   }
-  await fetch("http://localhost:3000/send", {
+  await fetch("https://lesp-resources-fcm-server.vercel.app/send", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -260,7 +260,10 @@ export function unsubscribeFCM() {
       token,
       topics: subscribedTopics,
     });
-    navigator.sendBeacon("http://localhost:3000/unsubscribe", payload);
+    navigator.sendBeacon(
+      "https://lesp-resources-fcm-server.vercel.app/unsubscribe",
+      payload,
+    );
   }
 }
 export async function subscribe() {
@@ -314,7 +317,7 @@ export async function subscribe() {
   }
   subscribedTopics = topicArr;
   if (isSubscribe.subscribe) {
-    await fetch("http://localhost:3000/subscribe", {
+    await fetch("https://lesp-resources-fcm-server.vercel.app/subscribe", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

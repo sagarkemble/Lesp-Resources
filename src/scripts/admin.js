@@ -32,6 +32,7 @@ import {
   getWholeSemesterData,
   initAppState,
 } from "./appstate";
+import { unsubscribeFCM } from "./notification.js";
 import { headerIcon, headerTitle } from "./navigation";
 import { hideSections } from "./index";
 import { showErrorSection } from "./error.js";
@@ -574,6 +575,7 @@ function encryptObj(obj) {
 
 DOM.logOutBtn.addEventListener("click", () => {
   localStorage.removeItem("rememberMe");
+  unsubscribeFCM();
   signOutUser();
 });
 DOM.visitClassRoomBtn.addEventListener("click", async () => {
