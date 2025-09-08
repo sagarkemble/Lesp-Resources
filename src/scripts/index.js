@@ -50,7 +50,7 @@ import {
   getUserData,
   adminAppState,
 } from "./appstate.js";
-import { isOffline, showErrorSection } from "./error.js";
+import { isOffline, sentaryInit, showErrorSection } from "./error.js";
 import {
   trackLoginUser,
   trackClass,
@@ -192,6 +192,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (userCredential) {
           const user = await getUserData(userCredential.uid);
           trackLoginUser(userCredential.uid, user.email);
+          sentaryInit(user.email, `${user.firstName} ${user.lastName}`);
           if (user.role === "teacher") {
             showSelectClassPopup(user);
             return;

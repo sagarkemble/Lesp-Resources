@@ -431,8 +431,9 @@ async function studentConfirmationPopup(data) {
   return new Promise((resolve) => {
     DOM.studentDetailsPopup.rollno.textContent = `Roll no : ${data.rollNumber}`;
     DOM.studentDetailsPopup.name.textContent = `${data.firstName} ${data.lastName}`;
-    DOM.studentDetailsPopup.sem.textContent = `Semester : ${data.semester}`;
-    DOM.studentDetailsPopup.div.textContent = `Division : ${data.division}`;
+    const [sem, div] = data.class.split("");
+    DOM.studentDetailsPopup.sem.textContent = `Semester : ${sem}`;
+    DOM.studentDetailsPopup.div.textContent = `Division : ${div}`;
     fadeInEffect(DOM.studentDetailsPopup.popup);
     DOM.studentDetailsPopup.successBtn.addEventListener("click", async () => {
       fadeOutEffect(DOM.studentDetailsPopup.popup);
@@ -831,11 +832,8 @@ async function renderPreviousSession() {
     if (!mentorData) continue;
 
     const name = `${mentorData.firstName} ${mentorData.lastName}`;
-    const {semester,division} = mentorData.class.split("");
-    const mentorClass = getFormattedClass(
-      semester,
-      division,
-    );
+    const [sem, div] = mentorData.class.split("");
+    const mentorClass = getFormattedClass(sem, div);
     const pfp = mentorData.pfpLink;
     const card = document.createElement("div");
     card.className =
