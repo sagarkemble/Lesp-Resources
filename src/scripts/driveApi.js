@@ -84,8 +84,10 @@ export async function uploadDriveFile(file, path) {
     const { accessToken } = await tokenRes.json();
 
     if (!accessToken) throw new Error("No access token received");
+    console.log("called ensure folder");
 
     const folderId = await ensureFolder(path, accessToken);
+    console.log("ensured folder:", folderId);
 
     const metadata = {
       name: file.name,
