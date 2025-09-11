@@ -37,13 +37,13 @@ Currently, it is officially used by the Computer Department of Latthe Polytechni
 
 # Features
 
-- 📂 **Cloud-Based Resources** – Upload and Access study materials anytime, without downloading.
+- **Cloud-Based Resources** – Upload and Access study materials anytime, without downloading.
 
-- 🖥️ **Organized and Personalized Dashboard** – Minimal and easy-to-use interface with everything which every student needs like timetable ,notice , submissions , tests , current rank and many more in one place.
-- 🎨 **Customizable Profiles** – Personalize your experience with customizable profile with over 500+ pfp and 50+ themes.
-- ⚡ **Lightweight & Fast** – Optimized to run smoothly on all types of devices.  
-   Works as a **Chrome-packaged app on phones** and is fully compatible with **interactive panels used in colleges**.
-- 📝 **Online Tests** – We conduct weekly tests based on weekly completed syllabus.
-- 🏆 **Leaderboard** – Students are ranked on leaderboard based on test performance .
-- 📚 **Extra Learning Sessions** – We conduct sessions that cover essential skills beyond the syllabus (like API,Firebase , Git and GitHub etc).
-- 🔔 **Timely Updates** – Stay on top of deadlines, notices, weekly schedules, and get notified quickly.
+- **Organized and Personalized Dashboard** – Minimal and easy-to-use interface with everything which every student needs like timetable ,notice , submissions , tests , current rank and many more in one place.
+- **Customizable Profiles** – Personalize your experience with customizable profile with over 500+ pfp and 50+ themes.
+- **Lightweight & Fast** – Optimized to run smoothly on all types of devices.  
+  Works as a **Chrome-packaged app on phones** and is fully compatible with **interactive panels used in colleges**.
+- **Online Tests** – We conduct weekly tests based on weekly completed syllabus.
+- **Leaderboard** – Students are ranked on leaderboard based on test performance .
+- **Extra Learning Sessions** – We conduct sessions that cover essential skills beyond the syllabus (like API,Firebase , Git and GitHub etc).
+- **Timely Updates** – Stay on top of deadlines, notices, weekly schedules, and get notified quickly.
