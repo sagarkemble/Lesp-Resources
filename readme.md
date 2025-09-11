@@ -2,7 +2,7 @@
   class="container"
   align="center"
 >
- <img src="public/favicon.png" style="height:70px"/>
+ <img src="public/favicon.png" style="height:6rem"/>
 
 # LESP Resources
 
@@ -14,6 +14,7 @@
     <a href="https://github.com/sagarkemble/Lesp-Resources/issues">Request Feature</a>
   </p>
 </div>
+
 <p align="center">
   <a href="https://firebase.google.com/">
     <img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" alt="Firebase">
