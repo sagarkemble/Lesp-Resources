@@ -2,12 +2,12 @@
   class="container"
   align="center"
 >
-<div align="center">
- <img src="public/favicon.png" style="height:6rem"/>
- 
-# LESP Resources
-</div>
-
+<div class="container" align="center">
+  <div align="center" style="line-height:1;">
+    <img src="public/favicon.png" alt="LESP logo" style="height:6rem; display:block; margin:0 auto 0.25rem;" />
+    <h1 style="margin:0;">LESP Resources</h1>
+  </div>
+  
   <p align="center">
     <a href="https://lespresources.in">Visit</a>
     &middot;
