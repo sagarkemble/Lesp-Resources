@@ -2,9 +2,11 @@
   class="container"
   align="center"
 >
+<div align="center">
  <img src="public/favicon.png" style="height:6rem"/>
-
+ 
 # LESP Resources
+</div>
 
   <p align="center">
     <a href="https://lespresources.in">Visit</a>
