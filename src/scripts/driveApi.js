@@ -4,7 +4,7 @@ export async function deleteDriveFile(attachmentId) {
   if (!attachmentId) return false;
   try {
     const res = await fetch(
-      "https://lesp-resources-api-server.vercel.app/delete",
+      "https://lesp-resources-backend.vercel.app/delete",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -79,15 +79,13 @@ export async function uploadDriveFile(file, path) {
 
   try {
     const tokenRes = await fetch(
-      "https://lesp-resources-api-server.vercel.app/get-token",
+      "https://lesp-resources-backend.vercel.app/get-token",
     );
     const { accessToken } = await tokenRes.json();
 
     if (!accessToken) throw new Error("No access token received");
-    console.log("called ensure folder");
 
     const folderId = await ensureFolder(path, accessToken);
-    console.log("ensured folder:", folderId);
 
     const metadata = {
       name: file.name,
@@ -150,7 +148,7 @@ export async function uploadDriveFile(file, path) {
 //   formData.append("path", path);
 
 //   try {
-//     const response = await fetch("http://localhost:3000/upload", {
+//     const response = await fetch("lesp-resources-backend.vercel.app/upload", {
 //       method: "POST",
 //       body: formData,
 //     });

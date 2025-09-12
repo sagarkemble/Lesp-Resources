@@ -105,6 +105,9 @@ const DOM = {
     removeUserBtn: document.querySelector(
       ".individual-user-popup-wrapper .remove-user-btn",
     ),
+    deleteUserBtn: document.querySelector(
+      ".individual-user-popup-wrapper .delete-user-btn",
+    ),
   },
   pickTeacherPopup: {
     popup: document.querySelector(".pick-teacher-popup-wrapper"),
@@ -451,7 +454,6 @@ function renderTeacherCardInPopup() {
     encryptedCode = encryptedData;
     DOM.addUserPopup.link.textContent = encryptedCode;
     DOM.addUserPopup.popupTitle.textContent = `Add teacher`;
-
     fadeInEffect(DOM.addUserPopup.popup);
   });
 }
@@ -528,6 +530,7 @@ async function addTeacherInClass(teacherId) {
   );
   if (!isConfirm) return;
   showSectionLoader("Updating data...");
+  await fadeOutEffect(DOM.pickTeacherPopup.popup);
   const key = `${adminAppState.activeSem.replace("semester", "")}${adminAppState.activeDiv}`;
   await updateData(`userData/${teacherId}/assignedClasses/`, {
     [key]: true,
@@ -537,6 +540,26 @@ async function addTeacherInClass(teacherId) {
   hideAdminDivisions();
   await hideSectionLoader();
   showClassRoom();
+}
+async function deleteUser(uid) {
+  try {
+    const response = await fetch("http://localhost:3000/delete-user", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ uid }),
+    });
+
+    const data = await response.json();
+    if (response.ok && data.success) {
+      console.log("User deleted:", data.message);
+    } else {
+      showErrorSection("error deleting user", data.error);
+    }
+  } catch (err) {
+    showErrorSection("error deleting user", err);
+  }
 }
 
 //add student link
@@ -590,11 +613,40 @@ DOM.visitClassRoomBtn.addEventListener("click", async () => {
 DOM.pickTeacherPopup.closePopupBtn.addEventListener("click", () => {
   fadeOutEffect(DOM.pickTeacherPopup.popup);
 });
-// DOM.removeUserBtn.addEventListener("click", async () => {
-//   const isConfirmed = await showConfirmationPopup(
-//     "Are you sure you want to remove this user?",
-//   );
-// });
+
+DOM.individualUserPopup.deleteUserBtn.addEventListener("click", async () => {
+  const isConfirmed = await showConfirmationPopup(
+    "Are you sure you want to delete this user's account?",
+  );
+  if (!isConfirmed) return;
+  const userId = activeUserId;
+  showSectionLoader("Deleting user...");
+  await deleteUser(userId);
+  await fadeOutEffect(DOM.individualUserPopup.popup);
+  await showSectionLoader("Syncing data...");
+  await syncAdminData();
+  await hideAdminDivisions();
+  await hideSectionLoader();
+  await showClassRoom();
+});
+DOM.individualUserPopup.removeUserBtn.addEventListener("click", async () => {
+  const isConfirmed = await showConfirmationPopup(
+    "Are you sure you want to remove this teacher from the class?",
+  );
+  if (!isConfirmed) return;
+  const userId = activeUserId;
+  const key = `${adminAppState.activeSem.replace("semester", "")}${adminAppState.activeDiv}`;
+  showSectionLoader("Updating data...");
+  await fadeOutEffect(DOM.individualUserPopup.popup);
+  await updateData(`userData/${userId}/assignedClasses/`, {
+    [key]: null,
+  });
+  await showSectionLoader("Syncing data...");
+  await syncAdminData();
+  await hideAdminDivisions();
+  await hideSectionLoader();
+  await showClassRoom();
+});
 
 // individual student related
 DOM.individualUserPopup.closePopupBtn.addEventListener("click", () => {

@@ -163,7 +163,7 @@ export async function sendNotification(title, message, scope) {
     const div = appState.activeDiv;
     topics.push(`${sem}${div}`);
   }
-  await fetch("https://lesp-resources-fcm-server.vercel.app/send", {
+  await fetch("https://lesp-resources-backend.vercel.app/send", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -253,7 +253,7 @@ window.addEventListener("beforeunload", () => {
       topics: subscribedTopics,
     };
     navigator.sendBeacon(
-      "https://lesp-resources-fcm-server.vercel.app/unsubscribe",
+      "https://lesp-resources-backend.vercel.app/unsubscribe",
       new Blob([JSON.stringify(payload)], { type: "application/json" }),
     );
   }
@@ -272,7 +272,7 @@ export function unsubscribeFCM() {
       topics: subscribedTopics,
     };
     navigator.sendBeacon(
-      "https://lesp-resources-fcm-server.vercel.app/unsubscribe",
+      "https://lesp-resources-backend.vercel.app/unsubscribe",
       new Blob([JSON.stringify(payload)], { type: "application/json" }),
     );
   }
@@ -329,7 +329,7 @@ export async function subscribe() {
   }
   subscribedTopics = topicArr;
   if (isSubscribe.subscribe) {
-    await fetch("https://lesp-resources-fcm-server.vercel.app/subscribe", {
+    await fetch("https://lesp-resources-backend.vercel.app/subscribe", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
