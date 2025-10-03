@@ -17,7 +17,6 @@ import { appState, syncDbData } from "./appstate.js";
 import { deleteDriveFile, uploadDriveFile } from "./driveApi.js";
 import { initUpcomingTestCard as dashboardInitUpcomingTestCard } from "./dashboard.js";
 import { showErrorSection } from "./error.js";
-import { trackCreateEvent } from "./posthog.js";
 const DOM = {
   testsSection: document.querySelector(".tests-section"),
   upcomingTest: {
@@ -166,8 +165,24 @@ export async function loadTestSection() {
   }
 }
 export async function showTestsSection() {
-  headerIcon.src =
-    "https://ik.imagekit.io/yn9gz2n2g/others/test.png?updatedAt=1751607386764";
+  headerIcon.classList.add("bg-primary");
+
+  headerIcon.innerHTML = ` <svg
+  width="1.9rem"
+  height="2.47rem"
+  viewBox="0 0 20 26"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+>
+  <image
+    width="20"
+    height="26"
+    x="0"
+    y="0"
+    xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAdElEQVR4nO2TQQqAQAhFvVYdIjpJXbtbvDbtWiRqIyM+cDMoPviOSGMEOIHrqWP08p03W+QCLQuwapvDBcTYrxaQj7fo2TkEtNQT8NAClIgA5dGl/QL5W8BDDQGyIyBbwEMNAbIjIFvAQwtgjSCaeQQaGcgNJKA3wwCTxc8AAAAASUVORK5CYII="
+  ></image>
+</svg>`;
   headerTitle.textContent = "Tests";
   await hideSections();
   fadeInEffect(DOM.testsSection);
@@ -632,15 +647,30 @@ function renderPreviousTestCard() {
       "lg:gap-3",
       "icon-name-wrapper",
     );
-    const img = document.createElement("img");
-    img.src =
-      "https://ik.imagekit.io/yn9gz2n2g/others/test.png?updatedAt=1751607386764";
-    img.classList.add("h-[3rem]");
-    img.alt = "";
+    const icon = document.createElement("div");
+    icon.className =
+      "icon bg-primary flex h-[3rem] w-[3rem] items-center justify-center rounded-full";
+    icon.innerHTML = `  <svg
+  width="1.9rem"
+  height="2.47rem"
+  viewBox="0 0 20 26"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+>
+  <image
+    width="20"
+    height="26"
+    x="0"
+    y="0"
+    xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAdElEQVR4nO2TQQqAQAhFvVYdIjpJXbtbvDbtWiRqIyM+cDMoPviOSGMEOIHrqWP08p03W+QCLQuwapvDBcTYrxaQj7fo2TkEtNQT8NAClIgA5dGl/QL5W8BDDQGyIyBbwEMNAbIjIFvAQwtgjSCaeQQaGcgNJKA3wwCTxc8AAAAASUVORK5CYII="
+  ></image>
+</svg>`;
+    icon.alt = "";
     const testTitle = document.createElement("p");
     testTitle.classList.add("text-xl", "font-semibold");
     testTitle.textContent = title.charAt(0).toUpperCase() + title.slice(1);
-    iconNameWrapper.appendChild(img);
+    iconNameWrapper.appendChild(icon);
     iconNameWrapper.appendChild(testTitle);
     const resultLink = document.createElement("a");
     resultLink.href = resultUrl;

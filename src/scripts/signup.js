@@ -30,6 +30,7 @@ import {
   hideSections,
 } from "./index.js";
 import { showErrorSection } from "./error";
+import { initTheme, setLoaderProperties } from "./theme.js";
 import { showLoginSection } from "./login.js";
 import { trackSignup } from "./posthog.js";
 const DOM = {
@@ -202,7 +203,8 @@ DOM.classCodePopup.successBtn.addEventListener("click", async () => {
     showElement(DOM.classCodePopup.error);
     return;
   }
-
+  initTheme("default");
+  setLoaderProperties();
   userObj.division = decryptedData.division;
   userObj.semester = Number(
     decryptedData.semester.replace("semester", "").trim(),

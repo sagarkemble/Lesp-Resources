@@ -63,6 +63,7 @@ import {
   requestNotificationPermission,
   showStoredNotification,
 } from "./notification.js";
+import { initTheme, loadThemeOptions, showThemeUpdatePopup } from "./theme.js";
 export const lottieLoadingScreen = document.querySelector(
   ".lottie-loading-screen",
 );
@@ -143,9 +144,9 @@ export async function showSectionLoader(
 ) {
   if (!isBlur) {
     sectionLoader.classList.remove("bg-[#00000080]", "backdrop-blur-xs");
-    sectionLoader.classList.add("bg-surface");
+    sectionLoader.classList.add("bg-surface-1");
   } else {
-    sectionLoader.classList.remove("bg-surface");
+    sectionLoader.classList.remove("bg-surface-1");
     sectionLoader.classList.add("bg-[#00000080]", "backdrop-blur-xs");
   }
   sectionLoader.style.transitionDuration = `${duration}ms`;
@@ -191,6 +192,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       try {
         if (userCredential) {
           const user = await getUserData(userCredential.uid);
+          initTheme(user.theme);
           trackLoginUser(userCredential.uid, user.email);
           sentaryInit(user.email, `${user.firstName} ${user.lastName}`);
           if (user.role === "teacher") {
@@ -244,7 +246,10 @@ export async function initClass() {
     resetForm();
     requestNotificationPermission();
     showStoredNotification();
+    loadThemeOptions();
+
     initRouting();
+    showThemeUpdatePopup();
   } catch (error) {
     showErrorSection("Error initializing class:", error);
   }

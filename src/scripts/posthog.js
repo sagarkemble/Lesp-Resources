@@ -87,3 +87,11 @@ export function trackAllowNotification(description) {
     description,
   });
 }
+export function trackThemeChange(theme, semester, division) {
+  posthog.capture(`Changed theme to ${theme}`, {
+    type: "theme change",
+    theme,
+    semester,
+    division,
+  });
+}

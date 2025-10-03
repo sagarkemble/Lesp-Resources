@@ -16,7 +16,7 @@ import {
 } from "./index.js";
 import { initAdminRouting } from "./admin.js";
 import { deleteDriveFile, uploadDriveFile } from "./driveApi.js";
-import { headerIcon, headerTitle } from "./navigation.js";
+import { header, headerIcon, headerTitle } from "./navigation.js";
 import { pfpSelectionPopup } from "./avatars.js";
 import {
   app,
@@ -33,6 +33,8 @@ import { renderNoticeSlider as subjectRenderNoticeSlider } from "./subject.js";
 import { showErrorSection } from "./error.js";
 import { sendNotification, unsubscribeFCM } from "./notification.js";
 const dashboardSection = document.querySelector(".dashboard-section");
+const pfpElement = document.createElement("img");
+pfpElement.className = "h-full w-full";
 export const timeTablePopupSwiper = new Swiper("#time-table-popup-swiper", {
   direction: "horizontal",
   loop: true,
@@ -101,10 +103,7 @@ const DOM = {
       ),
     },
   },
-  themePopup: {
-    popup: document.querySelector(".theme-popup-wrapper"),
-    closeBtn: document.querySelector(".theme-popup-wrapper .close-popup-btn"),
-  },
+
   warningPopup: {
     popup: document.querySelector(".dashboard-section .warning-popup-wrapper"),
     successBtn: document.querySelector(
@@ -462,12 +461,17 @@ export async function loadDashboard() {
 }
 export async function showDashboard() {
   history.pushState({}, "", "/?dashboard=''");
+  console.log(appState.userData);
+
   if (window.innerWidth > 500)
     headerTitle.textContent = `Hello ${appState.userData.firstName}`;
   else headerTitle.textContent = `Hi ${appState.userData.firstName}`;
   await hideSections();
   await applyEditModeUI();
-  headerIcon.src = appState.userData.pfpLink;
+  pfpElement.src = appState.userData.pfpLink;
+  headerIcon.innerHTML = "";
+  headerIcon.classList.remove("bg-primary");
+  headerIcon.appendChild(pfpElement);
   if (window.innerWidth > 1024) hideElement(headerIcon);
   else showElement(headerIcon);
   await fadeInEffect(DOM.dashboardSection);
@@ -825,7 +829,7 @@ export function renderNoticeSlider() {
 
     const icon = document.createElement("div");
     icon.className =
-      "icon bg-surface flex h-[3rem] w-[3rem] items-center justify-center rounded-full shrink-0";
+      "icon bg-surface-1 flex h-[3rem] w-[3rem] items-center justify-center rounded-full shrink-0";
 
     const iconInner = document.createElement("i");
     iconInner.className = "ri-file-text-line text-2xl";
@@ -1580,28 +1584,13 @@ document.addEventListener("click", (e) => {
     (DOM.menuPopup.popup.classList.contains("hidden") &&
       e.target === DOM.navPfp) ||
     (DOM.menuPopup.popup.classList.contains("hidden") &&
-      e.target === headerIcon &&
+      e.target === pfpElement &&
       !DOM.dashboardSection.classList.contains("hidden"))
   ) {
     fadeInEffect(DOM.menuPopup.popup);
   } else fadeOutEffect(DOM.menuPopup.popup);
 });
-document.addEventListener("click", (e) => {
-  if (
-    DOM.themePopup.popup.classList.contains("hidden") &&
-    e.target === DOM.themeBtn
-  ) {
-    fadeInEffect(DOM.themePopup.popup);
-  } else if (window.innerWidth > 1024) fadeOutEffect(DOM.themePopup.popup);
-});
-DOM.smThemeBtn.addEventListener("click", async () => {
-  await fadeOutEffect(DOM.menuPopup.popup);
-  await fadeInEffect(DOM.themePopup.popup);
-});
-DOM.themePopup.closeBtn.addEventListener("click", async () => {
-  await fadeOutEffect(DOM.themePopup.popup);
-  await fadeInEffect(DOM.menuPopup.popup);
-});
+
 DOM.statsCard.card.addEventListener("click", async () => {
   history.pushState({}, "", "/?leaderboard=''");
   initRouting();

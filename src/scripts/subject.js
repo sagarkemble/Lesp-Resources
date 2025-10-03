@@ -234,9 +234,15 @@ const DOM = {
     ),
   },
 };
+const subjectIcon = document.createElement("img");
+subjectIcon.className = "h-full w-full";
+
 export async function loadSubjectSection() {
   try {
-    headerIcon.src = appState.subjectMetaData[appState.activeSubject].iconLink;
+    subjectIcon.src = appState.subjectMetaData[appState.activeSubject].iconLink;
+    headerIcon.innerHTML = "";
+    headerIcon.classList.remove("bg-primary");
+    headerIcon.appendChild(subjectIcon);
     headerTitle.textContent =
       appState.subjectMetaData[appState.activeSubject].name;
     await unloadSubjectSection();
@@ -289,7 +295,7 @@ export function renderNoticeSlider() {
 
     const icon = document.createElement("div");
     icon.className =
-      "icon bg-surface flex h-[3rem] w-[3rem] items-center justify-center rounded-full shrink-0";
+      "icon bg-surface-1 flex h-[3rem] w-[3rem] items-center justify-center rounded-full shrink-0";
 
     const iconInner = document.createElement("i");
     iconInner.className = "ri-file-text-line text-2xl";

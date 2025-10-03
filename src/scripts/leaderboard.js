@@ -203,8 +203,31 @@ async function unloadLeaderBoardSection() {
   DOM.leaderboardCardContainer.innerHTML = "";
 }
 export async function showLeaderboardSection() {
-  headerIcon.src =
-    "https://ik.imagekit.io/yn9gz2n2g/others/leaderboard.png?updatedAt=1751607436911";
+  headerIcon.classList.add("bg-primary");
+
+  headerIcon.innerHTML = `
+<svg width="31" height="30" viewBox="0 0 31 30" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<mask id="mask0_435_19623" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="31" height="30">
+<mask id="mask1_435_19623" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="31" height="30">
+<rect x="0.015625" width="30" height="30" fill="url(#pattern0_435_19623)"/>
+</mask>
+<g mask="url(#mask1_435_19623)">
+<rect x="-0.429688" y="-11.3535" width="31.7647" height="44.1177" class="fill-on-primary"/>
+</g>
+</mask>
+<g mask="url(#mask0_435_19623)">
+<rect x="0.015625" y="2" width="30" height="33" class="fill-on-primary"/>
+</g>
+<defs>
+<pattern id="pattern0_435_19623" patternContentUnits="objectBoundingBox" width="1" height="1">
+<use xlink:href="#image0_435_19623" transform="scale(0.01)"/>
+</pattern>
+<image id="image0_435_19623" width="100" height="100" preserveAspectRatio="none" xlink:href="data:image/png;base64,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"/>
+</defs>
+</svg>
+
+`;
+
   headerTitle.textContent = "Leaderboard";
   await hideSections();
   await fadeInEffect(leaderboarSection);

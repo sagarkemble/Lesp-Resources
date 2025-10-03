@@ -211,8 +211,27 @@ async function unloadSessionsSection() {
   DOM.previousSessions.cardContainer.innerHTML = "";
 }
 export async function showSessionsSection() {
-  headerIcon.src =
-    "https://ik.imagekit.io/yn9gz2n2g/others/session.png?updatedAt=1753970178886";
+  headerIcon.classList.add("bg-primary");
+
+  headerIcon.innerHTML = `
+  <svg width="26" height="18" viewBox="0 0 26 18" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<mask id="mask0_435_19595" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="26" height="18">
+<rect width="26" height="18" fill="url(#pattern0_435_19595)"/>
+</mask>
+<g mask="url(#mask0_435_19595)">
+<rect x="-2" width="28" height="18" class="fill-on-primary"/>
+</g>
+<defs>
+<pattern id="pattern0_435_19595" patternContentUnits="objectBoundingBox" width="1" height="1">
+<use xlink:href="#image0_435_19595" transform="matrix(0.0109571 0 0 0.0158269 -0.0280216 -0.302708)"/>
+</pattern>
+<image id="image0_435_19595" width="100" height="100" preserveAspectRatio="none" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAAAXNSR0IArs4c6QAABXdJREFUeAHtnUmIJFUQhtNdwdNI1/sjMtFWW4UW0ZMKnhTRgyt6E0XBBUXBi4wgo+N4EhFBcLkLrjf17uAGoogyNnrxIipeVBDcZUYn2qye7Jr3Xr3cujKLv6GozJcZkRHf//Jl5RadZfwjARIgARIgARIgARIgARIgARIgARIgARIgARIgARIgARIgARIgARIgga4InJDneeGcu0RVrxzQ5zIAq6urqyd3lehg/ViiqrpbRD4UkYMi8u/APwdU9Qnn3AWDhdoksDzPTwPwJIA/By5AsIOo6ttFUZzTJP9B2ajqVQB+HqsQ1bitQ6nqnYMCXCcYAPeLyD/VpJZk+pksy46pw2Lh64rIzSJyaEkE8A1lexYOOTWAPM8vAvDbEothAh1U1RtSmSx0PefcB3PE2ABwX57n5xZFccpCg53Z+Pr6+okicoaI3CYi78byAPBtF/EDuEZEPi478ScALp8Jq/msqt4YScJ61cNZlh3XfAs7a6mqt8T29jKfRkE5584E8OYsLwB/ADi/kdNZIxHZP7uByvxds+uPYd56rKr+Xclj65gC4Pssy46tk4eddAJ4DMDvPp/WpqpP1fHpXdfON0K/qgC86jUaSaOqPh6CZ1cbUtNwzl2rql+HfE3bVfWNVJ/B9Wz3njqc/bbjRdBwBAtWVlZOFZFfZvOyeTubn5dCOTy95bP3tXUiCIBHfc5F5MC8gMew3CAF8ns5FH85PO2NDU8+n50IIiIv+pyLyCuhgMfUDmBvIL/9vjzsgimArwI2W8ch3/JOBFHV1wPOn/cFPLY2VX3Al9/hk+AvqrlMJpOzACQPTz6fXQni3aVV9blqwGOdLi8F+Xr2huXUYHiyK94/UJCGPSImSN3hCcCnzrlLrbNSkO4FSb63A+BHEblneu5CQRqKYWaRPcQ3jM222YXWlwCsVEOgIFUaNaebCjIdnnyboyA+KoltdQUpb8w9GLt2R0ES4ftWqyGId3jy+aQgPiqJbSmCxIYn32YoiI9KYltMkJThybcZCuKjktgWEqS8UbUr0c221SjINhz1ZkKCiMjmmXo9b/+vTUGaUCttKEgLeH2YUpA+qLbwSUFawOvDlIL0QbWFTwrSAl4fphSkD6otfFKQFvD6MKUgfVBt4ZOCtIDXhykF6YNqC58UpAW8PkwpSB9UW/ikIC3g9WEaEoSX3/ugneAzJIg9V8UbVAkAu14lJsj0YTfewu2aesRfiiClMHzIIcKxs0U1BNl8SC5lGOMdwxby1BUkZRijIAsQJDaMUZB+BOHD1i24NjaNDFkbfB2hMdbmhjFBzOsQX9jhK21Zlg3plbYXpr8sqt8AXmveL4djGXpXXVXf8UVZdxirMuvkHUMR2VN1Wpnma9GRqg0VTlsv+XQiSKxwgKqe5+tFY2mbUzhg37w8FlI4IFZaw16Znhf0kJer6j5fT7Y2ABenxr6jpTUsKBtPQ4GLyN2pgQ9pPefcFaHiM8657+pWl0spPiMiz3bCQFWvjwhiJ1CPxF7x6iSIDp2IyK1zyjPtbrq5SHmmv/I8v7Cp36PsALwXEcUOXF9aVQQ7rnRRAOyoAFo0WAEzK2cL4HYA78fyAPCN9fYWm9s0LQuYfVTWQ/lcRK5u63ObvakrIr/GklmCZVaM7bptiQ955nAFoJuWvAimDb3j+hORe0MFzca8h6jq03UP5INRrjxb/WnMAkxjt0LKAO4YDNymgRRFsWvkpcYP2ZnzZDI5uymDQdqp6ukAHip/vSTfQ5j20J3+ds59ZtevOqsQOkhVjgR1fFEU+RD/XYXV7V1bWzvpSKicIgESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIIGhEfgPLHJnd4rEVIIAAAAASUVORK5CYII="/>
+</defs>
+</svg>
+
+
+  `;
+
   headerTitle.textContent = "Sessions";
   await hideSections();
   fadeInEffect(sessionsSection);

@@ -215,6 +215,11 @@ const DOM = {
     popup: document.querySelector(".edit-medal-popup-wrapper"),
   },
 };
+const headerImg = document.createElement("img");
+headerImg.className = "h-full w-full";
+headerImg.src =
+  "https://ik.imagekit.io/yn9gz2n2g/others/semester.png?updatedAt=1751607364675";
+
 export async function initAdminRouting(userData) {
   await showSectionLoader("Loading...", false);
   if (userData) {
@@ -248,8 +253,9 @@ async function showSemesterList() {
   await showSectionLoader("Loading...", false);
   await hideAdminDivisions();
   history.pushState({}, "", `?semesterList=''`);
-  headerIcon.src =
-    "https://ik.imagekit.io/yn9gz2n2g/others/semester.png?updatedAt=1751607364675";
+  headerIcon.innerHTML = "";
+  headerIcon.classList.remove("bg-primary");
+  headerIcon.appendChild(headerImg);
   headerTitle.textContent = "Admin Section";
   for (const key in adminAppState.semesterData) {
     const semesterName = key;
@@ -280,8 +286,9 @@ async function unloadSemesterList() {
 async function showDivisionList() {
   await showSectionLoader("Loading...", false);
   await hideAdminDivisions();
-  headerIcon.src =
-    "https://ik.imagekit.io/yn9gz2n2g/others/semester.png?updatedAt=1751607364675";
+  headerIcon.innerHTML = "";
+  headerIcon.classList.remove("bg-primary");
+  headerIcon.appendChild(headerImg);
   headerTitle.textContent = adminAppState.activeSem;
   for (const key in adminAppState.semesterData[adminAppState.activeSem]
     .divisionList) {
@@ -316,8 +323,9 @@ async function showClassRoom() {
   await showSectionLoader("Loading...", false);
   await hideAdminDivisions();
   showElement(DOM.visitClassRoomBtn);
-  headerIcon.src =
-    "https://ik.imagekit.io/yn9gz2n2g/others/semester.png?updatedAt=1751607364675";
+  headerIcon.innerHTML = "";
+  headerIcon.classList.remove("bg-primary");
+  headerIcon.appendChild(headerImg);
   headerTitle.textContent = adminAppState.activeDiv;
   const studentRawData = await getStudentRawData();
   let sortedRollNoWiseStudentData = {};
