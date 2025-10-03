@@ -152,6 +152,9 @@ export default defineConfig({
           },
         ],
       },
+      workbox: {
+        maximumFileSizeToCacheInBytes: 10000000,
+      },
       swSrc: "public/firebase-messaging-sw.js",
     }),
   ],
