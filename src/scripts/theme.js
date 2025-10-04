@@ -226,7 +226,6 @@ document.addEventListener("click", (e) => {
 
 // announcement popup
 export function showThemeUpdatePopup() {
-  console.log(appState.userData);
   if (appState.userData.popupData && appState.userData.popupData.themeUpdate)
     return;
   writeData("userData/" + appState.userId + "/popupData/themeUpdate", true);

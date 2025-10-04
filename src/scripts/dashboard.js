@@ -461,8 +461,6 @@ export async function loadDashboard() {
 }
 export async function showDashboard() {
   history.pushState({}, "", "/?dashboard=''");
-  console.log(appState.userData);
-
   if (window.innerWidth > 500)
     headerTitle.textContent = `Hello ${appState.userData.firstName}`;
   else headerTitle.textContent = `Hi ${appState.userData.firstName}`;
@@ -1733,7 +1731,6 @@ DOM.sendNotification.successBtn.addEventListener("click", async () => {
   if (hasError) return;
   showSectionLoader("Sending notification...");
   fadeOutEffect(DOM.sendNotification.popup);
-  console.log("Notification sent:", { title, description, type });
 
   sendNotification(title, description, type);
   hideSectionLoader();
