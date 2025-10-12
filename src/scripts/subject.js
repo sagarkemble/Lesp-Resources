@@ -1090,7 +1090,7 @@ function renderResources() {
         link.classList.add("hidden");
       } else
         card.className =
-          "card p-4 w-full text-center bg-surface-2 rounded-[1.25rem]";
+          "card p-4 w-full text-center bg-surface-2 rounded-[1.25rem] custom-hover";
 
       card.textContent = item.name.charAt(0).toUpperCase() + item.name.slice(1);
       link.appendChild(card);
