@@ -1,9 +1,9 @@
 import posthog from "posthog-js";
 
-// posthog.init("phc_3kfgkf3DWYBNyPopj8wCwBiGBsjHTLslCYrcAPxR6lo", {
-//   api_host: "https://us.i.posthog.com",
-//   person_profiles: "identified_only",
-// });
+posthog.init("phc_3kfgkf3DWYBNyPopj8wCwBiGBsjHTLslCYrcAPxR6lo", {
+  api_host: "https://us.i.posthog.com",
+  person_profiles: "identified_only",
+});
 export function trackLoginUser(uid, userEmail) {
   posthog.identify(uid, { email: userEmail });
 }

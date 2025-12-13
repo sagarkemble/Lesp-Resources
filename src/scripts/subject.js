@@ -894,30 +894,34 @@ DOM.itemPopup.successBtn.addEventListener("click", async () => {
   hideSectionLoader();
 });
 DOM.itemPopup.editTools.unhideBtn.addEventListener("click", async () => {
-  const title =
-    `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList/${selectedCategoryId}/itemList/${selectedItemId}`
-      .name;
-  let confirm = await showConfirmationPopup(
-    "Are you sure you want to unhide this item?",
-  );
-  if (!confirm) return;
-  showSectionLoader("Unhiding item...");
-  await updateData(
-    `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList/${selectedCategoryId}/itemList/${selectedItemId}`,
-    { isVisible: true },
-  );
-  await showSectionLoader("Syncing data...");
-  await fadeOutEffect(DOM.itemPopup.popup);
-  await syncDbData();
-  trackEditEvent(
-    appState.activeSem,
-    appState.activeDiv,
-    appState.activeSubject,
-    "Unhide item:" + title,
-  );
-  resetAddItemPopup();
-  await loadSubjectSection();
-  hideSectionLoader();
+  try {
+    const title =
+      `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList/${selectedCategoryId}/itemList/${selectedItemId}`
+        .name;
+    let confirm = await showConfirmationPopup(
+      "Are you sure you want to unhide this item?",
+    );
+    if (!confirm) return;
+    showSectionLoader("Unhiding item...");
+    await updateData(
+      `semesterList/${appState.activeSem}/divisionList/${appState.activeDiv}/subjectList/${appState.activeSubject}/containerList/${selectedCategoryId}/itemList/${selectedItemId}`,
+      { isVisible: true },
+    );
+    await showSectionLoader("Syncing data...");
+    await fadeOutEffect(DOM.itemPopup.popup);
+    await syncDbData();
+    trackEditEvent(
+      appState.activeSem,
+      appState.activeDiv,
+      appState.activeSubject,
+      "Unhide item:" + title,
+    );
+    resetAddItemPopup();
+    await loadSubjectSection();
+    hideSectionLoader();
+  } catch (err) {
+    showErrorSection("Error unhiding item", err);
+  }
 });
 DOM.itemPopup.editTools.hideBtn.addEventListener("click", async () => {
   const title =

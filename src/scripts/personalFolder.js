@@ -200,7 +200,7 @@ DOM.categoryPopup.successBtn.addEventListener("click", async () => {
     trackEditEvent(
       appState.activeSem,
       appState.activeDiv,
-      appState.activeSubject,
+      "Personal folder",
       "Edited category name to:" + title,
     );
   } else {
@@ -211,7 +211,7 @@ DOM.categoryPopup.successBtn.addEventListener("click", async () => {
     trackCreateEvent(
       appState.activeSem,
       appState.activeDiv,
-      appState.activeSubject,
+      "Personal folder",
       "Added category:" + title,
     );
   }
@@ -260,7 +260,7 @@ async function deleteCategory() {
   trackDeleteEvent(
     appState.activeSem,
     appState.activeDiv,
-    appState.activeSubject,
+    "Personal folder",
     "Deleted category:" + data.metaData.name,
   );
   await showSectionLoader("Syncing data...");
@@ -477,14 +477,14 @@ DOM.itemPopup.successBtn.addEventListener("click", async () => {
       trackEditEvent(
         appState.activeSem,
         appState.activeDiv,
-        appState.activeSubject,
+        "Personal folder",
         "Updated item:" + title,
       ),
     );
     trackEditEvent(
       appState.activeSem,
       appState.activeDiv,
-      appState.activeSubject,
+      "Personal folder",
       "Updated item:" + title,
     );
   } else {
@@ -508,7 +508,7 @@ DOM.itemPopup.successBtn.addEventListener("click", async () => {
     trackCreateEvent(
       appState.activeSem,
       appState.activeDiv,
-      appState.activeSubject,
+      "Personal folder",
       "Added item:" + title,
     );
   }
@@ -538,7 +538,7 @@ DOM.itemPopup.editTools.unhideBtn.addEventListener("click", async () => {
   trackEditEvent(
     appState.activeSem,
     appState.activeDiv,
-    appState.activeSubject,
+    "Personal folder",
     "Unhide item:" + title,
   );
   resetAddItemPopup();
@@ -563,7 +563,7 @@ DOM.itemPopup.editTools.hideBtn.addEventListener("click", async () => {
   trackEditEvent(
     appState.activeSem,
     appState.activeDiv,
-    appState.activeSubject,
+    "Personal folder",
     "Hide item:" + title,
   );
 
@@ -614,7 +614,7 @@ DOM.itemPopup.editTools.deleteBtn.addEventListener("click", async () => {
   trackDeleteEvent(
     appState.activeSem,
     appState.activeDiv,
-    appState.activeSubject,
+    "Personal folder",
     "Deleted item:" + name,
   );
   await syncDbData();

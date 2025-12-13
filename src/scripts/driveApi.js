@@ -134,7 +134,7 @@ export async function uploadDriveFile(file, path) {
       fileId: uploadResult.id,
     };
   } catch (err) {
-    console.error("Error uploading file:", err);
+    showErrorSection("Error uploading file to Drive:", err);
     return null;
   }
 }

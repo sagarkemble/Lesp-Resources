@@ -54,7 +54,6 @@ function isRunningAsPWA() {
   return window.matchMedia("(display-mode: standalone)").matches;
 }
 export async function handleAppFlow() {
-  return;
   if (isRunningAsPWA()) {
     return;
   }
