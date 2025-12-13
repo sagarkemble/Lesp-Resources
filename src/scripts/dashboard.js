@@ -851,7 +851,8 @@ export function renderNoticeSlider() {
     const diffInMinutes = (now - createdAt) / (1000 * 60);
     if (diffInMinutes <= 1440) {
       const tag = document.createElement("p");
-      tag.className = "bg-primary px-2 py-1 w-fit rounded-xl text-xs";
+      tag.className =
+        "bg-primary text-on-primary px-2 py-1 w-fit rounded-xl text-xs";
       tag.textContent = "New";
       topWrapper.appendChild(tag);
     }
