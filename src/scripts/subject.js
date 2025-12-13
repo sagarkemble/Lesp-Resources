@@ -682,11 +682,7 @@ function editCategory() {
   isCategoryEditing = true;
   DOM.categoryPopup.successBtn.textContent = "Edit";
   DOM.categoryPopup.popupTitle.textContent = "Edit Category";
-  sendNotification(
-    "Category Edited",
-    "category edited",
-    appState.userData.class,
-  );
+
   fadeInEffect(DOM.categoryPopup.popup);
 }
 async function toggleCategoryVisibility() {

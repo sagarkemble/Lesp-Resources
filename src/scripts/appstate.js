@@ -40,6 +40,8 @@ export async function initAppState(userData, semester, division) {
     appState.activeSubject = null;
     appState.activeNavIcon = null;
     appState.subjectMetaData = appState.divisionData.subjectMetaDataList;
+    appState.personalFolder = userData.personalFolder || {};
+    appState.role = userData.role || "student";
   } catch (error) {
     showErrorSection("Error initializing app state:", error);
   }
@@ -102,6 +104,20 @@ function getDivisionData(semester, division) {
       return null;
     });
 }
+function getPersonalFolderData(userId) {
+  return get(child(ref(db), `userData/${userId}/personalFolder`))
+    .then((snapshot) => {
+      if (snapshot.exists()) {
+        return snapshot.val();
+      } else {
+        return null;
+      }
+    })
+    .catch((error) => {
+      showErrorSection("Error fetching division data:", error);
+      return null;
+    });
+}
 export function getWholeSemesterData() {
   return get(child(ref(db), `semesterList`))
     .then((snapshot) => {
@@ -124,6 +140,7 @@ export async function syncDbData() {
   );
   appState.globalData = await getGlobalData();
   appState.subjectData = appState.divisionData.subjectList;
+  appState.personalFolder = await getPersonalFolderData(appState.userId);
 }
 export async function syncAdminData() {
   adminAppState.semesterData = await getWholeSemesterData();

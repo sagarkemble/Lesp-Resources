@@ -295,6 +295,25 @@
             />
           </svg>
         </span>
+        <span
+          class="icon-wrapper personal-folder-icon z-40 hidden h-4 -translate-y-1 transform cursor-pointer lg:flex lg:h-[2.1rem] lg:translate-y-0"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-folder-icon lucide-folder h-full w-full"
+          >
+            <path
+              d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"
+            />
+          </svg>
+        </span>
         <div
           class="slider bg-nav-selector lg:bg-surface-2 lg:border-nav-selector absolute bottom-3 left-0 z-10 h-1 w-6 translate-x-0 transform rounded-lg transition-all duration-100 lg:bottom-auto lg:h-12 lg:w-full lg:rounded-none lg:border-r-4"
         ></div>
@@ -359,6 +378,11 @@
           class="header-title hidden w-full items-center truncate text-2xl font-semibold"
         ></p>
         <button class="button-hug edit-mode-toggle-btn ml-auto hidden shrink-0">
+          Edit
+        </button>
+        <button
+          class="button-hug personal-folder-edit-mode-toggle-btn ml-auto hidden shrink-0"
+        >
           Edit
         </button>
         <div class="admin-btn-wrapper ml-auto flex hidden gap-2">
@@ -660,6 +684,16 @@
                 <i class="fa-solid fa-user"></i>
               </div>
               Account details
+            </div>
+            <div
+              class="personal-folder-btn wrapper just custom-hover flex cursor-pointer items-center gap-3"
+            >
+              <div
+                class="personal-folder text-text-tertiary flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-r text-center text-lg"
+              >
+                <i class="fa-solid fa-folder"></i>
+              </div>
+              Personal Folder
             </div>
             <div
               class="switch-class-btn-wrapper custom-hover flex hidden cursor-pointer items-center gap-3"
@@ -3836,6 +3870,165 @@
         ></div>
       </section>
 
+      <!-- personal folder section  -->
+      <section
+        class="personal-folder-page-section flex hidden min-h-full w-full flex-col gap-4 pb-2 transition-all duration-200 lg:min-h-0 lg:gap-5 lg:pb-0"
+      >
+        <!-- warning popup -->
+        <div
+          class="warning-popup-wrapper fixed top-0 left-0 z-60 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-100"
+        >
+          <div
+            class="warning-popup bg-surface-2 flex h-fit max-h-[90vh] max-w-[18.75rem] flex-col items-center justify-center gap-4 overflow-y-auto rounded-3xl p-6 lg:gap-5"
+          >
+            <p class="message text-white">
+              only 1 can be uploaded link or the attachment
+            </p>
+            <button class="button-fill success-btn">Okay</button>
+          </div>
+        </div>
+        <!-- add category popup -->
+        <div
+          class="add-category-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
+        >
+          <div
+            class="popup bg-surface-2 relative flex w-full max-w-[18.75rem] flex-col gap-4 rounded-3xl p-6"
+          >
+            <div class="wrapper flex w-full items-center justify-between">
+              <p class="popup-title text-2xl font-semibold">Add Category</p>
+              <i
+                class="fa-solid fa-xmark close-popup-btn cursor-pointer text-xl"
+              ></i>
+            </div>
+            <div class="title-input-wrapper flex flex-col gap-1">
+              <label
+                class="text-text-primary px-1"
+                for="personal-folder-category-title-input"
+                >Title</label
+              >
+              <input
+                type="text"
+                autocomplete="off"
+                maxlength="21"
+                class="title-input custom-input"
+                id="personal-folder-category-title-input"
+              />
+              <p class="title-error text-text-error hidden px-1 text-sm"></p>
+            </div>
+            <button class="button-fill success-btn" type="button">
+              Create
+            </button>
+          </div>
+        </div>
+        <!-- Add item Popup -->
+        <div
+          class="add-item-popup-wrapper fixed top-0 left-0 z-40 flex hidden h-full w-full items-center justify-center bg-[#00000080] p-4 backdrop-blur-xs transition-all duration-200"
+        >
+          <div
+            class="popup bg-surface-2 relative flex max-h-[90vh] w-full max-w-[18.75rem] flex-col gap-4 overflow-y-auto rounded-3xl p-6"
+          >
+            <div class="wrapper flex w-full items-center justify-between">
+              <p class="popup-title text-2xl font-semibold">Add item</p>
+              <i class="fa-solid fa-xmark close-popup-btn text-xl"></i>
+            </div>
+            <div class="wrapper edit-tools flex hidden items-center gap-2">
+              <div
+                class="wrapper delete-icon border-text-error text-text-error flex w-fit cursor-pointer items-center gap-2 rounded-lg border px-3 py-1"
+              >
+                <i class="fa-solid fa-trash"></i>
+                <p class="text-sm">Delete</p>
+              </div>
+              <div
+                class="wrapper unhide-icon border-text-primary flex hidden w-fit cursor-pointer items-center gap-2 rounded-lg border px-3 py-1"
+              >
+                <i class="fa-regular fa-eye"></i>
+                <p class="text-sm">Unhide</p>
+              </div>
+              <div
+                class="wrapper hide-icon border-text-primary flex hidden w-fit cursor-pointer items-center gap-2 rounded-lg border px-3 py-1"
+              >
+                <i class="fa-regular fa-eye-slash"></i>
+                <p class="text-sm">Hide</p>
+              </div>
+            </div>
+            <div class="title-input-wrapper flex flex-col gap-1">
+              <label
+                class="text-text-primary px-1"
+                for="personal-folder-item-title-input"
+                >Name</label
+              >
+              <input
+                type="text"
+                autocomplete="off"
+                id="personal-folder-item-title-input"
+                maxlength="13"
+                class="title-input custom-input"
+              />
+              <p class="title-error text-text-error hidden px-1 text-sm"></p>
+            </div>
+            <div class="link-input-wrapper flex flex-col gap-1">
+              <label
+                class="text-text-primary link-input-label px-1"
+                for="personal-folder-item-link-input"
+                >Link
+              </label>
+              <input
+                type="text"
+                autocomplete="off"
+                id="personal-folder-item-link-input"
+                class="link-input custom-input"
+              />
+              <p class="link-error text-text-error hidden px-1 text-sm"></p>
+            </div>
+            <div class="or-line flex w-full items-center gap-2 text-center">
+              <div class="line bg-surface-4 h-0.5 w-full"></div>
+              <p class="text-sm">or</p>
+              <div class="line bg-surface-4 h-0.5 w-full"></div>
+            </div>
+            <div
+              class="item-file-input-wrapper flex cursor-pointer flex-col gap-1"
+            >
+              <label class="px-1" for="personal-folder-item-file-input"
+                >Answer Key</label
+              >
+              <div
+                class="item-file-attachment-container bg-surface-3 border-surface-4 flex justify-center gap-2 rounded-3xl border-2 py-6"
+              >
+                <div class="wrapper upload-icon transition-all duration-100">
+                  <i
+                    class="fa-solid fa-arrow-up-from-bracket text-xl font-thin"
+                  ></i>
+                </div>
+                <span class="upload-text">Upload File</span>
+                <input
+                  type="file"
+                  class="hidden"
+                  id="personal-folder-item-file-input"
+                />
+              </div>
+              <p class="item-file-error error-text-style hidden">
+                File required
+              </p>
+            </div>
+            <button class="button-fill success-btn" type="button">
+              Create
+            </button>
+            <button
+              class="button-fill change-attachment-btn hidden"
+              type="button"
+            >
+              Change attachment
+            </button>
+          </div>
+        </div>
+        <button
+          class="button-hug editor-tool add-category-container-btn hidden"
+          type="button"
+        >
+          Add Container
+        </button>
+      </section>
+
       <!-- admin section -->
       <section
         class="admin-section flex hidden h-full w-full flex-col items-center justify-center gap-4 transition-all duration-200"
@@ -3960,7 +4153,11 @@
               <label class="text-text-primary px-1" for="student-role-input"
                 >Role</label
               >
-              <select name="role" class="custom-select" id="student-role-input">
+              <select
+                name="role"
+                class="custom-select role-input"
+                id="student-role-input"
+              >
                 <option value="student">Student</option>
                 <option value="editor">Editor</option>
               </select>
@@ -4277,7 +4474,7 @@
     <script src="src/scripts/tests.js" type="module"></script>
     <script src="src/scripts/sessions.js" type="module"></script>
     <script src="src/scripts/theme.js" type="module"></script>
-
+    <script src="src/scripts/personalFolder.js" type="module"></script>
     <script src="src/scripts/leaderboard.js" type="module"></script>
     <script src="src/scripts/index.js" type="module"></script>
     <script src="src/scripts/pwa.js" type="module"></script>

@@ -57,6 +57,9 @@ export const sessionsIcon = document.querySelector(".sessions-icon");
 export const timeTableIcon = document.querySelector(".timetable-icon");
 export const testsIcon = document.querySelector(".tests-icon");
 const timetablePopup = document.querySelector(".time-table-popup-wrapper");
+export const personalFolderIcon = document.querySelector(
+  ".personal-folder-icon",
+);
 dashboardIcon.addEventListener("click", (e) => {
   history.pushState({}, "", "/?dashboard=''");
   initRouting();
@@ -76,6 +79,10 @@ timeTableIcon.addEventListener("click", async () => {
 });
 testsIcon.addEventListener("click", () => {
   history.pushState({}, "", '?tests=""');
+  initRouting();
+});
+personalFolderIcon.addEventListener("click", () => {
+  history.pushState({}, "", '?personal-folder=""');
   initRouting();
 });
 export function loadSubjectSelectionList() {

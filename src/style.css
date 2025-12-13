@@ -308,7 +308,8 @@ input[type="time"]:valid::-webkit-datetime-edit {
 .timetable-icon,
 .leaderboard-icon,
 .tests-icon,
-.sessions-icon {
+.sessions-icon,
+.personal-folder-icon {
   stroke: var(--color-on-nav);
   transition: all 0.2s ease;
 }
@@ -318,7 +319,8 @@ input[type="time"]:valid::-webkit-datetime-edit {
 .timetable-icon:active,
 .leaderboard-icon:active,
 .tests-icon:active,
-.sessions-icon:active {
+.sessions-icon:active,
+.personal-folder-icon:active {
   filter: brightness(1.4);
 }
 
@@ -539,7 +541,8 @@ input[type="time"]:valid::-webkit-datetime-edit {
   .timetable-icon:hover,
   .leaderboard-icon:hover,
   .tests-icon:hover,
-  .sessions-icon:hover {
+  .sessions-icon:hover,
+  .personal-folder-icon:hover {
     filter: brightness(1.2);
   }
 }
@@ -569,7 +572,8 @@ input[type="time"]:valid::-webkit-datetime-edit {
   .timetable-icon,
   .leaderboard-icon,
   .tests-icon,
-  .sessions-icon {
+  .sessions-icon,
+  .personal-folder-icon {
     stroke: var(--color-text-secondary);
     transition: all 0.2s ease;
   }

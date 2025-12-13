@@ -18,6 +18,7 @@ import {
   localUserData,
   initClass,
   lottieLoadingScreen,
+  hideSections,
 } from "./index";
 import {
   fadeInEffect,
@@ -34,7 +35,6 @@ import {
 } from "./appstate";
 import { unsubscribeFCM } from "./notification.js";
 import { headerIcon, headerTitle } from "./navigation";
-import { hideSections } from "./index";
 import { showErrorSection } from "./error.js";
 const adminSection = document.querySelector(".admin-section");
 let activeUserId = null;
@@ -52,6 +52,9 @@ const DOM = {
   addTeacherBtn: document.querySelector(".class-room .add-teacher-btn"),
   logOutBtn: document.querySelector(".admin-logout-btn"),
   editBtn: document.querySelector(".edit-mode-toggle-btn"),
+  personalFolderEditBtn: document.querySelector(
+    ".personal-folder-edit-mode-toggle-btn",
+  ),
   visitClassRoomBtn: document.querySelector(".visit-class-room-btn"),
   adminBtnWrapper: document.querySelector(".admin-btn-wrapper"),
   addUserPopup: {
@@ -172,10 +175,10 @@ const DOM = {
     popup: document.querySelector(".edit-sem-div-popup-wrapper"),
     inputs: {
       semester: document.querySelector(
-        ".edit-sem-div-popup-wrapper .semester-input",
+        ".edit-sem-div-popup-wrapper #student-semester-input",
       ),
       division: document.querySelector(
-        ".edit-sem-div-popup-wrapper .division-input",
+        ".edit-sem-div-popup-wrapper #student-division-input",
       ),
     },
     errors: {
@@ -231,10 +234,14 @@ export async function initAdminRouting(userData) {
   showElement(adminSection);
   showElement(DOM.adminBtnWrapper);
   hideElement(DOM.editBtn);
+  hideElement(DOM.personalFolderEditBtn);
+  DOM.personalFolderEditBtn.textContent = "Edit";
+  appState.isEditing = false;
   const urlParams = new URLSearchParams(window.location.search);
   const semesterList = urlParams.get("semesterList");
   const sem = urlParams.get("sem");
   const div = urlParams.get("div");
+
   if (div) {
     adminAppState.activeSem = sem;
     adminAppState.activeDiv = div;
@@ -551,13 +558,16 @@ async function addTeacherInClass(teacherId) {
 }
 async function deleteUser(uid) {
   try {
-    const response = await fetch("http://localhost:3000/delete-user", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await fetch(
+      "https://lesp-resources-backend.vercel.app/delete-user",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ uid }),
       },
-      body: JSON.stringify({ uid }),
-    });
+    );
 
     const data = await response.json();
     if (response.ok && data.success) {
@@ -915,8 +925,9 @@ DOM.individualUserPopup.sem.addEventListener("click", () => {
   fadeInEffect(DOM.semDivPopup.popup);
 });
 DOM.individualUserPopup.div.addEventListener("click", () => {
-  DOM.semDivPopup.inputs.semester.value = activeUserObj.semester;
-  DOM.semDivPopup.inputs.division.value = activeUserObj.division;
+  const [sem, div] = activeUserObj.class.split("");
+  DOM.semDivPopup.inputs.semester.value = sem;
+  DOM.semDivPopup.inputs.division.value = div;
   fadeInEffect(DOM.semDivPopup.popup);
 });
 DOM.semDivPopup.closePopupBtn.addEventListener("click", () => {

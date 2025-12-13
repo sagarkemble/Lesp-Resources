@@ -223,15 +223,3 @@ document.addEventListener("click", (e) => {
     fadeInEffect(DOM.popup);
   }
 });
-
-// announcement popup
-export function showThemeUpdatePopup() {
-  if (appState.userData.popupData && appState.userData.popupData.themeUpdate)
-    return;
-  writeData("userData/" + appState.userId + "/popupData/themeUpdate", true);
-  fadeInEffect(DOM.updatePopup.popup);
-}
-DOM.updatePopup.successBtn.addEventListener("click", async () => {
-  await fadeOutEffect(DOM.updatePopup.popup);
-  fadeInEffect(DOM.popup);
-});

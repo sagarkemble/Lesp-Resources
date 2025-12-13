@@ -339,6 +339,9 @@ const DOM = {
     accountDetailsBtn: document.querySelector(
       ".menu-popup-wrapper .account-details-btn",
     ),
+    personalFolderBtn: document.querySelector(
+      ".menu-popup-wrapper .personal-folder-btn",
+    ),
     switchClassBtn: document.querySelector(
       ".menu-popup-wrapper .switch-class-btn-wrapper",
     ),
@@ -1561,6 +1564,10 @@ DOM.menuPopup.logoutBtn.addEventListener("click", async () => {
 DOM.menuPopup.accountDetailsBtn.addEventListener("click", async () => {
   await fadeOutEffect(DOM.menuPopup.popup);
   await fadeInEffect(DOM.accountDetailsPopup.popup);
+});
+DOM.menuPopup.personalFolderBtn.addEventListener("click", async () => {
+  history.pushState({}, "", '?personal-folder=""');
+  initRouting();
 });
 DOM.menuPopup.closePopupBtn.addEventListener("click", async () => {
   fadeOutEffect(DOM.menuPopup.popup);

@@ -29,6 +29,7 @@ import {
   testsIcon,
   sideBar,
   subjectSelectorPopup,
+  personalFolderIcon,
 } from "./navigation.js";
 import { loadSubjectSection } from "./subject.js";
 import {
@@ -63,19 +64,25 @@ import {
   requestNotificationPermission,
   showStoredNotification,
 } from "./notification.js";
-import { initTheme, loadThemeOptions, showThemeUpdatePopup } from "./theme.js";
+import { initTheme, loadThemeOptions } from "./theme.js";
+import { loadPersonalFolderSection } from "./personalFolder.js";
 export const lottieLoadingScreen = document.querySelector(
   ".lottie-loading-screen",
 );
 const lottieLoader = document.querySelector("#lottie-loader");
 const sectionLoader = document.querySelector(".task-loader-wrapper");
 const sectionLoaderMessage = sectionLoader.querySelector(".loader-status");
-const editModeToggleButton = document.querySelector(".edit-mode-toggle-btn");
+export const editModeToggleButton = document.querySelector(
+  ".edit-mode-toggle-btn",
+);
 const confirmationPopup = document.querySelector(".confirmation-popup-wrapper");
 const confirmationDescription = confirmationPopup.querySelector(".description");
 const confirmationTitle = confirmationPopup.querySelector(".title");
 const confirmButton = confirmationPopup.querySelector(".confirm-btn");
 const cancelButton = confirmationPopup.querySelector(".cancel-btn");
+const personalFolderEditModeToggleButton = document.querySelector(
+  ".personal-folder-edit-mode-toggle-btn",
+);
 let authStateInitialized = false;
 export let localUserData = {
   userData: undefined,
@@ -249,7 +256,6 @@ export async function initClass() {
     loadThemeOptions();
 
     initRouting();
-    showThemeUpdatePopup();
   } catch (error) {
     showErrorSection("Error initializing class:", error);
   }
@@ -262,6 +268,8 @@ export async function initRouting() {
   const tests = params.get("tests");
   const pyq = params.get("pyq");
   const sessions = params.get("sessions");
+  const personalFolder = params.get("personal-folder");
+  hideElement(personalFolderEditModeToggleButton);
   if (window.location.href.includes("login")) {
     await hideSections(false, false, false, false);
     trackPage(appState.activeSem, appState.activeDiv, "Login");
@@ -296,6 +304,15 @@ export async function initRouting() {
     await fadeOutEffect(lottieLoadingScreen);
     trackPage(appState.activeSem, appState.activeDiv, "Sessions");
     showSessionsSection();
+  } else if (personalFolder) {
+    if (window.innerWidth >= 1024) {
+      setActiveNavIcon(personalFolderIcon);
+    } else {
+      setActiveNavIcon(dashboardIcon);
+    }
+    await fadeOutEffect(lottieLoadingScreen);
+    // trackPage(appState.activeSem, appState.activeDiv, "Sessions");
+    await loadPersonalFolderSection();
   } else if (pyq) {
     await fadeOutEffect(lottieLoadingScreen);
     trackPage(
