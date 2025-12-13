@@ -311,7 +311,7 @@ export async function initRouting() {
       setActiveNavIcon(dashboardIcon);
     }
     await fadeOutEffect(lottieLoadingScreen);
-    // trackPage(appState.activeSem, appState.activeDiv, "Sessions");
+    trackPage(appState.activeSem, appState.activeDiv, "Personal Folder");
     await loadPersonalFolderSection();
   } else if (pyq) {
     await fadeOutEffect(lottieLoadingScreen);
