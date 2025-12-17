@@ -11,7 +11,6 @@ import {
   hideSections,
   showSectionLoader,
   hideSectionLoader,
-  applyEditModeUI,
   showConfirmationPopup,
 } from "./index.js";
 import { headerIcon, headerTitle } from "./navigation.js";
@@ -161,9 +160,54 @@ async function unloadPersonalFolderSection() {
     showElement(editModeToggleButton);
   }
 }
+
+// edit state function
+let personalFolderIsEditing = false;
+async function applyEditModeUI() {
+  const editorTool = DOM.personalFolderSection.querySelectorAll(".editor-tool");
+  const editorOnlyContent = DOM.personalFolderSection.querySelectorAll(
+    ".editor-only-content",
+  );
+  const editorOnlyContentCard = DOM.personalFolderSection.querySelectorAll(
+    ".editor-only-content-card",
+  );
+  const editorMousePointer = DOM.personalFolderSection.querySelectorAll(
+    ".editor-hover-pointer",
+  );
+  if (personalFolderIsEditing) {
+    editorOnlyContent.forEach((content) => showElement(content));
+    editorMousePointer.forEach((element) => {
+      element.style.cursor = "pointer";
+    });
+    editorOnlyContentCard.forEach((card) => {
+      const wrapper = card.closest("a");
+      if (wrapper?.classList.contains("hidden")) {
+        showElement(wrapper);
+      }
+      showElement(card);
+      if (card.classList.contains("visiblity-hidden")) {
+        card.style.opacity = "0.5";
+      }
+    });
+    editorTool.forEach(async (tool) => showElement(tool));
+    editModeToggleButton.textContent = "Exit editing";
+  } else {
+    editorOnlyContent.forEach((content) => hideElement(content));
+    editorMousePointer.forEach((element) => {
+      element.style.cursor = "default";
+    });
+    editorOnlyContentCard.forEach((card) => {
+      hideElement(card);
+      const wrapper = card.closest("a");
+      if (wrapper) hideElement(wrapper);
+    });
+    editorTool.forEach((tool) => hideElement(tool));
+    editModeToggleButton.textContent = "Edit";
+  }
+}
 DOM.editorBtn.editBtn.addEventListener("click", () => {
-  appState.isEditing = !appState.isEditing;
-  if (appState.isEditing) {
+  personalFolderIsEditing = !personalFolderIsEditing;
+  if (personalFolderIsEditing) {
     DOM.editorBtn.editBtn.textContent = "Exit mode";
     applyEditModeUI();
   } else {
@@ -723,7 +767,7 @@ function renderResources() {
 
       // listner
       card.addEventListener("click", (e) => {
-        if (appState.isEditing) {
+        if (personalFolderIsEditing) {
           e.preventDefault();
           editItem(
             itemId,
