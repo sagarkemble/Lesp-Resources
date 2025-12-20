@@ -218,6 +218,7 @@ async function clearNotifications() {
   });
 }
 export async function showStoredNotification() {
+  await FcmTopicMigrate();
   const notifications = await getNotifications();
   if (!notifications || notifications.length === 0) return;
   console.log("Retrieved notifications:", notifications);
@@ -339,5 +340,71 @@ export async function subscribe() {
     }).then(() => {
       isSubscribe.subscribe = false;
     });
+  }
+}
+
+export async function FcmTopicMigrate() {
+  const hasMigrated = localStorage.getItem("fcmTopicMigrated");
+
+  if (!token) {
+    token = await getToken(messaging, {
+      vapidKey:
+        "BP2FM9upp84r_zB6MSRn4OWOgiUt5qUzjEP0z863cBbQF7O7OypOL3Cc-rwcb6QVpqbpSC5L67tfoUn3jg7jlyQ",
+    });
+  }
+
+  const userRole = appState.userData.role;
+  const userClass = appState.userData.class;
+
+  if (userRole !== "student" && userRole !== "editor") {
+    console.log("Not a student/editor, no migration needed");
+    return;
+  }
+
+  let oldTopics = [];
+  let newTopics = [];
+
+  if (userClass === "6A") {
+    oldTopics = ["5A", "semester5"];
+    newTopics = ["6A", "semester6"];
+  } else if (userClass === "6B") {
+    oldTopics = ["5B", "semester5"];
+    newTopics = ["6B", "semester6"];
+  } else {
+    return;
+  }
+  if (hasMigrated === "true") {
+    console.log("FCM topic migration already done");
+    return;
+  }
+
+  try {
+    await fetch("https://lesp-resources-backend.vercel.app/unsubscribe", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        token: token.trim(),
+        topics: oldTopics,
+      }),
+    });
+
+    await fetch("https://lesp-resources-backend.vercel.app/subscribe", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        token: token.trim(),
+        topics: newTopics,
+      }),
+    });
+
+    subscribedTopics = subscribedTopics.filter(
+      (topic) => !oldTopics.includes(topic),
+    );
+    subscribedTopics.push(...newTopics);
+    console.log(subscribedTopics);
+    console.log("FCM topic migration completed successfully");
+    localStorage.setItem("fcmTopicMigrated", "true");
+  } catch (error) {
+    console.error("FCM topic migration failed:", error);
   }
 }
