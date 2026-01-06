@@ -4,6 +4,7 @@ import {
   fadeInEffectOpacity,
   fadeOutEffect,
 } from "./animation.js";
+import { trackTimeTable } from "./posthog.js";
 import { timeTablePopupSwiper } from "./dashboard.js";
 const sideBarContent = document.querySelector(".side-bar-content");
 import { appState } from "./appstate.js";
@@ -76,6 +77,11 @@ timeTableIcon.addEventListener("click", async () => {
   await fadeInEffect(timetablePopup);
   timeTablePopupSwiper.slideTo(0, 0);
   timeTablePopupSwiper.update();
+  trackTimeTable(
+    appState.currentSemester,
+    appState.currentDivision,
+    "Opened timetable",
+  );
 });
 testsIcon.addEventListener("click", () => {
   history.pushState({}, "", '?tests=""');

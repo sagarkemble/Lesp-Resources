@@ -95,3 +95,11 @@ export function trackThemeChange(theme, semester, division) {
     division,
   });
 }
+export function trackTimeTable(semester, division, description) {
+  posthog.capture(`Event: ${description}`, {
+    type: "timetable",
+    semester,
+    division,
+    description,
+  });
+}
