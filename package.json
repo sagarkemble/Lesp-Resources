@@ -23,7 +23,7 @@
     "google-auth-library": "^10.3.0",
     "googleapis": "^150.0.1",
     "lottie-web": "^5.13.0",
-    "posthog-js": "^1.260.1",
+    "posthog-js": "^1.336.1",
     "tailwindcss": "^4.1.11",
     "workbox-precaching": "^7.3.0"
   }
