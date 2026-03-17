@@ -1,9 +1,0 @@
-{
-  "redirects": [
-    {
-      "source": "/(.*)",
-      "destination": "https://lespresources.in/$1",
-      "permanent": true
-    }
-  ]
-}
